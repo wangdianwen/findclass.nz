@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # DynamoDB Local (single table design)
+  dynamodb-local:
+    image: amazon/dynamodb-local:2.0.0
+    container_name: findclass-dynamodb
+    ports:
+      - '8000:8000'
+    command: [-jar, DynamoDBLocal.jar, -sharedDb]
+    volumes:
+      - dynamodb-data:/home/dynamodb
+    networks:
+      - findclass-network
+
+  # LocalStack for AWS services simulation
+  localstack:
+    image: localstack/localstack:3.0
+    container_name: findclass-localstack
+    ports:
+      - '4566:4566'
+    environment:
+      - SERVICES=dynamodb,s3,ses,sqs
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - localstack-data:/tmp/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - findclass-network
+
+  # Backend API server
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: findclass-api
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+      - AWS_REGION=ap-southeast-2
+      - DYNAMODB_ENDPOINT=http://dynamodb-local:8000
+      - DYNAMODB_TABLE_NAME=FindClass-MainTable
+      - LOCALSTACK_ENDPOINT=http://localstack:4566
+    depends_on:
+      - dynamodb-local
+      - localstack
+    networks:
+      - findclass-network
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/tests:/app/tests
+      - ./backend/package.json:/app/package.json
+
+  # Frontend development server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: findclass-frontend
+    ports:
+      - '5173:5173'
+    environment:
+      - VITE_API_URL=http://localhost:3000/api/v1
+    networks:
+      - findclass-network
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/index.html:/app/index.html
+
+networks:
+  findclass-network:
+    driver: bridge
+
+volumes:
+  dynamodb-data:
+  localstack-data:
