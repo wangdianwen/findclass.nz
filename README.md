@@ -12,6 +12,25 @@ A comprehensive course search and management platform built with TypeScript, fea
 - **Frontend**: React 19 + TypeScript + Ant Design 6 + React Query
 - **Documentation**: Architecture and product documentation
 
+## Quick Start
+
+### Docker (Recommended)
+
+```bash
+# Start all services
+docker-compose up -d
+```
+
+### Manual Setup
+
+```bash
+# Backend (port 3000)
+cd backend && npm install && npm run dev
+
+# Frontend (port 5173)
+cd frontend && npm install && npm run dev
+```
+
 ## Project Structure
 
 ```
@@ -19,96 +38,63 @@ findclass.nz/
 ├── backend/           # Backend API service
 ├── frontend/          # React frontend application
 ├── docs-architecture/ # Technical architecture documentation
-├── docs-product/      # Product documentation
 └── docker-compose.yml # Development environment
 ```
 
-## Getting Started
+## Documentation
 
-### Prerequisites
-
-- Node.js 18+
-- Docker & Docker Compose
-- npm or pnpm
-
-### Installation
-
-```bash
-# Install dependencies for all workspaces
-npm install
-
-# Or with pnpm
-pnpm install
-```
-
-### Development
-
-```bash
-# Run backend development server (port 3000)
-npm run dev:backend
-
-# Run frontend development server (port 5173)
-npm run dev:frontend
-
-# Run both concurrently (requires concurrently or similar)
-npm run dev:backend & npm run dev:frontend
-```
-
-### Testing
-
-```bash
-# Run backend tests
-cd backend && npm run test:unit
-
-# Run frontend tests
-cd frontend && npm run test:unit
-
-# Run all tests
-npm run test:backend && npm run test:frontend
-```
-
-### Building
-
-```bash
-# Build backend
-npm run build:backend
-
-# Build frontend
-npm run build:frontend
-```
-
-### Docker Development
-
-```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-```
+| Guide | Description |
+|-------|------------|
+| [Backend Guide](backend/README.md) | Express.js, DynamoDB, JWT Auth |
+| [Frontend Guide](frontend/README.md) | React 19, Vite, Storybook |
+| [CLAUDE.md](CLAUDE.md) | Claude Code development guidelines |
 
 ## Tech Stack
 
-### Backend
-- Runtime: Node.js 18+
-- Framework: Express.js 5
-- Language: TypeScript 5
-- Database: DynamoDB (local with Docker)
-- Testing: Vitest
-- AWS Services: DynamoDB, Lambda, S3, SES, SQS
+### Frontend (`frontend/`)
+
+| Category | Technology |
+|----------|------------|
+| Framework | React 19 + TypeScript |
+| Build | Vite |
+| UI Library | Ant Design 6 + Ant Design Mobile |
+| State | Zustand (global) + TanStack Query (server) |
+| Routing | React Router 7 |
+| Testing | Storybook + Playwright |
+| i18n | react-i18next |
+
+### Backend (`backend/`)
+
+| Category | Technology |
+|----------|------------|
+| Framework | Express.js 5 + TypeScript |
+| Database | DynamoDB (single-table design) |
+| Auth | JWT + bcrypt |
+| Cloud | AWS SDK (Lambda, S3, SES, SQS) |
+
+## Commands
 
 ### Frontend
-- Framework: React 19
-- Language: TypeScript
-- UI Library: Ant Design 6
-- State Management: Zustand, React Query
-- Internationalization: i18next (EN/ZH)
-- Testing: Vitest, Playwright
-- Build Tool: Vite
+
+```bash
+npm run dev       # Development server (port 5173)
+npm run storybook # Storybook UI (port 6006)
+npm run build     # Production build
+npm run test      # Run tests
+npm run lint      # ESLint check
+npm run format    # Prettier format
+```
+
+### Backend
+
+```bash
+npm run dev       # Development server (port 3000)
+npm run build     # TypeScript build + OpenAPI docs
+npm run test      # Run tests
+npm run lint      # ESLint check
+npm run format    # Prettier format
+```
 
 ## License
 
-UNLICENSED
+MIT
