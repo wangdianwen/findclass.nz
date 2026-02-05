@@ -1,24 +1,32 @@
 version: 2
 updates:
+  # NPM dependencies for backend
   - package-ecosystem: "npm"
-    directory: "/"
+    directory: "/backend"
     schedule:
-      interval: "monthly"
-      day: "1"
-      time: "03:00"
-    open-pull-requests-limit: 10
+      interval: "weekly"
     labels:
       - "dependencies"
       - "npm"
     commit-message:
       prefix: "chore(deps)"
 
+  # NPM dependencies for frontend
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "chore(deps)"
+
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
-      day: "1"
-      time: "03:00"
     labels:
       - "dependencies"
       - "github-actions"
