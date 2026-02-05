@@ -1,0 +1,11 @@
+{{title}}
+{{description}}
+
+Your verification code: {{code}}
+
+This code will expire in {{expiresInMinutes}} minutes.
+
+If you didn't request this code, please ignore this email.
+
+---
+FindClass NZ - Your trusted class search platform

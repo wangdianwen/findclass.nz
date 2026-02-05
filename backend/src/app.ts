@@ -1,0 +1,163 @@
+/**
+ * Express Application
+ * Main Express app configuration
+ */
+
+import express, { Application, Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+import crypto from 'crypto';
+import { getConfig } from './config';
+import { logger, logStream } from './core/logger';
+import { AppError, ErrorCode } from './core/errors';
+import { createErrorResponse } from './shared/types/api';
+import { AuthenticatedRequest } from './shared/middleware/auth';
+
+// Import routes
+import { authRoutes } from './modules/auth/routes';
+import { userRoutes } from './modules/users/routes';
+import { courseRoutes } from './modules/courses/routes';
+import { teacherRoutes } from './modules/teachers/routes';
+import { healthRoutes } from './modules/health/routes';
+import { NodeEnv } from './config/env-schema';
+
+// Create Express application
+export function createApp(): Application {
+  const app = express();
+  const config = getConfig();
+
+  // Security middleware
+  app.use(helmet());
+
+  // CORS configuration
+  app.use(
+    cors({
+      origin: config.cors.origin,
+      methods: config.cors.methods.split(','),
+      credentials: config.cors.credentials,
+    })
+  );
+
+  // Body parsing
+  app.use(express.json({ limit: '1mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
+  // Request logging
+  if (config.env !== 'ut') {
+    app.use(morgan('combined', { stream: logStream }));
+  }
+
+  // Rate limiting - General API (disabled in test)
+  const generalLimiter = rateLimit({
+    windowMs: config.rateLimit.windowMs,
+    max: config.rateLimit.maxRequests,
+    message: {
+      success: false,
+      code: ErrorCode.RATE_LIMIT_EXCEEDED,
+      message: 'Too many requests, please try again later.',
+      meta: {
+        requestId: '',
+        timestamp: new Date().toISOString(),
+      },
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: req => req.ip || 'unknown',
+  });
+
+  // Stricter rate limiting for auth endpoints (disabled in test)
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // 10 attempts per window
+    message: {
+      success: false,
+      code: ErrorCode.RATE_LIMIT_EXCEEDED,
+      message: 'Too many authentication attempts, please try again later.',
+      meta: {
+        requestId: '',
+        timestamp: new Date().toISOString(),
+      },
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: req => req.ip || 'unknown',
+  });
+
+  // Disable rate limiting in test environments
+  const isTestEnv = config.env === NodeEnv.Test;
+  if (!isTestEnv) {
+    app.use('/api', generalLimiter);
+    app.use(`/api/${config.apiVersion}/auth`, authLimiter);
+  }
+
+  // Request ID middleware - Use cryptographically secure UUID
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const requestId = req.headers['x-request-id'] || crypto.randomUUID();
+    res.setHeader('X-Request-ID', requestId);
+    req.headers['x-request-id'] = requestId as string;
+    next();
+  });
+
+  // Health check route (no rate limit)
+  app.use('/health', healthRoutes);
+
+  // API routes
+  app.use(`/api/${config.apiVersion}/auth`, authRoutes);
+  app.use(`/api/${config.apiVersion}/users`, userRoutes);
+  app.use(`/api/${config.apiVersion}/courses`, courseRoutes);
+  app.use(`/api/${config.apiVersion}/teachers`, teacherRoutes);
+
+  // 404 handler
+  app.use((req: Request, res: Response) => {
+    res
+      .status(404)
+      .json(
+        createErrorResponse(
+          404,
+          'The requested resource was not found',
+          undefined,
+          req.headers['x-request-id'] as string
+        )
+      );
+  });
+
+  // Global error handler
+  app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
+    const errorMsg = err.message;
+    const errorStack = err.stack;
+
+    logger.error('Unhandled error', {
+      error: errorMsg,
+      stack: config.env === 'development' ? errorStack : undefined,
+      path: req.path,
+      method: req.method,
+      requestId: req.headers['x-request-id'],
+      userId: (req as AuthenticatedRequest).user?.userId,
+    });
+
+    const requestId = req.headers['x-request-id'] as string;
+
+    if (err instanceof AppError) {
+      res
+        .status(err.statusCode)
+        .json(createErrorResponse(err.code, err.message, err.details, requestId));
+    } else {
+      const statusCode = 500;
+      const message = config.env === 'production' ? 'An unexpected error occurred' : err.message;
+
+      const errorResponse = createErrorResponse(
+        ErrorCode.INTERNAL_ERROR,
+        message,
+        undefined,
+        requestId
+      );
+      res.status(statusCode).json(errorResponse);
+    }
+  });
+
+  return app;
+}
+
+export default createApp;

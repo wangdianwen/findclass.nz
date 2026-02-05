@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+.git/
+.gitignore
+*.log
+coverage/
+.eslintcache
+*.tsbuildinfo
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+~*
