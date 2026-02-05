@@ -1,0 +1,5 @@
+packages:
+  - 'backend'
+  - 'frontend'
+  - 'docs-architecture'
+  - 'docs-product'
