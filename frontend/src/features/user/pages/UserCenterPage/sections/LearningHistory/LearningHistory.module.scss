@@ -1,0 +1,48 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.historySection {
+  .filterSection {
+    margin-bottom: $spacing-6;
+    padding-bottom: $spacing-4;
+    border-bottom: 1px solid $color-border-light;
+
+    .filterLabel {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: $color-text-secondary;
+      margin-bottom: $spacing-2;
+      display: block;
+    }
+
+    .filterButtons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-2;
+    }
+  }
+
+  .historyList {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-3;
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-12 $spacing-6;
+
+  .emptyTitle {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+    margin: 0 0 $spacing-2 0;
+  }
+
+  .emptyDesc {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    margin: 0;
+  }
+}

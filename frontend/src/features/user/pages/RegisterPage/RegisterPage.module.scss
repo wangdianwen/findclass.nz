@@ -1,0 +1,91 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-5;
+
+  @include mobile {
+    gap: $spacing-4;
+  }
+}
+
+.formItem {
+  // Ant Design form item styling
+}
+
+.verificationRow {
+  display: flex;
+  gap: $spacing-3;
+
+  .verificationInput {
+    flex: 1;
+  }
+
+  .getCodeButton {
+    width: 120px;
+    flex-shrink: 0;
+
+    @include mobile {
+      width: 100px;
+    }
+  }
+}
+
+.submitButton {
+  height: 48px;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  margin-top: $spacing-2;
+
+  @include mobile {
+    height: 44px;
+    font-size: $font-size-base;
+  }
+}
+
+// Terms
+.terms {
+  text-align: center;
+  margin-bottom: $spacing-4;
+
+  .termsText {
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+    line-height: 1.6;
+  }
+
+  .termsLink {
+    color: $color-primary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Links row
+.linksRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.loginLink {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  text-decoration: none;
+  font-weight: $font-weight-medium;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.dividerText {
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+}

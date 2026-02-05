@@ -1,0 +1,87 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.successPage {
+  background: $color-bg-primary;
+  border-radius: $radius-lg;
+  padding: $spacing-8;
+  box-shadow: $shadow-sm;
+}
+
+.quickActions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  max-width: 300px;
+  margin: 0 auto $spacing-8;
+}
+
+.gettingStarted {
+  margin-top: $spacing-8;
+  padding-top: $spacing-6;
+  border-top: 1px solid $color-border-light;
+}
+
+.sectionTitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-4;
+  text-align: center;
+}
+
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-8;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-4;
+  }
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.stepNumber {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: $color-primary;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+}
+
+.stepText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.help {
+  margin-top: $spacing-8;
+  padding-top: $spacing-6;
+  border-top: 1px solid $color-border-light;
+  text-align: center;
+
+  p {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-2;
+  }
+}
+
+.helpLinks {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-4;
+}

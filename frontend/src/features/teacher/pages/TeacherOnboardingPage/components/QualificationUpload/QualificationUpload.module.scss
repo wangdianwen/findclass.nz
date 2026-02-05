@@ -1,0 +1,109 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.uploadSection {
+  margin-bottom: $spacing-6;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-2;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-6;
+}
+
+.uploadCard {
+  border: 2px dashed $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-6;
+  margin-bottom: $spacing-4;
+  background: $color-bg-secondary;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: $color-primary;
+    background: rgba($color-primary, 0.02);
+  }
+
+  &.uploading {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+}
+
+.uploadContent {
+  text-align: center;
+  padding: $spacing-4;
+}
+
+.uploadIcon {
+  font-size: 40px;
+  color: $color-text-muted;
+  margin-bottom: $spacing-3;
+}
+
+.uploadText {
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-1;
+}
+
+.uploadHint {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-3;
+}
+
+.requiredHint {
+  font-size: $font-size-sm;
+  color: $color-error;
+  margin-bottom: $spacing-2;
+}
+
+.uploadPrompt {
+  margin-bottom: 0;
+}
+
+.fileList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-3 $spacing-4;
+  background: $color-bg-primary;
+  border-radius: $radius-md;
+  border: 1px solid $color-border-light;
+}
+
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.fileIcon {
+  font-size: 24px;
+  color: $color-primary;
+}
+
+.fileName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.fileActions {
+  display: flex;
+  gap: $spacing-2;
+}

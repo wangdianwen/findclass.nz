@@ -1,0 +1,64 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.statusPage {
+  background: $color-bg-primary;
+  border-radius: $radius-lg;
+  padding: $spacing-8;
+}
+
+.statusSection {
+  text-align: center;
+  padding: $spacing-6;
+}
+
+.statusIcon {
+  font-size: 64px;
+  margin-bottom: $spacing-4;
+
+  &.pending {
+    color: $color-warning;
+  }
+
+  &.approved {
+    color: $color-success;
+  }
+
+  &.rejected {
+    color: $color-error;
+  }
+}
+
+.statusTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-2;
+}
+
+.statusDescription {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-4;
+}
+
+.timeline {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: $spacing-2;
+}
+
+.timelineSection {
+  margin-top: $spacing-8;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.actions {
+  margin-top: $spacing-6;
+
+  &:empty {
+    margin-top: 0;
+  }
+}

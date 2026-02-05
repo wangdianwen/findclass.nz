@@ -1,0 +1,458 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.teacherDashboardPage {
+  min-height: 100vh;
+  background: $color-bg-secondary;
+  display: flex;
+  flex-direction: column;
+}
+
+.headerSpacer {
+  height: $size-header-height;
+
+  @include tablet {
+    height: $size-header-height-tablet;
+  }
+
+  @include mobile {
+    height: $size-header-height-mobile;
+  }
+}
+
+.footerSpacer {
+  height: $size-footer-height;
+
+  @include tablet {
+    height: $size-footer-height-tablet;
+  }
+
+  @include mobile {
+    height: $size-footer-height-mobile;
+  }
+}
+
+// Page Header
+.pageHeader {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-6 $spacing-6 0;
+  width: 100%;
+  box-sizing: border-box;
+
+  @include mobile {
+    padding: $spacing-4 $spacing-4 0;
+  }
+
+  .pageTitle {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    margin: 0 0 $spacing-2 0;
+  }
+
+  .pageSubtitle {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+}
+
+// Stats Section
+.statsSection {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-4 $spacing-6;
+  width: 100%;
+  box-sizing: border-box;
+
+  @include mobile {
+    padding: $spacing-4 $spacing-5;
+  }
+}
+
+.statsWrapper {
+  width: 100%;
+}
+
+.mainContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-6;
+  width: 100%;
+  box-sizing: border-box;
+
+  @include mobile {
+    padding: $spacing-4;
+  }
+
+  .dashboardTabs {
+    :global(.ant-tabs-nav) {
+      margin: 0;
+      padding: 0 $spacing-4;
+      background: $color-bg-primary;
+      border-bottom: 1px solid $color-border;
+      border-radius: $radius-lg $radius-lg 0 0;
+
+      @include mobile {
+        padding: 0 $spacing-3;
+      }
+
+      &::before {
+        display: none;
+      }
+    }
+
+    :global(.ant-tabs-tab) {
+      padding: $spacing-3 $spacing-4;
+      margin: 0;
+      font-size: $font-size-sm;
+
+      @include mobile {
+        padding: $spacing-3 $spacing-2;
+        font-size: $font-size-xs;
+      }
+    }
+
+    :global(.ant-tabs-tab-active .ant-tabs-tab-btn) {
+      color: $color-primary;
+      font-weight: $font-weight-medium;
+    }
+
+    :global(.ant-tabs-ink-bar) {
+      background: $color-primary;
+    }
+
+    :global(.ant-tabs-content-holder) {
+      background: $color-bg-primary;
+      border-radius: 0 0 $radius-lg $radius-lg;
+    }
+
+    :global(.ant-tabs-content) {
+      margin-top: 0;
+    }
+  }
+}
+
+// Stats Grid
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-4;
+  width: 100%;
+  padding: 0 $spacing-6;
+  box-sizing: border-box;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-3;
+    padding: 0 $spacing-4;
+  }
+
+  .statCard {
+    background: $color-bg-primary;
+    border-radius: $radius-lg;
+    border: 1px solid $color-border;
+    padding: $spacing-5 $spacing-4;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all $transition-base;
+    margin-left: $spacing-1;
+    margin-right: $spacing-1;
+
+    @include mobile {
+      padding: $spacing-4 $spacing-3;
+      margin-left: $spacing-1;
+      margin-right: $spacing-1;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--accent-color);
+    }
+
+    .statIcon {
+      font-size: 28px;
+      color: var(--accent-color);
+      margin-bottom: $spacing-3;
+
+      @include mobile {
+        font-size: 24px;
+        margin-bottom: $spacing-2;
+      }
+    }
+
+    .statValue {
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-bold;
+      color: $color-text-primary;
+      margin-bottom: $spacing-1;
+
+      @include mobile {
+        font-size: $font-size-xl;
+      }
+    }
+
+    .statLabel {
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+
+      @include mobile {
+        font-size: $font-size-xs;
+      }
+    }
+  }
+
+  // Warning state for stat card when limit reached
+  .statCardWarning {
+    border-color: $color-warning;
+
+    &::before {
+      background: $color-warning;
+    }
+
+    .statIcon {
+      color: $color-warning;
+    }
+  }
+}
+
+// Warning icon inside stat card
+.warningIcon {
+  position: absolute;
+  top: $spacing-3;
+  right: $spacing-3;
+  color: $color-warning;
+  font-size: 18px;
+
+  @include mobile {
+    top: $spacing-2;
+    right: $spacing-2;
+    font-size: 16px;
+  }
+}
+
+// Published courses limit warning message
+.limitWarning {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-3 $spacing-4;
+  background: rgba(250, 173, 20, 0.1);
+  border: 1px solid $color-warning;
+  border-radius: $radius-md;
+  color: $color-warning;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  :global(.anticon) {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+}
+
+// Section Container
+.sectionContainer {
+  background: $color-bg-primary;
+  border-radius: $radius-lg;
+  border: 1px solid $color-border;
+  padding: $spacing-6;
+
+  @include mobile {
+    padding: $spacing-4;
+  }
+
+  .sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-5;
+
+    @include mobile {
+      flex-direction: column;
+      gap: $spacing-3;
+      align-items: flex-start;
+    }
+
+    h3 {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $color-text-primary;
+      margin: 0;
+    }
+  }
+}
+
+// Course Title Cell
+.courseTitleCell {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+
+  .courseThumbnail {
+    width: 48px;
+    height: 36px;
+    border-radius: $radius-sm;
+    object-fit: cover;
+  }
+}
+
+// Student Cell
+.studentCell {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+
+  .studentAvatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: $color-primary;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.desensitized {
+  font-family: monospace;
+  color: $color-text-tertiary;
+}
+
+// Action Buttons
+.actionButtons {
+  display: flex;
+  gap: $spacing-2;
+}
+
+// Empty State
+.emptyState {
+  padding: $spacing-8 0;
+}
+
+// Overview Content
+.overviewContent {
+  .quickActions {
+    margin-top: $spacing-8;
+
+    h3 {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $color-text-primary;
+      margin: 0 0 $spacing-4 0;
+    }
+
+    .actionGrid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-3;
+    }
+  }
+}
+
+// Revenue Overview
+.revenueOverview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-4;
+  margin-bottom: $spacing-6;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+
+  .revenueCard {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+    border-radius: $radius-lg;
+    padding: $spacing-5;
+    color: white;
+    text-align: center;
+
+    .revenueLabel {
+      display: block;
+      font-size: $font-size-sm;
+      opacity: 0.9;
+      margin-bottom: $spacing-2;
+    }
+
+    .revenueValue {
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-bold;
+    }
+  }
+}
+
+.revenueNotes {
+  background: $color-bg-secondary;
+  border-radius: $radius-md;
+  padding: $spacing-4;
+
+  .noteTitle {
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+    margin: 0 0 $spacing-2 0;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: $spacing-5;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+
+    li {
+      margin-bottom: $spacing-1;
+    }
+  }
+}
+
+// Content Area for Courses Tab
+.contentArea {
+  padding: $spacing-4 $spacing-6;
+
+  @include mobile {
+    padding: $spacing-4;
+  }
+}
+
+// Modal Content
+.modalContent {
+  :global(.ant-modal-body) {
+    padding: $spacing-6;
+  }
+}
+
+.courseDescription {
+  line-height: 1.6;
+  color: $color-text-primary;
+
+  p {
+    margin-bottom: $spacing-2;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul,
+  ol {
+    margin: $spacing-2 0;
+    padding-left: $spacing-6;
+  }
+
+  strong {
+    font-weight: $font-weight-semibold;
+  }
+}

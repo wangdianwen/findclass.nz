@@ -1,0 +1,49 @@
+{
+  "helpCentre": "Help Centre",
+  "description": "Find answers to frequently asked questions or contact our support team for assistance.",
+
+  "faqTitle": "Frequently Asked Questions",
+
+  "faq.search.q": "How do I search for courses?",
+  "faq.search.a": "You can use the search bar on our homepage to search for courses by keyword, subject, or location. We also offer advanced filters to help you narrow down results by grade level, price range, teaching language, and more.",
+
+  "faq.contact.q": "How can I contact a tutor?",
+  "faq.contact.a": "Once you find a course you're interested in, you can contact the tutor directly through our platform. Click on the course detail page and use the 'Contact Tutor' button to send a message. Tutors typically respond within 24-48 hours.",
+
+  "faq.booking.q": "How do I contact a tutor for a trial class?",
+  "faq.booking.a": "FindClass.nz is a course discovery platform. You can contact tutors directly through our platform to discuss class arrangements. Once you've agreed on the details with the tutor, you'll handle payments and scheduling directly with them. We recommend communicating clearly about expectations before starting any class.",
+
+  "faq.payment.q": "How do payments work on FindClass.nz?",
+  "faq.payment.a": "FindClass.nz is a free platform for students - you don't pay anything to use our search and contact features. For course payments, you'll arrange directly with the tutor or institution. We recommend discussing payment methods (bank transfer, cash, etc.) and scheduling with your tutor before starting classes.",
+
+  "faq.refund.q": "What if I need to cancel or reschedule a class?",
+  "faq.refund.a": "As a discovery platform, FindClass.nz doesn't handle payments or refunds. Please communicate directly with your tutor or institution about cancellation and rescheduling policies. We recommend confirming these arrangements before your first class.",
+
+  "faq.report.q": "How do I report incorrect course information?",
+  "faq.report.a": "If you notice any outdated or incorrect information on a course listing, please use the 'Report' button on the course page or contact us directly. We appreciate your help in maintaining accurate course information.",
+
+  "faq.becomeTutor.q": "How can I become a tutor on FindClass.nz?",
+  "faq.becomeTutor.a": "To become a tutor on our platform, click 'Join as Tutor' in the navigation menu and fill out the application form. You'll need to provide your teaching qualifications and relevant experience. Our team will review your application within 1-3 business days. Currently, we only support individual tutors - institution registration is coming soon!",
+
+  "faq.privacy.q": "How is my personal information protected?",
+  "faq.privacy.a": "We take your privacy seriously. All personal information is encrypted and stored securely. We never share your contact details with third parties without your consent. Please read our Privacy Policy for more details.",
+
+  "quickLinks": "Quick Links",
+
+  "links.searchCourses": "Search Courses",
+  "links.searchCoursesDesc": "Browse our database of quality courses",
+
+  "links.findTutors": "Find Tutors",
+  "links.findTutorsDesc": "Connect with verified individual tutors",
+
+  "links.institutions": "For Institutions",
+  "links.institutionsDesc": "Institution registration coming soon!",
+
+  "links.privacy": "Privacy Policy",
+  "links.privacyDesc": "How we protect your data",
+
+  "contactTitle": "Still Need Help?",
+  "contactDesc": "Can't find what you're looking for? Get in touch with our support team.",
+
+  "contactLink": "Contact Us →"
+}

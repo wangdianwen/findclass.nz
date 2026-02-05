@@ -1,0 +1,180 @@
+{
+  "title": "我的课程",
+  "pageTitle": "课程管理",
+  "subtitle": "管理您的课程并跟踪表现",
+  "activeCoursesHint": "您最多可以创建 {{count}} 个已发布的活跃课程。",
+  "activeCoursesLimitReached": "您已达到 {{count}} 个活跃课程的上限。请暂停或删除一些课程后再创建新课程。",
+
+  "stats": {
+    "totalCourses": "课程总数",
+    "publishedCourses": "已发布",
+    "draftCourses": "草稿",
+    "pausedCourses": "已暂停",
+    "totalStudents": "学员总数",
+    "totalLessons": "总课时数",
+    "avgRating": "平均评分",
+    "publishLimitHint": "最多可发布 {{count}} 门课程"
+  },
+
+  "filters": {
+    "all": "全部",
+    "published": "已发布",
+    "draft": "草稿",
+    "paused": "已暂停",
+    "searchPlaceholder": "搜索课程..."
+  },
+
+  "table": {
+    "courseName": "课程名称",
+    "title": "课程标题",
+    "subject": "科目",
+    "grade": "年级",
+    "price": "价格",
+    "students": "学员",
+    "status": "状态",
+    "createdAt": "创建时间",
+    "actions": "操作"
+  },
+
+  "status": {
+    "published": "已发布",
+    "draft": "草稿",
+    "paused": "已暂停"
+  },
+
+  "actions": {
+    "create": "创建课程",
+    "edit": "编辑",
+    "preview": "预览",
+    "more": "更多",
+    "publish": "发布",
+    "pause": "暂停",
+    "delete": "删除",
+    "deleteConfirm": "确定要删除这门课程吗？",
+    "confirm": "确认",
+    "cancel": "取消"
+  },
+
+  "empty": {
+    "title": "还没有课程",
+    "description": "创建第一门课程开始授课吧",
+    "action": "创建课程"
+  },
+
+  "form": {
+    "createTitle": "创建课程",
+    "editTitle": "编辑课程",
+    "basicInfo": "基本信息",
+    "courseDetails": "课程详情",
+    "pricing": "价格设置",
+    "schedule": "时间安排",
+    "media": "封面图片",
+
+    "title": "课程标题",
+    "titlePlaceholder": "请输入课程标题",
+    "subtitle": "副标题",
+    "subtitlePlaceholder": "简短描述（选填）",
+
+    "subject": "教学科目",
+    "grade": "适合年级",
+    "teachingMode": "授课方式",
+    "city": "授课城市",
+    "region": "授课区域",
+    "address": "具体地址",
+    "lessonCount": "总课时数",
+    "price": "课程价格",
+    "description": "课程简介",
+    "descriptionPlaceholder": "详细介绍您的课程，包括授课时间、教学方式等...",
+    "language": "授课语言",
+    "coverImage": "课程封面",
+    "coverImageUpload": "上传封面",
+    "coverImageRequired": "请至少上传一张封面图片",
+    "coverImageMaxHint": "最多上传 {{count}} 张图片，支持 JPG/PNG 格式",
+    "showAddress": "显示地址",
+    "showAddressTooltip": "在课程详情页面显示具体地址。如关闭，将仅显示城市。",
+
+    "titleRequired": "请输入课程标题",
+    "titleTooShort": "标题至少5个字符",
+    "titleTooLong": "标题不能超过100个字符",
+    "subjectRequired": "请选择教学科目",
+    "gradeRequired": "请选择适合年级",
+    "languageRequired": "请选择授课语言",
+    "priceRequired": "请输入课程价格",
+    "teachingModeRequired": "请选择授课方式",
+    "descriptionRequired": "请输入课程简介",
+    "descriptionTooShort": "简介至少20个字符",
+    "descriptionTooLong": "简介不能超过5000个字符",
+    "lessonCountRequired": "请输入总课时数",
+    "cityRequired": "请选择授课城市",
+    "regionRequired": "请选择授课区域",
+    "addressRequired": "请输入具体地址",
+    "addressPlaceholder": "输入详细地址（如街道名称、门牌号等）",
+
+    "lessons": "课时",
+    "pricePlaceholder": "输入价格",
+    "languagePlaceholder": "选择授课语言",
+    "teachingModePlaceholder": "选择授课方式",
+    "cityPlaceholder": "选择城市",
+    "regionPlaceholder": "输入区域",
+    "lessonCountPlaceholder": "输入课时数",
+    "subjectPlaceholder": "选择科目",
+    "gradePlaceholder": "选择年级",
+
+    "saveDraft": "保存草稿",
+    "publish": "发布课程",
+    "cancel": "取消"
+  },
+
+  "messages": {
+    "createSuccess": "课程创建成功",
+    "updateSuccess": "课程更新成功",
+    "deleteSuccess": "课程删除成功",
+    "publishSuccess": "课程发布成功",
+    "pauseSuccess": "课程已暂停",
+    "error": "操作失败，请重试"
+  },
+
+  "evidence": {
+    "maxSize": "最大文件大小：{{size}}",
+    "upload": "上传文件",
+    "uploadSuccess": "图片上传成功"
+  },
+
+  "subject": {
+    "chinese": "语文/中文",
+    "math": "数学",
+    "english": "英语",
+    "physics": "物理",
+    "chemistry": "化学",
+    "biology": "生物",
+    "science": "科学",
+    "geography": "地理",
+    "history": "历史",
+    "civics": "政治/思想品德",
+    "music": "音乐",
+    "art": "美术/艺术",
+    "pe": "体育/健康",
+    "it": "信息技术/计算机",
+    "other": "其他"
+  },
+
+  "grade": {
+    "preschool": "幼儿园",
+    "primaryLow": "小学 (1-3年级)",
+    "primaryHigh": "小学 (4-6年级)",
+    "middleSchool": "初中",
+    "highSchool": "高中",
+    "adult": "成人"
+  },
+
+  "teachingMode": {
+    "online": "线上",
+    "offline": "线下",
+    "both": "线上线下均可"
+  },
+
+  "language": {
+    "chinese": "中文授课",
+    "english": "英文授课"
+  }
+}

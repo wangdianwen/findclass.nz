@@ -1,0 +1,175 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.contactPage {
+  min-height: 100vh;
+  background: $color-bg-primary;
+}
+
+.breadcrumb {
+  max-width: $size-content-max-width;
+  margin: 0 auto;
+  padding: $spacing-6 $spacing-6 $spacing-4;
+
+  @include tablet {
+    padding: $spacing-4 $spacing-4 $spacing-3;
+  }
+}
+
+:global(.ant-breadcrumb-link) a {
+  color: $color-text-secondary;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $color-primary;
+  }
+}
+
+.content {
+  max-width: $size-content-max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-6 $spacing-16;
+
+  @include tablet {
+    padding: 0 $spacing-4 $spacing-12;
+  }
+}
+
+.content h1 {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-2 0;
+
+  @include tablet {
+    font-size: $font-size-3xl;
+  }
+}
+
+.content h2 {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: $spacing-10 0 $spacing-4 0;
+
+  @include tablet {
+    font-size: $font-size-xl;
+    margin: $spacing-8 0 $spacing-3 0;
+  }
+}
+
+.description {
+  color: $color-text-secondary;
+  line-height: 1.8;
+  font-size: $font-size-base;
+  margin-bottom: $spacing-10 !important;
+
+  @include tablet {
+    margin-bottom: $spacing-8 !important;
+  }
+}
+
+.section {
+  margin-bottom: $spacing-10;
+
+  @include tablet {
+    margin-bottom: $spacing-8;
+  }
+}
+
+.section p {
+  color: $color-text-secondary;
+  line-height: 1.8;
+  font-size: $font-size-base;
+}
+
+.sectionDescription {
+  color: $color-text-secondary;
+  line-height: 1.8;
+  font-size: $font-size-base;
+  margin-bottom: $spacing-10 !important;
+
+  @include tablet {
+    margin-bottom: $spacing-8 !important;
+  }
+}
+
+.contactSection {
+  background: $color-bg-secondary;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-8;
+  margin-top: $spacing-8;
+
+  @include tablet {
+    padding: $spacing-5;
+    margin-top: $spacing-6;
+  }
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: $spacing-6;
+  margin-top: $spacing-6;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: $spacing-4;
+  }
+}
+
+.contactCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: $spacing-5;
+  background: $color-bg-primary;
+  border-radius: $radius-md;
+  border: 1px solid $color-border;
+  transition: border-color $transition-base;
+
+  &:hover {
+    border-color: $color-primary;
+  }
+
+  .iconWrapper {
+    width: $size-icon-md;
+    height: $size-icon-md;
+    border-radius: $radius-full;
+    background: rgba($color-primary, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: $spacing-3;
+    color: $color-primary;
+    font-size: $font-size-2xl;
+  }
+
+  .contactTitle {
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin-bottom: $spacing-1;
+  }
+
+  .contactValue {
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+
+    a {
+      color: $color-primary;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .responseTime {
+    margin-top: $spacing-2;
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+}

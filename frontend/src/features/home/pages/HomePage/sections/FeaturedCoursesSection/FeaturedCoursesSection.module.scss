@@ -1,0 +1,274 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.featuredSection {
+  background: $color-bg-primary;
+  padding: $spacing-16 $spacing-6;
+  border-top: 1px solid $color-border;
+  border-bottom: 1px solid $color-border;
+  max-width: 100%;
+  overflow-x: hidden;
+
+  @include tablet {
+    padding: $spacing-12 $spacing-4;
+  }
+}
+
+.featuredContent {
+  max-width: $breakpoint-xl;
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  max-width: $breakpoint-xl;
+  margin: 0 auto $spacing-8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin: 0;
+}
+
+.viewAllLink {
+  color: $color-primary-hover;
+  text-decoration: none;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-md;
+  transition: all $transition-base;
+}
+
+.viewAllLink:hover {
+  color: $color-blue-800;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-12 $spacing-6;
+  background: linear-gradient(180deg, $color-bg-secondary 0%, $color-bg-tertiary 100%);
+  border-radius: $radius-xl;
+  border: 2px dashed $color-slate-300;
+  grid-column: 1 / -1;
+  min-height: $spacing-16;
+}
+
+.emptyIcon {
+  font-size: $font-size-3xl;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-4;
+}
+
+.emptyTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-dark-tertiary;
+  margin: 0 0 $spacing-2 0;
+}
+
+.courseGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-6;
+  max-width: $breakpoint-xl;
+  margin: 0 auto;
+  overflow: visible;
+
+  @include desktop-sm {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-4;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.courseCard {
+  background: $color-bg-primary;
+  border-radius: $radius-xl;
+  padding: $spacing-5;
+  box-shadow: $shadow-md;
+  transition: all $transition-slow;
+  border: 1px solid $color-border;
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 280px;
+
+  @include tablet {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+.courseCardTopBorder {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: $spacing-1;
+  background: linear-gradient(90deg, $color-primary-light, $color-cyan-light);
+  opacity: 0;
+  transition: opacity $transition-slow;
+}
+
+.courseCard:hover {
+  transform: translateY(-6px);
+  box-shadow: $shadow-xl;
+}
+
+.courseCard:hover .courseCardTopBorder {
+  opacity: 1;
+}
+
+.trustBadge {
+  position: absolute;
+  top: $spacing-2;
+  right: $spacing-2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: $spacing-6;
+  height: $spacing-6;
+  padding: 0 $spacing-1;
+  background: linear-gradient(135deg, $color-blue-50 0%, $color-blue-100-light 100%);
+  border-radius: $radius-lg;
+  border: 1px solid $color-blue-200;
+  cursor: pointer;
+  transition: all $transition-base;
+  z-index: 10;
+}
+
+.trustBadge span:first-child {
+  font-size: $font-size-base;
+}
+
+.trustBadge:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+}
+
+.trustBadge[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: $color-blue-800;
+  color: $color-bg-primary;
+  padding: $spacing-1 $spacing-2;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  opacity: 0;
+  visibility: hidden;
+  transition: all $transition-base;
+  pointer-events: none;
+  z-index: $z-tooltip;
+  box-shadow: $shadow-card;
+}
+
+.trustBadge[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  bottom: calc(100% + 12px);
+}
+
+.courseTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-3 0;
+  padding-right: $spacing-16 + $spacing-1;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.courseInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+  flex: 1;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+}
+
+.price {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  background: linear-gradient(135deg, $color-primary 0%, $color-cyan-600 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.priceUnit {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  margin-left: $spacing-1;
+  color: $color-primary;
+}
+
+.ratingRow {
+  display: flex;
+  align-items: baseline;
+  gap: $spacing-1;
+}
+
+.rating {
+  color: $color-warning;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-md;
+}
+
+.reviewCount {
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.region,
+.teacher {
+  color: $color-gray-500;
+  font-size: $font-size-sm;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+  margin-top: $spacing-2;
+}
+
+.tags .ant-tag {
+  margin: 0;
+  font-size: $font-size-xs;
+  line-height: $line-height-base;
+  padding: 0 $spacing-2;
+  border-radius: $radius-sm;
+}

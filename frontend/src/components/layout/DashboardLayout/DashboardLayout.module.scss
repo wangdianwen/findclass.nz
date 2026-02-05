@@ -1,0 +1,124 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.dashboardLayout {
+  width: 100%;
+}
+
+.header {
+  margin-bottom: $spacing-6;
+
+  @media (max-width: 768px) {
+    margin-bottom: $spacing-4;
+  }
+}
+
+.title {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-2 0;
+
+  @include tablet {
+    font-size: $font-size-xl;
+  }
+
+  @include mobile {
+    font-size: $font-size-lg;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  margin: 0;
+}
+
+.card {
+  // Compact card width like Teacher Onboarding
+  max-width: 800px;
+  border-radius: $radius-lg;
+  box-shadow: none;
+  border: 1px solid $color-border-light;
+
+  @media (max-width: 992px) {
+    max-width: 100%;
+  }
+}
+
+.content {
+  // Form sections and content
+}
+
+// Grid system for form rows - matches Teacher Onboarding
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-4;
+  margin-bottom: $spacing-4;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: $spacing-3;
+  }
+}
+
+// Single column form row
+.formRowSingle {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-4;
+  margin-bottom: $spacing-4;
+}
+
+// Three column grid
+.formRowThree {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-4;
+  margin-bottom: $spacing-4;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Form field spacing
+.formField {
+  margin-bottom: $spacing-2;
+}
+
+// Section with divider
+.formSection {
+  margin-bottom: $spacing-5;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Section title with accent bar - matches Teacher Onboarding
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-4;
+  padding-bottom: $spacing-2;
+  border-bottom: 1px solid $color-border-light;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: $color-primary;
+    border-radius: 2px;
+    margin-right: $spacing-2;
+  }
+}

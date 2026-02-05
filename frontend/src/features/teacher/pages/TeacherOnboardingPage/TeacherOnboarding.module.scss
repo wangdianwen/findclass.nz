@@ -1,0 +1,344 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.onboardingPage {
+  min-height: 100vh;
+  background: $color-bg-secondary;
+}
+
+.header {
+  background: $color-bg-primary;
+  padding: $spacing-8 $spacing-6;
+  text-align: center;
+  border-bottom: 1px solid $color-border-light;
+
+  .title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    margin-bottom: $spacing-2;
+  }
+
+  .subtitle {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+  }
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: $spacing-8 $spacing-6;
+}
+
+.steps {
+  margin-bottom: $spacing-8;
+}
+
+.stepContent {
+  background: $color-bg-primary;
+  border-radius: $radius-lg;
+  padding: $spacing-8;
+}
+
+.formSection {
+  margin-bottom: $spacing-6;
+
+  .sectionTitle {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin-bottom: $spacing-4;
+    padding-bottom: $spacing-2;
+    border-bottom: 1px solid $color-border-light;
+  }
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-4;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formField {
+  margin-bottom: $spacing-4;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: $spacing-8;
+  padding-top: $spacing-6;
+  border-top: 1px solid $color-border-light;
+
+  .backButton {
+    padding: $spacing-3 $spacing-6;
+  }
+
+  .nextButton {
+    padding: $spacing-3 $spacing-8;
+  }
+}
+
+.uploadSection {
+  margin-bottom: $spacing-6;
+}
+
+.uploadCard {
+  border: 2px dashed $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-8;
+  text-align: center;
+  background: $color-bg-secondary;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: $color-primary;
+    background: rgba($color-primary, 0.02);
+  }
+
+  &.uploading {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+}
+
+.uploadIcon {
+  font-size: 48px;
+  color: $color-text-muted;
+  margin-bottom: $spacing-4;
+}
+
+.uploadText {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-2;
+}
+
+.uploadHint {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.fileList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  margin-top: $spacing-4;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-3 $spacing-4;
+  background: $color-bg-secondary;
+  border-radius: $radius-md;
+}
+
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.fileIcon {
+  font-size: 24px;
+  color: $color-primary;
+}
+
+.fileName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.fileActions {
+  display: flex;
+  gap: $spacing-2;
+}
+
+.statusSection {
+  text-align: center;
+  padding: $spacing-12 $spacing-6;
+}
+
+.statusIcon {
+  font-size: 64px;
+  margin-bottom: $spacing-4;
+
+  &.pending {
+    color: $color-warning;
+  }
+
+  &.approved {
+    color: $color-success;
+  }
+
+  &.rejected {
+    color: $color-error;
+  }
+}
+
+.statusTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-2;
+}
+
+.statusDescription {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-8;
+}
+
+.successActions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.quickActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-4;
+  justify-content: center;
+  margin-top: $spacing-8;
+}
+
+.quickActionButton {
+  padding: $spacing-4 $spacing-6;
+}
+
+.reviewSection {
+  background: $color-bg-secondary;
+  border-radius: $radius-md;
+  padding: $spacing-6;
+  margin-bottom: $spacing-6;
+}
+
+.reviewDescription {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-6;
+}
+
+.reviewContent {
+  margin-bottom: $spacing-6;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.reviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-4;
+  padding-bottom: $spacing-2;
+  border-bottom: 1px solid $color-border-light;
+
+  .reviewSubtitle {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+.reviewSubtitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-4;
+  padding-bottom: $spacing-2;
+  border-bottom: 1px solid $color-border-light;
+}
+
+.reviewEvidenceList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.reviewEvidenceItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-3 $spacing-4;
+  background: $color-bg-primary;
+  border-radius: $radius-md;
+}
+
+.evidenceIcon {
+  font-size: 18px;
+}
+
+.evidenceName {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.evidenceType {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  background: $color-bg-primary;
+  padding: $spacing-1 $spacing-2;
+  border-radius: $radius-sm;
+}
+
+.reviewItem {
+  display: flex;
+  margin-bottom: $spacing-3;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.reviewLabel {
+  width: 140px;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  flex-shrink: 0;
+}
+
+.reviewValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-12 $spacing-6;
+}
+
+.emptyIcon {
+  font-size: 64px;
+  color: $color-text-muted;
+  margin-bottom: $spacing-4;
+}
+
+.emptyTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-2;
+}
+
+.emptyDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-6;
+}
+
+.footerSpacer {
+  height: 80px;
+}

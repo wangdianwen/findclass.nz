@@ -1,0 +1,101 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.privacyPolicyPage {
+  min-height: 100vh;
+  background: $color-bg-primary;
+}
+
+.breadcrumb {
+  max-width: $size-content-max-width;
+  margin: 0 auto;
+  padding: $spacing-6 $spacing-6 $spacing-4;
+
+  @include tablet {
+    padding: $spacing-4 $spacing-4 $spacing-3;
+  }
+}
+
+:global(.ant-breadcrumb-link) a {
+  color: $color-text-secondary;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $color-primary;
+  }
+}
+
+.content {
+  max-width: $size-content-max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-6 $spacing-16;
+
+  @include tablet {
+    padding: 0 $spacing-4 $spacing-12;
+  }
+}
+
+.pageTitle {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-2 0;
+
+  @include tablet {
+    font-size: $font-size-3xl;
+  }
+}
+
+.sectionTitle {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: $spacing-10 0 $spacing-4 0;
+
+  @include tablet {
+    font-size: $font-size-xl;
+    margin: $spacing-8 0 $spacing-3 0;
+  }
+}
+
+.subsectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-2 0;
+}
+
+.lastUpdated {
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+  margin-bottom: $spacing-10;
+
+  @include tablet {
+    margin-bottom: $spacing-8;
+  }
+}
+
+.section {
+  margin-bottom: $spacing-10;
+
+  @include tablet {
+    margin-bottom: $spacing-8;
+  }
+}
+
+.sectionDescription {
+  color: $color-text-secondary;
+  line-height: 1.8;
+  font-size: $font-size-base;
+}
+
+.list {
+  list-style-type: disc;
+  padding-left: $spacing-6;
+
+  li {
+    color: $color-text-secondary;
+    line-height: 1.8;
+    margin-bottom: $spacing-2;
+  }
+}

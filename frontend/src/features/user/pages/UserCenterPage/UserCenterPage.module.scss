@@ -1,0 +1,336 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.userCenterPage {
+  min-height: 100vh;
+  background: $color-bg-secondary;
+  display: flex;
+  flex-direction: column;
+}
+
+.headerSpacer {
+  height: $size-header-height;
+
+  @include tablet {
+    height: $size-header-height-tablet;
+  }
+
+  @include mobile {
+    height: $size-header-height-mobile;
+  }
+}
+
+.footerSpacer {
+  height: $size-footer-height;
+
+  @include tablet {
+    height: $size-footer-height-tablet;
+  }
+
+  @include mobile {
+    height: $size-footer-height-mobile;
+  }
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: $spacing-6;
+
+  @include mobile {
+    padding: $spacing-4;
+  }
+}
+
+.pageHeader {
+  margin-bottom: $spacing-6;
+
+  .pageTitle {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+    margin: 0 0 $spacing-2 0;
+
+    @include mobile {
+      font-size: $font-size-xl;
+    }
+  }
+
+  .pageSubtitle {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+    margin: 0;
+
+    @include mobile {
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+.userCard {
+  background: $color-bg-primary;
+  border-radius: $radius-lg;
+  border: 1px solid $color-border;
+  padding: $spacing-5;
+  margin-bottom: $spacing-6;
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+
+  @include mobile {
+    flex-direction: column;
+    text-align: center;
+    gap: $spacing-3;
+  }
+
+  .avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: $color-primary;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+
+    @include mobile {
+      width: 80px;
+      height: 80px;
+      font-size: $font-size-3xl;
+    }
+  }
+
+  .userInfo {
+    flex: 1;
+
+    .userName {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $color-text-primary;
+      margin: 0 0 $spacing-1 0;
+    }
+
+    .userEmail {
+      font-size: $font-size-sm;
+      color: $color-text-tertiary;
+      margin: 0;
+    }
+  }
+
+  .logoutButton {
+    color: $color-error;
+
+    &:hover {
+      background: $color-error-bg;
+    }
+  }
+}
+
+.contentSection {
+  background: $color-bg-primary;
+  border-radius: $radius-lg;
+  border: 1px solid $color-border;
+  overflow: hidden;
+
+  // Override Ant Design Tabs styles
+  :global(.ant-tabs-nav) {
+    margin: 0;
+    padding: 0 $spacing-6;
+    background: $color-bg-secondary;
+
+    @include mobile {
+      padding: 0 $spacing-4;
+    }
+
+    &::before {
+      border-bottom: 1px solid $color-border;
+    }
+  }
+
+  :global(.ant-tabs-tab) {
+    padding: $spacing-4 $spacing-4;
+    margin: 0;
+    font-size: $font-size-sm;
+
+    @include mobile {
+      padding: $spacing-3 $spacing-3;
+      font-size: $font-size-xs;
+    }
+
+    // Add spacing between icon and text
+    .anticon + span {
+      margin-left: $spacing-2;
+
+      @include mobile {
+        margin-left: $spacing-1;
+      }
+    }
+  }
+
+  :global(.ant-tabs-tab-active .ant-tabs-tab-btn) {
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+  }
+
+  :global(.ant-tabs-ink-bar) {
+    background: $color-primary;
+  }
+
+  :global(.ant-tabs-content-holder) {
+    padding: $spacing-6;
+
+    @include mobile {
+      padding: $spacing-4;
+    }
+  }
+
+  :global(.ant-tabs-content) {
+    margin-top: 0;
+  }
+}
+
+.teacherCard {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-6;
+  margin-bottom: $spacing-6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-6;
+
+  @include mobile {
+    flex-direction: column;
+    text-align: center;
+    padding: $spacing-5;
+  }
+
+  .teacherInfo {
+    .teacherTitle {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      margin: 0 0 $spacing-2 0;
+    }
+
+    .teacherSubtitle {
+      font-size: $font-size-base;
+      opacity: 0.9;
+      margin: 0;
+
+      @include mobile {
+        font-size: $font-size-sm;
+      }
+    }
+  }
+
+  .teacherButton {
+    flex-shrink: 0;
+
+    @include mobile {
+      width: 100%;
+    }
+
+    :global(.ant-btn) {
+      background: white;
+      color: $color-primary;
+      font-weight: $font-weight-medium;
+      border: none;
+      height: 44px;
+      padding: 0 $spacing-6;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.9);
+        color: $color-primary-dark;
+      }
+    }
+  }
+}
+
+// Teacher Dashboard Entry Card (for approved teachers)
+.teacherDashboardCard {
+  background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-5;
+  margin-bottom: $spacing-6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-6;
+
+  @include mobile {
+    flex-direction: column;
+    text-align: center;
+    padding: $spacing-4;
+  }
+
+  .teacherDashboardInfo {
+    display: flex;
+    align-items: center;
+    gap: $spacing-4;
+
+    @include mobile {
+      flex-direction: column;
+    }
+
+    .teacherDashboardIcon {
+      width: 56px;
+      height: 56px;
+      border-radius: $radius-lg;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+
+      @include mobile {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+      }
+    }
+
+    .teacherDashboardText {
+      .teacherDashboardTitle {
+        font-size: $font-size-lg;
+        font-weight: $font-weight-bold;
+        margin: 0 0 $spacing-1 0;
+      }
+
+      .teacherDashboardSubtitle {
+        font-size: $font-size-sm;
+        opacity: 0.9;
+        margin: 0;
+
+        @include mobile {
+          font-size: $font-size-xs;
+        }
+      }
+    }
+  }
+
+  .teacherDashboardButton {
+    flex-shrink: 0;
+
+    @include mobile {
+      width: 100%;
+    }
+
+    :global(.ant-btn) {
+      background: white;
+      color: #52c41a;
+      font-weight: $font-weight-medium;
+      border: none;
+      height: 44px;
+      padding: 0 $spacing-6;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.9);
+        color: #389e0d;
+      }
+    }
+  }
+}

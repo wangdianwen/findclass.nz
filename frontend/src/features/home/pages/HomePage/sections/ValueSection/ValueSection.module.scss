@@ -1,0 +1,132 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.valueSection {
+  background: linear-gradient(
+    135deg,
+    $color-blue-50 0%,
+    $color-bg-primary 50%,
+    $color-green-50 100%
+  );
+  padding: $spacing-16 $spacing-6;
+  border-top: 1px solid $color-border;
+  border-bottom: 1px solid $color-border;
+  max-width: 100%;
+  overflow-x: hidden;
+
+  @include tablet {
+    padding: $spacing-12 $spacing-4;
+  }
+}
+
+.valueContent {
+  max-width: $breakpoint-xl;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-12 + $spacing-2;
+  align-items: center;
+
+  @include desktop-sm {
+    grid-template-columns: 1fr;
+    gap: $spacing-10;
+  }
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: $spacing-8;
+  }
+}
+
+.valueText {
+  @include tablet {
+    order: 1;
+    text-align: center;
+  }
+}
+
+.valueTitle {
+  font-size: $font-size-5xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-5 0;
+  line-height: 1.3;
+}
+
+.valueDescription {
+  font-size: $font-size-lg;
+  color: $color-text-secondary;
+  line-height: 1.8;
+  margin: 0 0 $spacing-7 0;
+}
+
+.valueHighlights {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3 + 2px;
+}
+
+.highlight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  font-size: $font-size-md;
+  color: $color-slate-800;
+}
+
+.highlightIcon {
+  color: $color-success;
+  font-size: $font-size-lg;
+}
+
+.valueStats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-5;
+
+  @include tablet {
+    order: 2;
+    max-width: $size-stat-card-max-width;
+    margin: 0 auto;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.statCard {
+  background: $color-bg-primary;
+  border-radius: $radius-xl;
+  padding: $spacing-7;
+  text-align: center;
+  box-shadow: $shadow-md;
+  border: 1px solid $color-border;
+  transition: all $transition-slow;
+
+  @include tablet {
+    padding: $spacing-4;
+  }
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: $shadow-lg;
+}
+
+.statValue {
+  font-size: $font-size-5xl;
+  font-weight: $font-weight-bold;
+  background: linear-gradient(135deg, $color-primary 0%, $color-cyan 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: $spacing-2;
+
+  @include tablet {
+    font-size: $font-size-2xl;
+  }
+}
+
+.statLabel {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}

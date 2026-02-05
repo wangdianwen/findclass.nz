@@ -1,0 +1,108 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.statsContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-4;
+  margin-bottom: $spacing-6;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.statCard {
+  background: $color-bg-secondary;
+  border-radius: $radius-lg;
+  padding: $spacing-5;
+  text-align: center;
+  transition: transform $transition-base;
+  border: 1px solid $color-border-light;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: $color-primary;
+  }
+}
+
+.statValue {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  margin-bottom: $spacing-1;
+  line-height: 1.2;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.statCardHighlight {
+  background: $color-bg-secondary;
+  border-color: $color-border-light;
+
+  .statValue {
+    color: $color-primary;
+  }
+
+  .statLabel {
+    color: $color-text-secondary;
+  }
+}
+
+// Error state - red when published courses exceed limit
+.statCardError {
+  background: linear-gradient(135deg, $color-error 0%, #ff4d4f 100%);
+  border-color: transparent;
+
+  .statValue {
+    color: $color-white;
+  }
+
+  .statLabel {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+// Warning state - yellow when published courses at limit
+.statCardWarning {
+  background: linear-gradient(135deg, $color-warning 0%, #faad14 100%);
+  border-color: transparent;
+
+  .statValue {
+    color: $color-white;
+  }
+
+  .statLabel {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+// Success state - green when published courses within limit
+.statCardSuccess {
+  background: linear-gradient(135deg, $color-success 0%, #52c41a 100%);
+  border-color: transparent;
+
+  .statValue {
+    color: $color-white;
+  }
+
+  .statLabel {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+// Limit hint text
+.limitHint {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-2;
+}

@@ -1,0 +1,72 @@
+{
+  "title": "We Use Cookies",
+  "description": "We use cookies to improve your experience. Your data security is important to us.",
+  "learnMore": "Learn More",
+  "decline": "Decline",
+  "customize": "Customize",
+  "acceptAll": "Accept All",
+  "preferencesTitle": "Cookie Preferences",
+  "cancel": "Cancel",
+  "save": "Save",
+  "selectCategories": "Select the types of cookies you want to accept",
+  "required": "Required",
+  "privacyPolicy": "Read our Privacy Policy",
+  "terms": "Terms of Use",
+  "cookiePolicy": "Cookie Policy",
+  "lastUpdated": "Last updated: January 2026",
+
+  "category.necessary": "Necessary Cookies",
+  "category.necessaryDesc": "These cookies are required for the website to function and cannot be disabled.",
+  "category.analytics": "Analytics Cookies",
+  "category.analyticsDesc": "Help us understand how you use our website to improve user experience.",
+  "category.functional": "Functional Cookies",
+  "category.functionalDesc": "Remember your preferences, such as language and region.",
+
+  "sections.introduction.title": "Introduction",
+  "sections.introduction.content": "FindClass.nz ('we', 'our', or 'us') uses cookies, session storage, and similar tracking technologies to improve your experience on our website. This Cookie Policy explains what these technologies are, how we use them, and your choices regarding their use.",
+
+  "sections.whatAreCookies.title": "What Are Cookies & Storage?",
+  "sections.whatAreCookies.content": "Cookies and similar storage technologies are small text files or data stored on your device (computer, tablet, or mobile phone) when you visit a website. They help the website function properly and provide a better user experience. We use both cookies and session storage - session storage only保存 data during your browser session and is automatically cleared when you close the tab.",
+
+  "sections.typesOfCookies.title": "Types of Cookies We Use",
+  "sections.typesOfCookies.content": "We use the following types of cookies:",
+
+  "sections.types.essential.title": "Essential Cookies",
+  "sections.types.essential.description": "These cookies are necessary for the website to function properly. They enable core functionality such as page navigation, security, and network management.",
+  "sections.types.essential.examples": "Examples: Session ID, login authentication, security tokens.",
+
+  "sections.types.performance.title": "Performance Cookies",
+  "sections.types.performance.description": "These cookies help us understand how visitors interact with our website by collecting anonymous information about page visits and error reports.",
+  "sections.types.performance.examples": "Examples: Google Analytics, page load times, error tracking.",
+
+  "sections.types.functionality.title": "Functionality Cookies",
+  "sections.types.functionality.description": "These cookies allow us to remember choices you make (such as language preferences, region, or customization choices) and provide enhanced features.",
+  "sections.types.functionality.examples": "Examples: Language settings, region selection, saved preferences.",
+
+  "sections.types.targeting.title": "Targeting/Advertising Cookies",
+  "sections.types.targeting.description": "These cookies are used to deliver advertisements that are relevant to you and your interests. They may also be used to limit the number of times you see an advertisement.",
+  "sections.types.targeting.examples": "Examples: Ad personalization, social media integration, retargeting pixels.",
+
+  "sections.howWeUse.title": "How We Use Cookies",
+  "sections.howWeUse.content": "We use cookies for the following purposes:",
+  "sections.howWeUse.item1": "To provide and maintain our services",
+  "sections.howWeUse.item2": "To remember your preferences and settings",
+  "sections.howWeUse.item3": "To analyze how our website is used and improve user experience",
+  "sections.howWeUse.item4": "To personalize content and advertisements",
+
+  "sections.cookieManagement.title": "Managing Your Cookie Preferences",
+  "sections.cookieManagement.content": "You have the right to accept, decline, or customize your cookie preferences. You can manage your preferences through:",
+  "sections.cookieManagement.item1": "The cookie consent banner that appears when you first visit our website",
+  "sections.cookieManagement.item2": "Your browser settings (most browsers allow you to block or delete cookies)",
+  "sections.cookieManagement.item3": "Our Cookie Preferences tool in the cookie consent banner",
+
+  "sections.thirdParty.title": "Third-Party Cookies",
+  "sections.thirdParty.content": "Some cookies are placed by third-party services that appear on our pages. We do not control these third-party cookies. Third parties may use cookies for their own purposes, and we recommend reviewing their privacy policies for more information.",
+
+  "sections.updates.title": "Updates to This Policy",
+  "sections.updates.content": "We may update this Cookie Policy from time to time to reflect changes in technology, legislation, or our business practices. We will notify you of any material changes by posting the updated policy on our website with a revised 'Last updated' date.",
+
+  "sections.contact.title": "Contact Us",
+  "sections.contact.content": "If you have any questions about our use of cookies or this Cookie Policy, please contact us at:",
+  "sections.contact.email": "support@findclass.nz"
+}

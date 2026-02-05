@@ -1,0 +1,36 @@
+{
+  "contactUs": "联系我们",
+  "description": "有疑问或需要帮助？请与我们联系，我们会在7个工作日内回复。",
+
+  "contactInfo": "联系方式",
+  "email": "电子邮件",
+  "emailAddress": "support@findclass.nz",
+  "responseTime": "我们会在7个工作日内回复",
+
+  "formTitle": "给我们留言",
+  "formDesc": "请填写以下表格，我们会在7个工作日内回复您。",
+
+  "form": {
+    "name": "姓名",
+    "namePlaceholder": "您的姓名",
+    "email": "电子邮箱",
+    "emailPlaceholder": "your@email.com",
+    "subject": "主题",
+    "subjectPlaceholder": "选择主题",
+    "subjectGeneral": "一般咨询",
+    "subjectTechnical": "技术问题",
+    "subjectCourse": "课程相关",
+    "subjectTutor": "导师合作",
+    "subjectInstitution": "机构合作",
+    "subjectOther": "其他",
+    "message": "消息内容",
+    "messagePlaceholder": "请描述您的问题或需求...",
+    "submit": "发送消息",
+    "required": "此项为必填",
+    "emailInvalid": "请输入有效的电子邮箱地址",
+    "success": "消息已发送！我们会在7个工作日内回复您。",
+    "error": "发送失败，请稍后重试。"
+  },
+
+  "backToHelp": "← 返回帮助中心"
+}

@@ -1,0 +1,118 @@
+@use '../../../styles/variables' as *;
+
+// ============================================
+// Trust Badge - Reusable component
+// ============================================
+
+// Base styles for all trust badges
+.trustBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: $radius-sm;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.label {
+  font-weight: 600;
+}
+
+// ============================================
+// Size variants
+// ============================================
+
+.small {
+  padding: 1px 4px;
+  font-size: $font-size-xs;
+
+  .icon {
+    font-size: 10px;
+  }
+
+  .label {
+    font-size: $font-size-xs;
+  }
+}
+
+.medium {
+  padding: 2px 6px;
+  font-size: $font-size-xs;
+
+  .icon {
+    font-size: 12px;
+  }
+
+  .label {
+    font-size: $font-size-xs;
+  }
+}
+
+.large {
+  padding: $spacing-1 $spacing-2;
+  font-size: $font-size-sm;
+
+  .icon {
+    font-size: 14px;
+  }
+
+  .label {
+    font-size: $font-size-sm;
+  }
+}
+
+// ============================================
+// Trust level colors - Solid filled background with white text
+// ============================================
+
+// S级 - Premium Gold
+.trustBadgeS {
+  background: $color-warning;
+  color: #fff;
+}
+
+// A级 - Primary Blue
+.trustBadgeA {
+  background: $color-primary;
+  color: #fff;
+}
+
+// B级 - Success Green
+.trustBadgeB {
+  background: $color-success;
+  color: #fff;
+}
+
+// C级 - Warning Orange
+.trustBadgeC {
+  background: #d46b08;
+  color: #fff;
+}
+
+// D级 - Tertiary Gray
+.trustBadgeD {
+  background: $color-text-tertiary;
+  color: #fff;
+}
+
+// ============================================
+// Clickable variant
+// ============================================
+
+.clickable {
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}

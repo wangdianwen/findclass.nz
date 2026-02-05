@@ -1,0 +1,182 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.institutionSection {
+  background: $color-bg-secondary;
+  padding: $spacing-16 $spacing-6;
+  border-top: 1px solid $color-border;
+  max-width: 100%;
+  overflow-x: hidden;
+
+  @include tablet {
+    padding: $spacing-8 $spacing-4;
+  }
+}
+
+.institutionContent {
+  max-width: $breakpoint-xl;
+  margin: 0 auto;
+}
+
+.institutionCard {
+  background: $color-bg-primary;
+  border-radius: $radius-2xl;
+  padding: $spacing-8 $spacing-10;
+  display: flex;
+  align-items: center;
+  gap: $spacing-8;
+  box-shadow: $shadow-md;
+  border: 1px solid $color-border;
+  position: relative;
+  overflow: hidden;
+
+  @include tablet {
+    flex-direction: column;
+    padding: $spacing-6 $spacing-4;
+    gap: $spacing-4;
+    border-radius: $radius-xl;
+    padding-left: $spacing-4;
+    text-align: left;
+  }
+}
+
+.comingSoonBadge {
+  position: absolute;
+  top: $spacing-4;
+  right: $spacing-4;
+  background: linear-gradient(135deg, $color-amber-bg 0%, $color-amber-200 100%);
+  color: $color-amber-dark;
+  padding: $spacing-1 $spacing-3;
+  border-radius: $radius-2xl;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+
+  &::before {
+    content: '★';
+    margin-right: $spacing-1;
+
+    @include tablet {
+      display: none;
+    }
+  }
+
+  @include tablet {
+    position: relative;
+    top: auto;
+    right: auto;
+    display: inline-block;
+    margin-bottom: $spacing-2;
+    font-size: $font-size-xs;
+    padding: $spacing-1 $spacing-2;
+  }
+}
+
+.institutionIconWrapper {
+  width: $spacing-16;
+  height: $spacing-16;
+  border-radius: $radius-2xl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, $color-blue-100-light 0%, $color-blue-200-light 100%);
+  flex-shrink: 0;
+
+  @include tablet {
+    width: $spacing-10;
+    height: $spacing-10;
+    border-radius: $radius-xl;
+    margin: 0;
+  }
+}
+
+.institutionIcon {
+  font-size: $font-size-4xl;
+  color: $color-primary-hover;
+
+  @include tablet {
+    font-size: $font-size-3xl;
+  }
+}
+
+.institutionText {
+  flex: 1;
+
+  @include tablet {
+    text-align: left;
+    width: 100%;
+  }
+}
+
+.institutionText h3 {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  margin: 0 0 $spacing-2 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  @include tablet {
+    font-size: $font-size-xs;
+    margin-bottom: $spacing-1;
+  }
+}
+
+.institutionText h2 {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-3 0;
+  line-height: 1.3;
+
+  @include tablet {
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-2;
+    line-height: 1.3;
+  }
+}
+
+.institutionText p {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  margin: 0 0 $spacing-5 0;
+  line-height: 1.6;
+
+  @include tablet {
+    font-size: $font-size-sm;
+    line-height: 1.5;
+    margin-bottom: $spacing-3;
+    padding: 0;
+  }
+}
+
+.institutionFeatures {
+  display: flex;
+  align-items: center;
+  gap: $spacing-5;
+
+  @include tablet {
+    flex-direction: column;
+    gap: $spacing-2;
+    margin-bottom: $spacing-3;
+    align-items: flex-start;
+    padding-left: 0;
+  }
+}
+
+.institutionFeatureItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  font-size: $font-size-base;
+  color: $color-slate-600;
+
+  @include tablet {
+    justify-content: flex-start;
+    font-size: $font-size-sm;
+  }
+}
+
+.institutionFeatureIcon {
+  color: $color-success;
+  font-size: $font-size-lg;
+}

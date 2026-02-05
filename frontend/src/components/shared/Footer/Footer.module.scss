@@ -1,0 +1,67 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.footer {
+  background: $color-dark-primary;
+  padding: $spacing-12 $spacing-6 $spacing-6;
+  max-width: 100%;
+  overflow-x: hidden;
+  // Ensure consistent spacing from page content
+  margin-top: $page-footer-spacing;
+}
+
+.footerContent {
+  max-width: $breakpoint-xl;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: $spacing-12;
+  padding-bottom: $spacing-8;
+  border-bottom: 1px solid $color-dark-secondary;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: $spacing-8;
+    text-align: center;
+  }
+}
+
+.footerSection h4 {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-dark-text;
+  margin: 0 0 $spacing-4 0;
+}
+
+.footerSection:first-child h4 {
+  font-size: $font-size-xl;
+  margin-bottom: $spacing-3;
+}
+
+.footerSection:first-child p {
+  color: $color-text-tertiary;
+  font-size: $font-size-base;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.footerSection:not(:first-child) a {
+  display: block;
+  color: $color-text-tertiary;
+  text-decoration: none;
+  font-size: $font-size-base;
+  margin-bottom: $spacing-2;
+  transition: all $transition-base;
+}
+
+.footerSection:not(:first-child) a:hover {
+  color: $color-primary-light;
+}
+
+.copyright {
+  max-width: $breakpoint-xl;
+  margin: $spacing-6 auto 0;
+  text-align: center;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+}

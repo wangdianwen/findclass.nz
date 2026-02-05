@@ -1,0 +1,60 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.main {
+  flex: 1;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+// Footer spacer - Ensure consistent spacing from last section
+// Footer handles its own margin-top, sections handle their own padding
+.footerSpacer {
+  height: $page-footer-spacing;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: linear-gradient(180deg, $color-bg-secondary 0%, $color-bg-tertiary 100%);
+}
+
+.smallLoader {
+  composes: loader;
+  height: $spacing-10;
+}
+
+.mediumLoader {
+  composes: loader;
+  height: $spacing-16;
+}
+
+.largeLoader {
+  composes: loader;
+  height: $spacing-12;
+}
+
+.loadingIcon {
+  font-size: $font-size-lg;
+  color: $color-primary;
+}
+
+.mediumLoadingIcon {
+  composes: loadingIcon;
+  font-size: $font-size-3xl;
+}
+
+.largeLoadingIcon {
+  composes: loadingIcon;
+  font-size: $font-size-xl;
+}

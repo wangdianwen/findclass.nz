@@ -1,0 +1,25 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.breadcrumb {
+  max-width: $size-content-max-width;
+  margin: 0 auto;
+  padding: $spacing-6 $spacing-6 $spacing-4;
+
+  @include tablet {
+    padding: $spacing-4 $spacing-4 $spacing-3;
+  }
+
+  @include mobile {
+    padding: $spacing-4 $spacing-3 $spacing-2;
+  }
+}
+
+:global(.ant-breadcrumb-link) a {
+  color: $color-text-secondary;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $color-primary;
+  }
+}

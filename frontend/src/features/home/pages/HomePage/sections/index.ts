@@ -1,0 +1,6 @@
+export { default as HeroSection } from './HeroSection';
+export { default as FeaturesSection } from './FeaturesSection';
+export { default as FeaturedCoursesSection } from './FeaturedCoursesSection';
+export { default as ValueSection } from './ValueSection';
+export { default as CTASection } from './CTASection';
+export { default as InstitutionSection } from './InstitutionSection';

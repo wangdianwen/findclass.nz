@@ -1,0 +1,205 @@
+{
+  "title": "个人中心",
+  "subtitle": "管理您的账户和偏好设置",
+  "nav": {
+    "profile": "个人信息",
+    "favorites": "我的收藏",
+    "history": "学习记录",
+    "notifications": "消息通知",
+    "children": "我的孩子",
+    "teaching": "教学中心",
+    "reviews": "我的评价"
+  },
+  "teaching": {
+    "title": "教学中心",
+    "subtitle": "分享知识，成就学生",
+    "apply": "申请成为教师",
+    "applied": "已提交申请",
+    "approved": "前往教师后台",
+    "pending": "查看申请状态",
+    "dashboardTitle": "教师后台",
+    "dashboardSubtitle": "管理您的课程、学员，查看收入统计",
+    "goToDashboard": "进入后台"
+  },
+  "profile": {
+    "title": "个人信息",
+    "avatar": "头像",
+    "fullName": "姓名",
+    "displayName": "显示名称",
+    "gender": "性别",
+    "genderMale": "男",
+    "genderFemale": "女",
+    "genderOther": "其他",
+    "genderPreferNot": "不愿透露",
+    "email": "邮箱",
+    "phone": "手机号",
+    "wechat": "微信号",
+    "edit": "编辑资料",
+    "save": "保存修改",
+    "cancel": "取消",
+    "changeAvatar": "更换头像",
+    "removeAvatar": "移除",
+    "cropAvatar": "编辑头像",
+    "joinedDate": "加入于 {{date}}",
+    "required": "此项为必填项",
+    "selectAvatar": "选择头像",
+    "avatarDefault": "默认",
+    "avatarUpload": "上传",
+    "uploadAvatar": "选择图片",
+    "placeholder": {
+      "fullName": "请输入您的姓名",
+      "displayName": "请输入显示名称",
+      "phone": "请输入手机号",
+      "wechat": "请输入微信号"
+    }
+  },
+  "favorites": {
+    "title": "我的收藏",
+    "empty": "暂无收藏",
+    "emptyDesc": "开始探索课程并在此处保存您的收藏",
+    "courses": "课程",
+    "teachers": "教师",
+    "institutions": "机构",
+    "remove": "取消收藏",
+    "removeSuccess": "已从收藏中移除"
+  },
+  "history": {
+    "title": "学习记录",
+    "empty": "暂无学习记录",
+    "emptyDesc": "您浏览的课程将显示在这里",
+    "clear": "清除记录",
+    "clearConfirm": "确定要清除所有学习记录吗？",
+    "clearSuccess": "学习记录已清除",
+    "lastViewed": "最后浏览",
+    "today": "今天",
+    "yesterday": "昨天",
+    "daysAgo": "{{count}} 天前",
+    "statusCompleted": "已完成",
+    "statusInProgress": "学习中",
+    "statusNotStarted": "未开始",
+    "filterBy": "按学习者筛选：",
+    "allRecords": "全部",
+    "learnerSelf": "我",
+    "noRecordsFor": "{{name}} 暂无学习记录"
+  },
+  "notifications": {
+    "title": "消息通知",
+    "empty": "暂无消息",
+    "emptyDesc": "您已处理完所有消息！",
+    "markRead": "标记已读",
+    "markAllRead": "全部已读",
+    "delete": "删除",
+    "unreadCount": "{{count}} 条未读",
+    "types": {
+      "system": "系统",
+      "course": "课程",
+      "promotion": "优惠",
+      "reminder": "提醒"
+    },
+    "settings": "通知设置"
+  },
+  "settings": {
+    "title": "账户设置",
+    "account": {
+      "title": "账户安全",
+      "changePassword": "修改密码",
+      "passwordUpdated": "密码修改成功",
+      "bindPhone": "绑定手机",
+      "bindEmail": "绑定邮箱",
+      "unbind": "解绑",
+      "currentPassword": "当前密码",
+      "currentPasswordPlaceholder": "请输入当前密码",
+      "newPassword": "新密码",
+      "newPasswordPlaceholder": "请输入新密码",
+      "confirmPassword": "确认密码",
+      "confirmPasswordPlaceholder": "请再次输入新密码",
+      "passwordMismatch": "两次输入的密码不一致"
+    },
+    "privacy": {
+      "title": "隐私设置",
+      "profileVisibility": "资料可见性",
+      "showEmail": "向他人显示邮箱",
+      "showPhone": "向他人显示手机号",
+      "showWechat": "向他人显示微信号",
+      "showRealName": "向他人显示真实姓名"
+    },
+    "appearance": {
+      "title": "外观设置",
+      "theme": "主题",
+      "themeLight": "浅色",
+      "themeDark": "深色",
+      "themeSystem": "跟随系统",
+      "language": "语言",
+      "languageEn": "English",
+      "languageZh": "中文"
+    },
+    "danger": {
+      "title": "危险操作",
+      "deleteAccount": "删除账户",
+      "deleteConfirm": "此操作无法撤销。您的所有数据将被永久删除。",
+      "deleteSuccess": "账户已删除"
+    }
+  },
+  "teacherDashboard": "教师后台",
+  "logout": {
+    "button": "退出登录",
+    "confirm": "确定要退出登录吗？",
+    "success": "已成功退出登录"
+  },
+  "children": {
+    "title": "我的孩子",
+    "subtitle": "管理孩子的信息，让报名更便捷",
+    "add": "添加孩子",
+    "edit": "编辑",
+    "delete": "删除",
+    "empty": "还没有添加孩子",
+    "emptyDesc": "添加孩子的信息，让课程报名更方便",
+    "form": {
+      "title": "孩子信息",
+      "name": "姓名",
+      "namePlaceholder": "请输入孩子姓名",
+      "gender": "性别",
+      "genderMale": "男",
+      "genderFemale": "女",
+      "genderOther": "其他",
+      "grade": "年级",
+      "required": "此项为必填项",
+      "save": "保存",
+      "cancel": "取消",
+      "addChild": "添加孩子",
+      "editChild": "编辑孩子"
+    },
+    "genderLabel": "性别: {{gender}}",
+    "gradeLabel": "年级: {{grade}}",
+    "deleteConfirm": "确定要删除 {{name}} 吗？",
+    "deleteSuccess": "孩子已删除",
+    "saveSuccess": "孩子信息保存成功",
+    "gradeOptions": {
+      "preschool": "幼儿园",
+      "primary": {
+        "1": "一年级",
+        "2": "二年级",
+        "3": "三年级",
+        "4": "四年级",
+        "5": "五年级",
+        "6": "六年级"
+      },
+      "secondary": {
+        "7": "七年级",
+        "8": "八年级",
+        "9": "九年级"
+      },
+      "high": {
+        "10": "十年级",
+        "11": "十一年级",
+        "12": "十二年级",
+        "13": "十三年级"
+      }
+    }
+  },
+  "success": "保存成功！",
+  "error": {
+    "network": "网络错误，请重试。",
+    "updateFailed": "更新失败，请重试。"
+  }
+}

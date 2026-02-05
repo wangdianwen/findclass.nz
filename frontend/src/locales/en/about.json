@@ -1,0 +1,42 @@
+{
+  "title": "About Us",
+  "lastUpdated": "Last updated: January 2026",
+
+  "hero.title": "Connecting Learners with Quality Education",
+  "hero.subtitle": "FindClass.nz is dedicated to helping students in New Zealand discover the perfect classes while giving great teachers the recognition they deserve.",
+
+  "story.title": "Our Story",
+  "story.content1": "FindClass.nz was born from a simple belief: quality education should be accessible to everyone, without being blocked by high intermediary fees. We noticed that many talented teachers in New Zealand struggle to reach students, while students often find it difficult to discover the right classes for their needs.",
+  "story.content2": "Our platform bridges this gap by creating a transparent, efficient marketplace where teachers can showcase their expertise and students can find courses that match their learning goals. We're committed to building trust through quality data, real reviews, and a commitment to privacy.",
+
+  "mission.title": "Our Mission",
+  "mission.freeTutors.title": "Free for Tutors",
+  "mission.freeTutors.description": "Individual tutors join completely free. We believe great teachers shouldn't have to pay to share their knowledge.",
+  "mission.freeStudents.title": "Free for Students",
+  "mission.freeStudents.description": "Students use the platform completely free. Search, browse, and book without any hidden fees.",
+  "mission.transparency.title": "Real Reviews",
+  "mission.transparency.description": "Transparent reviews ensure you can make informed decisions about your learning journey.",
+
+  "values.title": "Our Values",
+  "values.quality.title": "Quality First",
+  "values.quality.description": "We maintain high standards for course content and teacher qualifications.",
+  "values.trust.title": "Trust & Safety",
+  "values.trust.description": "Your privacy and data security are our top priorities.",
+  "values.accessibility.title": "Accessibility",
+  "values.accessibility.description": "Making quality education accessible to all New Zealanders.",
+  "values.transparency.title": "Transparency",
+  "values.transparency.description": "Clear pricing, real reviews, and honest information.",
+
+  "trust.title": "Trust & Safety",
+  "trust.content": "We take trust seriously. All course listings go through our verification process, and we continuously monitor for quality and authenticity. Your personal information is protected according to our privacy policy.",
+  "trust.badges": {
+    "verified": "Verified Tutors",
+    "secure": "Secure Data",
+    "quality": "Quality Courses",
+    "transparent": "Transparent Reviews"
+  },
+
+  "contact.title": "Contact Us",
+  "contact.content": "Have questions or suggestions? We'd love to hear from you:",
+  "contact.email": "support@findclass.nz"
+}

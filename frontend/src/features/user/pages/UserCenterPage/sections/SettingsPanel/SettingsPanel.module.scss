@@ -1,0 +1,124 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.settingsSection {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-8;
+
+  @include mobile {
+    gap: $spacing-6;
+  }
+}
+
+.settingsGroup {
+  .groupTitle {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-primary;
+    margin: 0 0 $spacing-4 0;
+    padding-bottom: $spacing-3;
+    border-bottom: 1px solid $color-border;
+  }
+}
+
+.settingsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.settingsItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4 0;
+  border-bottom: 1px solid $color-border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .itemInfo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .itemLabel {
+    font-size: $font-size-base;
+    color: $color-text-primary;
+    margin: 0 0 $spacing-1 0;
+  }
+
+  .itemDesc {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    margin: 0;
+  }
+
+  .itemAction {
+    flex-shrink: 0;
+    margin-left: $spacing-4;
+  }
+}
+
+.accountSecurity {
+  .passwordForm {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+    padding: $spacing-4;
+    background: $color-bg-secondary;
+    border-radius: $radius-lg;
+    margin-top: $spacing-4;
+
+    .formField {
+      margin-bottom: 0;
+    }
+
+    .formActions {
+      display: flex;
+      justify-content: flex-end;
+      gap: $spacing-4;
+      margin-top: $spacing-4;
+
+      @include mobile {
+        flex-direction: column-reverse;
+        gap: $spacing-3;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+.dangerZone {
+  border: 1px solid $color-error-light;
+  border-radius: $radius-lg;
+  padding: $spacing-4;
+  background: $color-error-bg;
+
+  .dangerTitle {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $color-error;
+    margin: 0 0 $spacing-2 0;
+  }
+
+  .dangerDesc {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0 0 $spacing-4 0;
+  }
+
+  .dangerButton {
+    border-color: $color-error;
+    color: $color-error;
+
+    &:hover {
+      background: $color-error;
+      color: white;
+    }
+  }
+}

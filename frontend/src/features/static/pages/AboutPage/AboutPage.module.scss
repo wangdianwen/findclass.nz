@@ -1,0 +1,232 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.aboutPage {
+  min-height: 100vh;
+  background: $color-bg-primary;
+}
+
+.breadcrumb {
+  max-width: $size-content-max-width;
+  margin: 0 auto;
+  padding: $spacing-6 $spacing-6 $spacing-4;
+
+  @include tablet {
+    padding: $spacing-4 $spacing-4 $spacing-3;
+  }
+}
+
+:global(.ant-breadcrumb-link) a {
+  color: $color-text-secondary;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $color-primary;
+  }
+}
+
+.content {
+  max-width: $size-content-max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-6 $spacing-16;
+
+  @include tablet {
+    padding: 0 $spacing-4 $spacing-12;
+  }
+}
+
+.hero {
+  text-align: center;
+  padding: $spacing-12 0 $spacing-16;
+
+  @include tablet {
+    padding: $spacing-8 0 $spacing-12;
+  }
+}
+
+.heroTitle {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-4 0;
+
+  @include tablet {
+    font-size: $font-size-3xl;
+  }
+}
+
+.heroSubtitle {
+  font-size: $font-size-lg;
+  color: $color-text-secondary;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+.section {
+  margin-bottom: $spacing-16;
+
+  @include tablet {
+    margin-bottom: $spacing-12;
+  }
+}
+
+.sectionTitle {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-6 0;
+  padding-bottom: $spacing-3;
+  border-bottom: 2px solid $color-border;
+
+  @include tablet {
+    font-size: $font-size-xl;
+  }
+}
+
+.sectionDescription {
+  color: $color-text-secondary;
+  line-height: 1.8;
+  font-size: $font-size-base;
+}
+
+.missionCards {
+  margin-top: $spacing-8;
+}
+
+.missionCard {
+  background: $color-bg-secondary;
+  border-radius: $radius-lg;
+  padding: $spacing-8;
+  text-align: center;
+  height: 100%;
+  border: 1px solid $color-border;
+  transition:
+    transform $transition-base,
+    box-shadow $transition-base;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+
+  @include mobile {
+    padding: $spacing-6;
+  }
+}
+
+.missionIcon {
+  width: $size-icon-lg;
+  height: $size-icon-lg;
+  border-radius: $radius-full;
+  background: linear-gradient(135deg, $color-primary, $color-primary-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto $spacing-4;
+}
+
+.missionIconAnticon {
+  font-size: $font-size-2xl;
+  color: $color-white;
+}
+
+.missionCardTitle {
+  font-size: $font-size-lg;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-3 0;
+}
+
+.missionCardDescription {
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+  margin: 0;
+}
+
+.valuesGrid {
+  margin-top: $spacing-8;
+}
+
+.valueItem {
+  text-align: center;
+  padding: $spacing-6;
+  background: $color-bg-secondary;
+  border-radius: $radius-md;
+  height: 100%;
+
+  @include mobile {
+    padding: $spacing-4;
+  }
+}
+
+.valueIcon {
+  font-size: $font-size-xl;
+  color: $color-primary;
+  margin-bottom: $spacing-3;
+  display: block;
+}
+
+.valueItemTitle {
+  font-size: $font-size-base;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-2 0;
+}
+
+.valueItemDescription {
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+  margin: 0;
+}
+
+.trustBadges {
+  margin-top: $spacing-8;
+  background: $color-bg-secondary;
+  border-radius: $radius-lg;
+  padding: $spacing-8;
+
+  @include mobile {
+    padding: $spacing-6;
+  }
+}
+
+.trustBadge {
+  text-align: center;
+  padding: $spacing-4;
+  background: $color-bg-primary;
+  border-radius: $radius-md;
+  border: 1px solid $color-border;
+
+  @include mobile {
+    padding: $spacing-3;
+  }
+}
+
+.badgeIcon {
+  font-size: $font-size-2xl;
+  color: $color-success;
+  display: block;
+  margin-bottom: $spacing-2;
+
+  @include mobile {
+    font-size: $font-size-xl;
+  }
+}
+
+.trustBadgeText {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.contactInfo {
+  margin-top: $spacing-6;
+  padding: $spacing-6;
+  background: $color-bg-secondary;
+  border-radius: $radius-md;
+  text-align: center;
+}
+
+.contactEmail {
+  font-size: $font-size-lg;
+  color: $color-primary;
+}

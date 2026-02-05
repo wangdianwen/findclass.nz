@@ -1,0 +1,507 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.featuresSection {
+  background: $color-bg-primary;
+  padding: $spacing-16 $spacing-6;
+  border-top: 1px solid $color-border;
+  border-bottom: 1px solid $color-border;
+
+  @include tablet {
+    padding: $spacing-12 $spacing-4;
+  }
+}
+
+.featuresContent {
+  max-width: $breakpoint-xl;
+  margin: 0 auto;
+}
+
+.featuresTitle {
+  text-align: center;
+  margin-bottom: $spacing-8;
+  font-size: $font-size-5xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: $spacing-10;
+    height: $spacing-1;
+    background: linear-gradient(90deg, $color-primary-light, $color-cyan-light);
+    margin: $spacing-4 auto 0;
+    border-radius: $radius-xs;
+  }
+}
+
+.featureCard:nth-child(1) {
+  --feature-color: $color-success;
+  --feature-bg: $color-success-bg;
+
+  .featureIconWrapper {
+    background: $color-success-bg;
+    color: $color-success;
+  }
+}
+
+.featureCard:nth-child(2) {
+  --feature-color: $color-info;
+  --feature-bg: $color-info-bg;
+
+  .featureIconWrapper {
+    background: $color-info-bg;
+    color: $color-info;
+  }
+}
+
+.featureCard:nth-child(3) {
+  --feature-color: $color-warning;
+  --feature-bg: $color-warning-bg;
+
+  .featureIconWrapper {
+    background: $color-warning-bg;
+    color: $color-warning;
+  }
+}
+
+.featureCard:nth-child(4) {
+  --feature-color: $color-purple;
+  --feature-bg: $color-purple-bg;
+
+  .featureIconWrapper {
+    background: $color-purple-bg;
+    color: $color-purple;
+  }
+}
+
+.featureCard:nth-child(5) {
+  --feature-color: $color-pink;
+  --feature-bg: $color-pink-bg;
+
+  .featureIconWrapper {
+    background: $color-pink-bg;
+    color: $color-pink;
+  }
+}
+
+.featureCard:nth-child(6) {
+  --feature-color: $color-cyan;
+  --feature-bg: $color-cyan-50;
+
+  .featureIconWrapper {
+    background: $color-cyan-50;
+    color: $color-cyan;
+  }
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-6;
+
+  @include desktop-sm {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-4;
+  }
+}
+
+.featureCard {
+  background: $color-bg-primary;
+  border-radius: $radius-xl;
+  padding: $spacing-8 $spacing-6;
+  text-align: center;
+  transition: all $transition-slow;
+  box-shadow: $shadow-md;
+  border: 1px solid $color-border;
+}
+
+.featureCard:hover {
+  transform: translateY(-4px);
+  box-shadow: $shadow-lg;
+}
+
+.featureIconWrapper {
+  width: $spacing-12;
+  height: $spacing-12;
+  margin: 0 auto $spacing-5;
+  border-radius: $radius-xl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: $shadow-icon-sm;
+}
+
+.featureIconWrapper .featureIcon {
+  font-size: $font-size-3xl;
+  margin: 0;
+}
+
+.featureCard:hover .featureIconWrapper {
+  box-shadow: $shadow-card-hover;
+}
+
+.cardTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-3 0;
+  line-height: 1.4;
+}
+
+.cardDescription {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.featureTabs {
+  margin-top: $spacing-4;
+}
+
+.featureTabs .ant-tabs-nav {
+  margin-bottom: $spacing-8;
+  position: relative;
+}
+
+.featureTabs .ant-tabs-ink-bar {
+  display: none !important;
+}
+
+.featureTabs .ant-tabs-tab {
+  padding: $spacing-3 $spacing-6;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  background: transparent;
+  border: none;
+  border-radius: $radius-md;
+  margin-right: $spacing-2;
+  transition: all $transition-slow;
+
+  @include tablet {
+    padding: $spacing-2 $spacing-4;
+    font-size: $font-size-sm;
+  }
+}
+
+.featureTabs .ant-tabs-tab:hover {
+  color: $color-primary;
+  background: rgba($color-primary, 0.08);
+}
+
+.featureTabs .ant-tabs-tab-active {
+  color: $color-primary-hover;
+  font-weight: $font-weight-semibold;
+  background: linear-gradient(135deg, $color-info-bg 0%, $color-blue-100-light 100%);
+  border: 1px solid $color-blue-200-light;
+}
+
+.featureTabs .ant-tabs-nav::before {
+  border-bottom: 1px solid $color-border;
+}
+
+.tabIconWrapper {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+
+  @include tablet {
+    gap: $spacing-1;
+  }
+}
+
+.tabIconWrapper .anticon {
+  font-size: $font-size-lg;
+
+  @include tablet {
+    font-size: $font-size-base;
+  }
+}
+
+.tabContent {
+  padding: $spacing-4 0;
+}
+
+.roleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-6;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: $spacing-4;
+  }
+}
+
+.roleCard {
+  background: $color-bg-primary;
+  border-radius: $radius-xl;
+  padding: $spacing-7;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-md;
+  transition: all $transition-slow;
+
+  @include tablet {
+    padding: $spacing-5;
+  }
+}
+
+.roleCard:hover {
+  transform: translateY(-4px);
+  box-shadow: $shadow-lg;
+}
+
+.roleIcon {
+  width: $size-icon-lg;
+  height: $size-icon-lg;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-4;
+  font-size: $font-size-2xl;
+  transition: all $transition-slow;
+
+  @include tablet {
+    width: $size-icon-md;
+    height: $size-icon-md;
+    font-size: $font-size-lg;
+  }
+}
+
+.roleCard:nth-child(1) .roleIcon {
+  background: linear-gradient(135deg, $color-success-bg 0%, $color-green-100 100%);
+  color: $color-success;
+  box-shadow: $shadow-success-sm;
+}
+
+.roleCard:nth-child(2) .roleIcon {
+  background: linear-gradient(135deg, $color-info-bg 0%, $color-blue-200 100%);
+  color: $color-info;
+  box-shadow: $shadow-info-sm;
+}
+
+.roleCard:nth-child(3) .roleIcon {
+  background: linear-gradient(135deg, $color-warning-bg 0%, $color-amber-200 100%);
+  color: $color-warning;
+  box-shadow: $shadow-warning-sm;
+}
+
+.roleCard:nth-child(4) .roleIcon {
+  background: linear-gradient(135deg, $color-purple-bg 0%, $color-purple-200 100%);
+  color: $color-purple;
+  box-shadow: $shadow-purple-sm;
+}
+
+.roleGrid:hover .roleIcon {
+  transform: scale(1.1);
+}
+
+.starIcon {
+  color: $color-amber-500;
+}
+
+.roleCardTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-4 0;
+}
+
+.roleList {
+  margin: 0;
+  padding-left: $spacing-5;
+  color: $color-text-secondary;
+  line-height: 1.8;
+  font-size: $font-size-base;
+}
+
+.roleList li {
+  margin-bottom: $spacing-1;
+}
+
+.stepsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-12;
+  padding: $spacing-6 0;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: $spacing-6;
+  }
+}
+
+.stepsLeft,
+.stepsRight {
+  background: $color-bg-primary;
+  border-radius: $radius-xl;
+  padding: $spacing-7;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-md;
+
+  @include tablet {
+    padding: $spacing-5;
+  }
+}
+
+.stepsLeft h3,
+.stepsRight h3 {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-6 0;
+  text-align: center;
+}
+
+.stepsContainer .ant-steps-item-title {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+}
+
+.stepsContainer .ant-steps-item-description {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.howItWorksGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-6;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-4;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.howItWorksCard {
+  background: $color-bg-primary;
+  border-radius: $radius-xl;
+  padding: $spacing-7;
+  text-align: center;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-md;
+  transition: all $transition-slow;
+  position: relative;
+  overflow: hidden;
+
+  @include tablet {
+    padding: $spacing-5;
+  }
+}
+
+.howItWorksCard:hover {
+  transform: translateY(-4px);
+  box-shadow: $shadow-lg;
+}
+
+.howItWorksNumber {
+  width: $size-icon-md;
+  height: $size-icon-md;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto $spacing-4;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  transition: all $transition-slow;
+
+  @include tablet {
+    width: $size-icon-sm;
+    height: $size-icon-sm;
+    font-size: $font-size-base;
+  }
+}
+
+.howItWorksCard:nth-child(1) .howItWorksNumber {
+  background: linear-gradient(135deg, $color-success-bg 0%, $color-green-100 100%);
+  color: $color-success;
+  box-shadow: $shadow-success-md;
+}
+
+.howItWorksCard:nth-child(2) .howItWorksNumber {
+  background: linear-gradient(135deg, $color-info-bg 0%, $color-blue-200 100%);
+  color: $color-info;
+  box-shadow: $shadow-info-md;
+}
+
+.howItWorksCard:nth-child(3) .howItWorksNumber {
+  background: linear-gradient(135deg, $color-warning-bg 0%, $color-amber-200 100%);
+  color: $color-warning;
+  box-shadow: $shadow-warning-md;
+}
+
+.howItWorksCard:nth-child(4) .howItWorksNumber {
+  background: linear-gradient(135deg, $color-purple-bg 0%, $color-purple-200 100%);
+  color: $color-purple;
+  box-shadow: $shadow-purple-md;
+}
+
+.howItWorksCard:nth-child(5) .howItWorksNumber {
+  background: linear-gradient(135deg, $color-pink-bg 0%, $color-pink-100 100%);
+  color: $color-pink;
+  box-shadow: $shadow-pink-md;
+}
+
+.howItWorksCard:nth-child(6) .howItWorksNumber {
+  background: linear-gradient(135deg, $color-cyan-50 0%, $color-cyan-100 100%);
+  color: $color-cyan;
+  box-shadow: $shadow-cyan-md;
+}
+
+.howItWorksGrid:hover .howItWorksNumber {
+  transform: scale(1.1);
+}
+
+.howItWorksCardTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-3 0;
+}
+
+.howItWorksCardDescription {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: $breakpoint-xl) {
+  .courseGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .featureTabs .ant-tabs-nav {
+    margin-bottom: $spacing-6;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .featureTabs .ant-tabs-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .courseGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .courseCard {
+    min-width: $size-course-card-min-width;
+  }
+}

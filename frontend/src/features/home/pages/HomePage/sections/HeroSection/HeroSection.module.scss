@@ -1,0 +1,230 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.hero {
+  background: linear-gradient(
+    135deg,
+    $color-blue-50 0%,
+    $color-blue-100-light 50%,
+    $color-blue-50 100%
+  );
+  padding: $spacing-16 $spacing-6;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  @include tablet {
+    padding: $spacing-12 $spacing-4;
+  }
+}
+
+:global(.hero)::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba($color-primary, 0.08) 0%, transparent 50%);
+  animation: pulse 15s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.heroContent {
+  max-width: $size-hero-max-width;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.heroTitle {
+  font-size: $font-size-hero;
+  font-weight: 800;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-4 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  @include tablet {
+    font-size: $font-size-4xl;
+  }
+}
+
+.heroSubtitle {
+  font-size: $font-size-xl;
+  color: $color-text-secondary;
+  margin: 0 0 $spacing-10 0;
+  line-height: 1.6;
+
+  @include tablet {
+    font-size: $font-size-base;
+  }
+}
+
+.searchContainer {
+  max-width: $size-search-max-width;
+  margin: 0 auto;
+}
+
+.searchBar {
+  display: flex;
+  gap: $spacing-2;
+  background: $color-bg-primary;
+  padding: $spacing-2;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-hero;
+  border: 1px solid $color-border;
+
+  @include tablet {
+    flex-direction: column;
+  }
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  box-shadow: none;
+  font-size: $font-size-lg;
+}
+
+.searchInput input {
+  border: none;
+  box-shadow: none;
+}
+
+.searchInput:hover {
+  background: transparent;
+}
+
+.searchIcon {
+  color: $color-text-tertiary;
+  font-size: $font-size-xl;
+}
+
+.searchButton {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-hover 100%);
+  border: none;
+  border-radius: $radius-lg;
+  padding: 0 $spacing-8;
+  height: $size-icon-md;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-lg;
+  transition: all $transition-slow;
+
+  @include tablet {
+    width: 100%;
+  }
+}
+
+.searchButton:hover {
+  background: linear-gradient(135deg, $color-primary-light 0%, $color-primary 100%);
+  transform: translateY(-2px);
+  box-shadow: $shadow-primary-lg;
+}
+
+.quickFilters {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+  margin-top: $spacing-6;
+}
+
+.filterLabel {
+  color: $color-text-tertiary;
+  font-size: $font-size-base;
+  margin-top: $spacing-1;
+  flex-shrink: 0;
+}
+
+.tagList {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.filterTag {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-3;
+  background: $color-bg-tertiary;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  color: $color-text-secondary;
+  font-size: $font-size-base;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: $color-blue-100-light;
+    color: $color-primary-hover;
+    border-color: $color-blue-300;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.tagIcon {
+  font-size: $font-size-sm;
+}
+
+.tagText {
+  line-height: 1.4;
+}
+
+.popularSearches {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: $spacing-3;
+  margin-top: $spacing-6;
+}
+
+.popularLabel {
+  color: $color-text-tertiary;
+  font-size: $font-size-base;
+  margin-top: $spacing-1;
+  flex-shrink: 0;
+}
+
+.popularTag {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-1 $spacing-3;
+  background: $color-bg-tertiary;
+  border: 1px solid $color-border;
+  border-radius: $radius-2xl;
+  color: $color-text-secondary;
+  font-size: $font-size-base;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: $color-blue-100-light;
+    color: $color-primary-hover;
+    border-color: $color-blue-300;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}

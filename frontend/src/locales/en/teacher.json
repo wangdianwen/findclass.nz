@@ -1,0 +1,367 @@
+{
+  "nav": {
+    "profile": "Profile",
+    "courses": "My Courses",
+    "students": "Students",
+    "revenue": "Revenue"
+  },
+
+  "teacherOnboarding": {
+    "title": "Become a Teacher",
+    "subtitle": "Share your knowledge and inspire students on FindClass",
+    "pageTitle": "Teacher Application",
+
+    "steps": {
+      "basicInfo": "Basic Information",
+      "evidence": "Teaching Evidence",
+      "review": "Review & Submit",
+      "status": "Application Status"
+    },
+
+    "form": {
+      "name": "Display Name",
+      "namePlaceholder": "Enter your display name",
+      "nameRequired": "Please enter your display name",
+
+      "basicInfo": "Basic Information",
+      "teachingInfo": "Teaching Information",
+
+      "subject": "Teaching Subjects",
+      "subjectPlaceholder": "Select your teaching subjects (max 5)",
+      "subjectRequired": "Please select at least one subject",
+      "subjectMax5": "Maximum 5 subjects can be selected",
+
+      "experience": "Years of Experience",
+      "experiencePlaceholder": "Enter years of teaching experience",
+      "experienceRequired": "Please enter teaching experience",
+      "experienceInvalid": "Please enter a valid number (0-50)",
+
+      "education": "Highest Education",
+      "educationPlaceholder": "Select your highest education",
+      "educationRequired": "Please select your education level",
+
+      "university": "University/Institution",
+      "universityPlaceholder": "Enter your university name",
+      "universityRequired": "Please enter your university name",
+
+      "bio": "Teaching Introduction",
+      "bioPlaceholder": "Introduce yourself and your teaching style (50-500 characters)",
+      "bioRequired": "Please enter your teaching introduction",
+      "bioTooShort": "Introduction must be at least 50 characters",
+      "bioTooLong": "Introduction must not exceed 500 characters",
+
+      "teachingInfo": "Teaching Information",
+      "years": "years",
+      "subjectHint": "Select up to {{count}} subjects"
+    },
+
+    "validation": {
+      "subjectRequired": "Please select at least one teaching subject",
+      "maxSubjects": "Maximum {{count}} subjects can be selected",
+      "bioMinLength": "Introduction must be at least 20 characters",
+      "bioMaxLength": "Introduction must not exceed 1000 characters"
+    },
+
+    "educationOptions": {
+      "highSchool": "High School / Secondary",
+      "associate": "Associate Degree",
+      "bachelor": "Bachelor's Degree",
+      "master": "Master's Degree",
+      "doctorate": "Doctorate",
+      "other": "Other"
+    },
+
+    "subjectOptions": {
+      "chinese": "Chinese / Mandarin",
+      "math": "Mathematics",
+      "english": "English",
+      "physics": "Physics",
+      "chemistry": "Chemistry",
+      "biology": "Biology",
+      "science": "General Science",
+      "geography": "Geography",
+      "history": "History",
+      "civics": "Civics / Social Studies",
+      "music": "Music",
+      "art": "Art / Design",
+      "pe": "Physical Education",
+      "it": "IT / Computer Science",
+      "other": "Other"
+    },
+
+    "evidence": {
+      "title": "Teaching Evidence",
+      "description": "Show us your teaching experience and abilities. Upload photos, videos, or share links to your teaching content.",
+
+      "teachingPhotos": "Teaching Photos/Videos",
+      "teachingPhotosDesc": "Photos or videos of you teaching (classroom, online sessions, tutoring, etc.)",
+      "teachingPhotosRequired": "At least one teaching photo/video is required",
+
+      "platformLinks": "Teaching Platform Links",
+      "platformLinksDesc": "Links to your teaching profiles on other platforms (LinkedIn, TikTok, YouTube, Bilibili, etc.)",
+      "linkPlaceholder": "Paste your profile or video link here",
+      "addLink": "Add",
+
+      "introLetter": "Teaching Introduction Letter",
+      "introLetterDesc": "A detailed introduction about yourself and your teaching philosophy",
+      "introLetterRequired": "Introduction letter is required",
+
+      "awards": "Awards & Certificates",
+      "awardsDesc": "Teaching awards, certifications, or other credentials (optional)",
+
+      "maxSize": "Maximum file size: {{size}}",
+
+      "upload": "Upload File",
+      "uploadSuccess": "Evidence uploaded successfully",
+      "uploadError": "Upload failed, please try again"
+    },
+
+    "review": {
+      "title": "Review Your Application",
+      "description": "Please review your information before submitting.",
+
+      "basicInfo": "Basic Information",
+      "qualificationsInfo": "Uploaded Documents",
+
+      "edit": "Edit",
+      "submit": "Submit Application",
+
+      "confirmSubmit": "Confirm Submission",
+      "confirmSubmitMessage": "By submitting, you confirm that all information provided is accurate and authentic."
+    },
+
+    "status": {
+      "title": "Application Status",
+
+      "pending": {
+        "title": "Under Review",
+        "description": "Your application is being reviewed by our team."
+      },
+
+      "approved": {
+        "title": "Congratulations!",
+        "description": "Your teacher application has been approved.",
+        "nextSteps": "You can now create courses and start teaching!",
+        "goToDashboard": "Go to Teacher Dashboard"
+      },
+
+      "rejected": {
+        "title": "Application Not Approved",
+        "description": "Unfortunately, your application did not meet our requirements.",
+        "reasonLabel": "Reason:",
+        "contact": "If you have questions, please contact our support team.",
+        "resubmit": "Update and Resubmit"
+      },
+
+      "revision": {
+        "title": "Revision Required",
+        "description": "Please update your application with the following changes:",
+        "update": "Update Application"
+      }
+    },
+
+    "success": {
+      "title": "Welcome to FindClass!",
+      "subtitle": "Your teacher account has been activated successfully.",
+
+      "quickActions": "Quick Actions",
+      "createCourse": "Create Your First Course",
+      "viewDashboard": "Go to Teacher Dashboard",
+      "viewStudents": "View Students",
+
+      "gettingStarted": "Getting Started",
+      "setupProfile": "Complete your teacher profile",
+      "addCourse": "Add your first course",
+      "setSchedule": "Set your availability",
+
+      "help": "Need Help?",
+      "docs": "Teacher Guide",
+      "support": "Contact Support"
+    },
+
+    "navigation": {
+      "back": "Back",
+      "next": "Next",
+      "saveDraft": "Save as Draft",
+      "cancel": "Cancel"
+    },
+
+    "messages": {
+      "draftSaved": "Draft saved successfully",
+      "submitSuccess": "Application submitted successfully!",
+      "submitError": "Failed to submit application. Please try again.",
+      "networkError": "Network error. Please check your connection.",
+      "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?"
+    }
+  },
+
+  "teacherDashboard": {
+    "title": "Teacher Dashboard",
+    "welcome": "Welcome, {{name}}",
+    "verified": "Verified Teacher",
+
+    "editProfile": "Edit Profile",
+    "studentView": "Student View",
+
+    "stats": {
+      "totalCourses": "Total Courses",
+      "totalStudents": "Total Students",
+      "monthlyRevenue": "Monthly Revenue",
+      "avgRating": "Average Rating"
+    },
+
+    "nav": {
+      "profile": "Profile",
+      "overview": "Overview",
+      "courses": "My Courses",
+      "students": "Students",
+      "revenue": "Revenue",
+      "replies": "Replies",
+      "settings": "Settings"
+    },
+
+    "quickActions": "Quick Actions",
+    "exportData": "Export Data",
+
+    "students": {
+      "name": "Student",
+      "contact": "Contact",
+      "courses": "Enrolled Courses",
+      "joined": "Joined",
+      "actions": "Actions",
+      "contactBtn": "Contact"
+    },
+
+    "revenue": {
+      "monthly": "Monthly Revenue",
+      "total": "Total Revenue",
+      "hours": "Teaching Hours",
+      "notes": {
+        "title": "Important Notes",
+        "offline": "This is an estimate based on your class hours. Payment is handled offline.",
+        "cash": "All payments are collected directly by you (bank transfer, cash, etc.)."
+      }
+    }
+  },
+
+  "myCourses": {
+    "title": "My Courses",
+    "empty": "You haven't created any courses yet",
+    "emptyDesc": "Create your first course to start teaching",
+    "createCourse": "Create Course",
+    "editCourse": "Edit Course",
+    "deleteCourse": "Delete Course",
+    "deleteConfirm": "Are you sure you want to delete this course?",
+    "viewDetails": "View Details",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "paused": "Paused"
+    }
+  },
+
+  "profile": {
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "success": "Profile updated successfully!",
+    "required": "This field is required",
+    "validation": {
+      "phoneFormat": "Please enter a valid phone number"
+    }
+  },
+
+  "replies": {
+    "title": "Review Replies",
+    "nav": "Replies",
+    "description": "Respond to student reviews and build trust with parents",
+    "stats": {
+      "pending": "Pending Replies",
+      "replied": "Replied",
+      "total": "Total Reviews"
+    },
+
+    "empty": "No reviews yet",
+    "emptyDesc": "When students leave reviews, they will appear here",
+
+    "filter": {
+      "all": "All Reviews",
+      "pending": "Pending",
+      "replied": "Replied"
+    },
+
+    "category": {
+      "all": "All",
+      "review": "Course Reviews",
+      "inquiry": "Course Inquiries",
+      "type": "Type"
+    },
+
+    "columns": {
+      "review": "Review",
+      "rating": "Rating",
+      "date": "Date",
+      "status": "Status",
+      "actions": "Actions"
+    },
+
+    "status": {
+      "pending": "Pending Reply",
+      "replied": "Replied",
+      "overdue": "Overdue"
+    },
+
+    "reply": {
+      "placeholder": "Write your reply (max 500 characters)",
+      "charCount": "{{current}}/500 characters",
+      "minLength": "Reply must be at least 10 characters",
+      "success": "Reply posted successfully!",
+      "error": "Failed to post reply. Please try again."
+    },
+
+    "inquiry": {
+      "placeholder": "Write your response (max 500 characters)",
+      "charCount": "{{current}}/500 characters",
+      "minLength": "Response must be at least 5 characters",
+      "success": "Response sent successfully!",
+      "error": "Failed to send response. Please try again."
+    },
+
+    "templates": {
+      "title": "Quick Templates",
+      "thank": "Thank You",
+      "apologize": "Apology",
+      "explain": "Explanation",
+      "encourage": "Encouragement"
+    },
+
+    "templateContent": {
+      "thank1": "Thank you for your kind words! We're glad to hear that the classes are helping. Your child's progress is our greatest motivation.",
+      "thank2": "Thank you so much for the wonderful review! We're committed to providing the best learning experience for every student.",
+      "apologize1": "We sincerely apologize for any inconvenience. We will continue to improve our teaching quality.",
+      "apologize2": "We're sorry that the experience didn't meet your expectations. Please contact us directly so we can address your concerns.",
+      "explain1": "Thank you for your feedback. We're constantly working to improve our teaching methods and materials.",
+      "explain2": "We appreciate your honest review. Your suggestions are valuable for our continuous improvement.",
+      "encourage1": "Keep up the great work! We believe every student can achieve their goals with dedication.",
+      "encourage2": "Learning is a journey. Thank you for trusting us to be part of your child's education."
+    },
+
+    "actions": {
+      "reply": "Reply",
+      "cancel": "Cancel",
+      "post": "Post Reply",
+      "useTemplate": "Use Template"
+    },
+
+    "confirm": {
+      "title": "Post Reply",
+      "message": "Are you sure you want to post this reply?"
+    },
+
+    "messages": {
+      "replySuccess": "Reply posted successfully!",
+      "replyError": "Failed to post reply",
+      "networkError": "Network error. Please check your connection."
+    }
+  }
+}

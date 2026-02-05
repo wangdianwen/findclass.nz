@@ -1,0 +1,205 @@
+{
+  "title": "Personal Center",
+  "subtitle": "Manage your account and preferences",
+  "nav": {
+    "profile": "Profile",
+    "favorites": "Favorites",
+    "history": "Learning History",
+    "notifications": "Notifications",
+    "children": "My Children",
+    "teaching": "Teaching Center",
+    "reviews": "My Reviews"
+  },
+  "teaching": {
+    "title": "Teaching Center",
+    "subtitle": "Share your knowledge and inspire students",
+    "apply": "Apply to Become a Teacher",
+    "applied": "Application Submitted",
+    "approved": "Go to Teacher Dashboard",
+    "pending": "View Application Status",
+    "dashboardTitle": "Teacher Dashboard",
+    "dashboardSubtitle": "Manage your courses, students, and view revenue",
+    "goToDashboard": "Enter Dashboard"
+  },
+  "profile": {
+    "title": "Profile Information",
+    "avatar": "Avatar",
+    "fullName": "Full Name",
+    "displayName": "Display Name",
+    "gender": "Gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderOther": "Other",
+    "genderPreferNot": "Prefer not to say",
+    "email": "Email",
+    "phone": "Phone",
+    "wechat": "WeChat",
+    "edit": "Edit Profile",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "changeAvatar": "Change Avatar",
+    "removeAvatar": "Remove",
+    "cropAvatar": "Edit Avatar",
+    "joinedDate": "Member since {{date}}",
+    "required": "This field is required",
+    "selectAvatar": "Choose an avatar",
+    "avatarDefault": "Default",
+    "avatarUpload": "Upload",
+    "uploadAvatar": "Choose Image",
+    "placeholder": {
+      "fullName": "Enter your full name",
+      "displayName": "Enter your display name",
+      "phone": "Enter your phone number",
+      "wechat": "Enter your WeChat ID"
+    }
+  },
+  "favorites": {
+    "title": "My Favorites",
+    "empty": "No favorites yet",
+    "emptyDesc": "Start exploring courses and save your favorites here",
+    "courses": "Courses",
+    "teachers": "Teachers",
+    "institutions": "Institutions",
+    "remove": "Remove",
+    "removeSuccess": "Removed from favorites"
+  },
+  "history": {
+    "title": "Learning History",
+    "empty": "No learning history",
+    "emptyDesc": "Your viewed courses will appear here",
+    "clear": "Clear History",
+    "clearConfirm": "Are you sure you want to clear all learning history?",
+    "clearSuccess": "Learning history cleared",
+    "lastViewed": "Last viewed",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}} days ago",
+    "statusCompleted": "Completed",
+    "statusInProgress": "In Progress",
+    "statusNotStarted": "Not Started",
+    "filterBy": "Filter by learner:",
+    "allRecords": "All",
+    "learnerSelf": "Me",
+    "noRecordsFor": "No records for {{name}}"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "emptyDesc": "You're all caught up!",
+    "markRead": "Mark as Read",
+    "markAllRead": "Mark All as Read",
+    "delete": "Delete",
+    "unreadCount": "{{count}} unread",
+    "types": {
+      "system": "System",
+      "course": "Course",
+      "promotion": "Promotion",
+      "reminder": "Reminder"
+    },
+    "settings": "Notification Settings"
+  },
+  "settings": {
+    "title": "Account Settings",
+    "account": {
+      "title": "Account Security",
+      "changePassword": "Change Password",
+      "passwordUpdated": "Password updated successfully",
+      "bindPhone": "Bind Phone",
+      "bindEmail": "Bind Email",
+      "unbind": "Unbind",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "profileVisibility": "Profile Visibility",
+      "showEmail": "Show email to others",
+      "showPhone": "Show phone to others",
+      "showWechat": "Show WeChat to others",
+      "showRealName": "Show real name to others"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "theme": "Theme",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeSystem": "System Default",
+      "language": "Language",
+      "languageEn": "English",
+      "languageZh": "中文"
+    },
+    "danger": {
+      "title": "Danger Zone",
+      "deleteAccount": "Delete Account",
+      "deleteConfirm": "This action cannot be undone. All your data will be permanently deleted.",
+      "deleteSuccess": "Account deleted successfully"
+    }
+  },
+  "teacherDashboard": "Teacher Dashboard",
+  "logout": {
+    "button": "Log Out",
+    "confirm": "Are you sure you want to log out?",
+    "success": "Logged out successfully"
+  },
+  "children": {
+    "title": "My Children",
+    "subtitle": "Manage your children's information for course enrollment",
+    "add": "Add Child",
+    "edit": "Edit",
+    "delete": "Delete",
+    "empty": "No children added yet",
+    "emptyDesc": "Add your children's information to make course enrollment easier",
+    "form": {
+      "title": "Child Information",
+      "name": "Name",
+      "namePlaceholder": "Enter child's name",
+      "gender": "Gender",
+      "genderMale": "Male",
+      "genderFemale": "Female",
+      "genderOther": "Other",
+      "grade": "Grade",
+      "required": "This field is required",
+      "save": "Save",
+      "cancel": "Cancel",
+      "addChild": "Add Child",
+      "editChild": "Edit Child"
+    },
+    "genderLabel": "Gender: {{gender}}",
+    "gradeLabel": "Grade: {{grade}}",
+    "deleteConfirm": "Are you sure you want to remove {{name}}?",
+    "deleteSuccess": "Child removed successfully",
+    "saveSuccess": "Child information saved successfully",
+    "gradeOptions": {
+      "preschool": "Preschool",
+      "primary": {
+        "1": "Year 1",
+        "2": "Year 2",
+        "3": "Year 3",
+        "4": "Year 4",
+        "5": "Year 5",
+        "6": "Year 6"
+      },
+      "secondary": {
+        "7": "Year 7",
+        "8": "Year 8",
+        "9": "Year 9"
+      },
+      "high": {
+        "10": "Year 10",
+        "11": "Year 11",
+        "12": "Year 12",
+        "13": "Year 13"
+      }
+    }
+  },
+  "success": "Saved successfully!",
+  "error": {
+    "network": "Network error. Please try again.",
+    "updateFailed": "Failed to update. Please try again."
+  }
+}

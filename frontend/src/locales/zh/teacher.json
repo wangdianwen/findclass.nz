@@ -1,0 +1,366 @@
+{
+  "nav": {
+    "profile": "个人资料",
+    "courses": "我的课程",
+    "students": "学员",
+    "revenue": "收入"
+  },
+
+  "teacherOnboarding": {
+    "title": "申请成为教师",
+    "subtitle": "分享知识，成就学生，在 FindClass 开启教学之旅",
+    "pageTitle": "教师入驻申请",
+
+    "steps": {
+      "basicInfo": "基本信息",
+      "evidence": "教学证明",
+      "review": "确认提交",
+      "status": "申请状态"
+    },
+
+    "form": {
+      "name": "显示名称",
+      "namePlaceholder": "请输入您的显示名称",
+      "nameRequired": "请输入显示名称",
+
+      "basicInfo": "基本信息",
+      "teachingInfo": "教学信息",
+
+      "subject": "教学科目",
+      "subjectPlaceholder": "选择您的教学科目（最多5个）",
+      "subjectRequired": "请至少选择一个科目",
+      "subjectMax5": "最多选择5个教学科目",
+
+      "experience": "教学经验（年）",
+      "experiencePlaceholder": "请输入教学年限",
+      "experienceRequired": "请输入教学经验",
+      "experienceInvalid": "请输入有效的数字（0-50）",
+
+      "education": "最高学历",
+      "educationPlaceholder": "请选择最高学历",
+      "educationRequired": "请选择学历",
+
+      "university": "毕业院校",
+      "universityPlaceholder": "请输入毕业院校名称",
+      "universityRequired": "请输入毕业院校",
+
+      "bio": "教学简介",
+      "bioPlaceholder": "介绍一下您的教学风格和经验（50-500字）",
+      "bioRequired": "请输入教学简介",
+      "bioTooShort": "简介至少需要50个字",
+      "bioTooLong": "简介不能超过500字",
+
+      "years": "年",
+      "subjectHint": "最多选择 {{count}} 个科目"
+    },
+
+    "validation": {
+      "subjectRequired": "请至少选择一个教学科目",
+      "maxSubjects": "最多选择 {{count}} 个教学科目",
+      "bioMinLength": "简介至少需要20个字",
+      "bioMaxLength": "简介不能超过1000字"
+    },
+
+    "educationOptions": {
+      "highSchool": "高中/中专",
+      "associate": "大专",
+      "bachelor": "本科",
+      "master": "硕士",
+      "doctorate": "博士",
+      "other": "其他"
+    },
+
+    "subjectOptions": {
+      "chinese": "语文/中文",
+      "math": "数学",
+      "english": "英语",
+      "physics": "物理",
+      "chemistry": "化学",
+      "biology": "生物",
+      "science": "科学",
+      "geography": "地理",
+      "history": "历史",
+      "civics": "政治/思想品德",
+      "music": "音乐",
+      "art": "美术/艺术",
+      "pe": "体育/健康",
+      "it": "信息技术/计算机",
+      "other": "其他"
+    },
+
+    "evidence": {
+      "title": "教学证明",
+      "description": "展示您的教学经验和能力。上传照片、视频，或分享您教学内容的链接。",
+
+      "teachingPhotos": "教学照片/视频",
+      "teachingPhotosDesc": "您正在教学的照片或视频（课堂、在线授课、家教等）",
+      "teachingPhotosRequired": "请至少上传一张教学照片或视频",
+
+      "platformLinks": "教学平台链接",
+      "platformLinksDesc": "您在其他教学平台的个人主页或视频链接（LinkedIn、抖音、B站、YouTube等）",
+      "linkPlaceholder": "粘贴您的个人主页或视频链接",
+      "addLink": "添加",
+
+      "introLetter": "教学介绍信",
+      "introLetterDesc": "详细介绍您自己和教学理念",
+      "introLetterRequired": "请上传教学介绍信",
+
+      "awards": "获奖证书",
+      "awardsDesc": "教学奖项、证书或其他资质（选填）",
+
+      "maxSize": "最大文件大小：{{size}}",
+
+      "upload": "上传文件",
+      "uploadSuccess": "证明材料上传成功",
+      "uploadError": "上传失败，请重试"
+    },
+
+    "review": {
+      "title": "确认申请信息",
+      "description": "提交前请仔细核对以下信息。",
+
+      "basicInfo": "基本信息",
+      "qualificationsInfo": "已上传材料",
+
+      "edit": "修改",
+      "submit": "提交申请",
+
+      "confirmSubmit": "确认提交",
+      "confirmSubmitMessage": "提交即表示您确认以上信息真实准确。"
+    },
+
+    "status": {
+      "title": "申请状态",
+
+      "pending": {
+        "title": "审核中",
+        "description": "您的申请正在由我们的团队审核中。"
+      },
+
+      "approved": {
+        "title": "恭喜！",
+        "description": "您的教师申请已通过审核。",
+        "nextSteps": "现在可以创建课程开始授课了！",
+        "goToDashboard": "前往教师后台"
+      },
+
+      "rejected": {
+        "title": "申请未通过",
+        "description": "很抱歉，您的申请未通过我们的审核要求。",
+        "reasonLabel": "拒绝原因：",
+        "contact": "如有疑问，请联系客服。",
+        "resubmit": "修改并重新提交"
+      },
+
+      "revision": {
+        "title": "需要补充修改",
+        "description": "请根据以下要求修改您的申请：",
+        "update": "修改申请"
+      }
+    },
+
+    "success": {
+      "title": "欢迎加入 FindClass！",
+      "subtitle": "您的教师账号已激活成功。",
+
+      "quickActions": "快捷操作",
+      "createCourse": "创建第一门课程",
+      "viewDashboard": "进入教师后台",
+      "viewStudents": "查看学员",
+
+      "gettingStarted": "开始使用",
+      "setupProfile": "完善教师资料",
+      "addCourse": "添加课程",
+      "setSchedule": "设置可授课时间",
+
+      "help": "需要帮助？",
+      "docs": "教师使用指南",
+      "support": "联系客服"
+    },
+
+    "navigation": {
+      "back": "上一步",
+      "next": "下一步",
+      "saveDraft": "保存草稿",
+      "cancel": "取消"
+    },
+
+    "messages": {
+      "draftSaved": "草稿已保存",
+      "submitSuccess": "申请提交成功！",
+      "submitError": "提交失败，请重试",
+      "networkError": "网络错误，请检查网络连接",
+      "unsavedChanges": "您有未保存的修改，确定要离开吗？"
+    }
+  },
+
+  "teacherDashboard": {
+    "title": "教师后台",
+    "welcome": "欢迎您，{{name}}",
+    "verified": "认证教师",
+
+    "editProfile": "编辑资料",
+    "studentView": "学员视角",
+
+    "stats": {
+      "totalCourses": "课程总数",
+      "totalStudents": "学员总数",
+      "monthlyRevenue": "本月收入",
+      "avgRating": "平均评分"
+    },
+
+    "nav": {
+      "profile": "个人资料",
+      "overview": "概览",
+      "courses": "我的课程",
+      "students": "学员管理",
+      "revenue": "收入预估",
+      "replies": "回复管理",
+      "settings": "设置"
+    },
+
+    "quickActions": "快捷操作",
+    "exportData": "导出数据",
+
+    "students": {
+      "name": "学员",
+      "contact": "联系方式",
+      "courses": "报名课程",
+      "joined": "加入时间",
+      "actions": "操作",
+      "contactBtn": "联系"
+    },
+
+    "revenue": {
+      "monthly": "本月收入",
+      "total": "总收入",
+      "hours": "本月课时",
+      "notes": {
+        "title": "重要说明",
+        "offline": "此数据为预估收入，实际收款请线下处理。",
+        "cash": "所有费用由您自行收取（银行转账、现金等）。"
+      }
+    }
+  },
+
+  "myCourses": {
+    "title": "我的课程",
+    "empty": "您还没有创建任何课程",
+    "emptyDesc": "创建第一门课程开始授课吧",
+    "createCourse": "创建课程",
+    "editCourse": "编辑课程",
+    "deleteCourse": "删除课程",
+    "deleteConfirm": "确定要删除这门课程吗？",
+    "viewDetails": "查看详情",
+    "status": {
+      "draft": "草稿",
+      "published": "已发布",
+      "paused": "已暂停"
+    }
+  },
+
+  "profile": {
+    "edit": "编辑",
+    "save": "保存",
+    "cancel": "取消",
+    "success": "资料更新成功！",
+    "required": "此项为必填项",
+    "validation": {
+      "phoneFormat": "请输入正确的电话号码格式"
+    }
+  },
+
+  "replies": {
+    "title": "评价回复",
+    "nav": "回复管理",
+    "description": "回复学员评价，与家长建立信任",
+    "stats": {
+      "pending": "待回复",
+      "replied": "已回复",
+      "total": "总评价数"
+    },
+
+    "empty": "暂无评价",
+    "emptyDesc": "学员留下的评价将显示在这里",
+
+    "filter": {
+      "all": "全部评价",
+      "pending": "待回复",
+      "replied": "已回复"
+    },
+
+    "category": {
+      "all": "全部",
+      "review": "课程评价",
+      "inquiry": "课程咨询",
+      "type": "分类"
+    },
+
+    "columns": {
+      "review": "评价内容",
+      "rating": "评分",
+      "date": "日期",
+      "status": "状态",
+      "actions": "操作"
+    },
+
+    "status": {
+      "pending": "待回复",
+      "replied": "已回复",
+      "overdue": "已过期"
+    },
+
+    "reply": {
+      "placeholder": "撰写回复（最多500字）",
+      "charCount": "{{current}}/500 字",
+      "minLength": "回复至少需要10个字",
+      "success": "回复发布成功！",
+      "error": "回复失败，请重试。"
+    },
+
+    "inquiry": {
+      "placeholder": "撰写回复（最多500字）",
+      "charCount": "{{current}}/500 字",
+      "minLength": "回复至少需要5个字",
+      "success": "回复已发送！",
+      "error": "回复失败，请重试。"
+    },
+
+    "templates": {
+      "title": "快捷模板",
+      "thank": "感谢类",
+      "apologize": "致歉类",
+      "explain": "解释类",
+      "encourage": "鼓励类"
+    },
+
+    "templateContent": {
+      "thank1": "感谢您的认可！很高兴课程对孩子有所帮助。孩子的进步是我们最大的动力。",
+      "thank2": "非常感谢您的好评！我们会继续努力，为每一位学员提供最优质的学习体验。",
+      "apologize1": "对此给您带来的不便，我们深表歉意。我们会持续改进教学质量。",
+      "apologize2": "很抱歉这次体验未能达到您的期望。请直接联系我们，我们会认真处理您的反馈。",
+      "explain1": "感谢您的反馈。我们会不断改进教学方法和课程内容。",
+      "explain2": "感谢您真诚的评价。您的建议对我们非常重要，我们会持续改进。",
+      "encourage1": "继续加油！我们相信通过努力，每个孩子都能实现自己的目标。",
+      "encourage2": "学习是一场旅程。感谢您信任我们，陪伴孩子成长。"
+    },
+
+    "actions": {
+      "reply": "回复",
+      "cancel": "取消",
+      "post": "发布回复",
+      "useTemplate": "使用模板"
+    },
+
+    "confirm": {
+      "title": "发布回复",
+      "message": "确定要发布这条回复吗？"
+    },
+
+    "messages": {
+      "replySuccess": "回复发布成功！",
+      "replyError": "回复失败",
+      "networkError": "网络错误，请检查网络连接"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.contactForm {
+  background: $color-bg-secondary;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-8;
+  margin-top: $spacing-6;
+
+  @include tablet {
+    padding: $spacing-5;
+  }
+
+  .formRow {
+    display: flex;
+    gap: $spacing-4;
+
+    @include tablet {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+
+  .formItemHalf {
+    flex: 1;
+
+    @include tablet {
+      margin-bottom: 0;
+    }
+  }
+
+  .submitButton {
+    width: auto;
+    min-width: 150px;
+    margin-top: $spacing-4;
+  }
+}

@@ -1,0 +1,50 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.contentPage {
+  min-height: 100vh;
+  background: $color-bg-primary;
+}
+
+.content {
+  max-width: $size-content-max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-6 $spacing-16;
+
+  @include tablet {
+    padding: 0 $spacing-4 $spacing-12;
+  }
+
+  @include mobile {
+    padding: 0 $spacing-3 $spacing-8;
+  }
+}
+
+.pageTitle {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-2 0;
+
+  @include tablet {
+    font-size: $font-size-3xl;
+  }
+
+  @include mobile {
+    font-size: $font-size-2xl;
+  }
+}
+
+.lastUpdated {
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+  margin-bottom: $spacing-10 !important;
+
+  @include tablet {
+    margin-bottom: $spacing-8 !important;
+  }
+}
+
+.body {
+  // Content sections are styled individually
+}

@@ -1,0 +1,27 @@
+{
+  "feedback": "举报问题",
+  "description": "通过举报过时或错误的课程信息，帮助我们维护一个高质量的平台。",
+
+  "formTitle": "提交举报",
+  "formDesc": "请填写以下表格举报课程列表中的问题。",
+
+  "form.name": "姓名",
+  "form.namePlaceholder": "您的姓名（可选）",
+  "form.email": "电子邮箱",
+  "form.emailPlaceholder": "your@email.com",
+  "form.subject": "问题类型",
+  "form.subjectPlaceholder": "选择问题类型",
+  "form.subjectExpired": "信息已过期",
+  "form.subjectIncorrect": "信息错误",
+  "form.subjectFake": "可疑/虚假信息",
+  "form.subjectInvalidContact": "联系方式无效",
+  "form.subjectInappropriate": "不当内容",
+  "form.subjectOther": "其他",
+  "form.message": "详细内容",
+  "form.messagePlaceholder": "请详细描述问题...",
+  "form.submit": "提交举报",
+  "form.required": "此项为必填",
+  "form.emailInvalid": "请输入有效的电子邮箱地址",
+  "form.success": "感谢您的举报！我们会在7个工作日内处理。",
+  "form.error": "提交失败，请稍后重试。"
+}

@@ -1,0 +1,126 @@
+{
+  "pageTitle": "Reviews",
+  "title": "Reviews",
+  "reviewsCount": "{{count}} reviews",
+  "noReviews": "No reviews yet",
+  "writeReview": "Write a Review",
+  "viewAll": "View All",
+
+  "daysAgo": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "days": "{{days}} days ago"
+  },
+
+  "stats": {
+    "averageRating": "{{rating}} out of 5",
+    "totalReviews": "{{count}} reviews",
+    "ratingDistribution": "Rating Distribution",
+    "fiveStar": "5 star",
+    "fourStar": "4 star",
+    "threeStar": "3 star",
+    "twoStar": "2 star",
+    "oneStar": "1 star"
+  },
+
+  "filter": {
+    "all": "All",
+    "fiveStar": "Five Star",
+    "fourStar": "Four Star",
+    "threeStar": "Three Star",
+    "twoStar": "Two Star",
+    "oneStar": "One Star"
+  },
+
+  "sort": {
+    "recent": "Most Recent",
+    "helpful": "Most Helpful"
+  },
+
+  "rating": {
+    "overall": "Overall Rating",
+    "teaching": "Teaching Ability",
+    "course": "Course Quality",
+    "communication": "Communication",
+    "punctuality": "Punctuality",
+    "placeholder": "Select rating"
+  },
+
+  "form": {
+    "title": "Title",
+    "titlePlaceholder": "Summarize your experience",
+    "content": "Review",
+    "contentPlaceholder": "Share your learning experience...",
+    "tags": "Tags",
+    "tagsHint": "Select up to 3 tags",
+    "submit": "Submit Review",
+    "submitting": "Submitting...",
+    "success": "Review submitted successfully!",
+    "error": "Failed to submit review",
+    "edit": "Edit Review",
+    "editing": "Editing...",
+    "editSuccess": "Review updated successfully!",
+    "cancel": "Cancel"
+  },
+
+  "tags": {
+    "teachingSerious": "Teaching Serious",
+    "patient": "Patient",
+    "greatProgress": "Great Progress",
+    "easyToUnderstand": "Easy to Understand",
+    "responsible": "Responsible Homework",
+    "punctual": "Punctual",
+    "friendly": "Friendly",
+    "goodCourse": "Good Course Quality"
+  },
+
+  "card": {
+    "helpful": "Helpful",
+    "helpfulCount": "{{count}} found this helpful",
+    "report": "Report",
+    "reply": "Reply",
+    "edit": "Edit",
+    "edited": "Edited",
+    "daysAgo": "{{days}} days ago",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "viewCourse": "View Course",
+    "viewTeacher": "View Teacher"
+  },
+
+  "reply": {
+    "label": "Teacher Reply",
+    "placeholder": "Write a reply...",
+    "submit": "Submit Reply",
+    "success": "Reply submitted successfully!",
+    "empty": "No reply yet"
+  },
+
+  "errors": {
+    "ratingRequired": "Please select a rating",
+    "contentRequired": "Please enter your review",
+    "contentTooShort": "Review must be at least 10 characters",
+    "contentTooLong": "Review must not exceed 1000 characters",
+    "titleTooLong": "Title must not exceed 200 characters",
+    "maxTags": "Maximum 3 tags allowed",
+    "notEligible": "You are not eligible to review this course",
+    "alreadyReviewed": "You have already reviewed this course"
+  },
+
+  "eligibility": {
+    "title": "How to Write a Review",
+    "description": "You can write a review after completing a course.",
+    "button": "Go to My Courses"
+  },
+
+  "report": {
+    "reason": "Report Reason",
+    "reasonPlaceholder": "Select a reason",
+    "details": "Details",
+    "detailsPlaceholder": "Provide more information (optional)",
+    "reasonSpam": "Spam or Misleading",
+    "reasonInappropriate": "Inappropriate Content",
+    "reasonFake": "Fake Review",
+    "reasonOther": "Other"
+  }
+}

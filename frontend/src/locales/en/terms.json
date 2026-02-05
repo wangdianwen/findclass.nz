@@ -1,0 +1,49 @@
+{
+  "title": "Terms of Service",
+  "lastUpdated": "Last updated: January 2026",
+
+  "sections.introduction.title": "Introduction",
+  "sections.introduction.content": "Welcome to FindClass.nz ('we', 'our', or 'us'). These Terms of Service ('Terms') govern your use of our website and services. By accessing or using FindClass.nz, you agree to be bound by these Terms. If you do not agree to these Terms, please do not use our platform.",
+
+  "sections.acceptance.title": "Acceptance of Terms",
+  "sections.acceptance.content": "By creating an account, accessing, or using our services, you acknowledge that you have read, understood, and agree to be bound by these Terms, our Privacy Policy, and any other applicable policies. If you are using our services on behalf of an organization, you represent that you have the authority to bind that organization to these Terms.",
+
+  "sections.services.title": "Our Services",
+  "sections.services.content": "FindClass.nz provides a platform for connecting students with tutors and educational institutions in New Zealand. Our services include:",
+  "sections.services.item1": "Course discovery and search functionality",
+  "sections.services.item2": "Direct communication between students and tutors",
+  "sections.services.item3": "Reviews and ratings for courses and tutors",
+
+  "sections.userResponsibilities.title": "User Responsibilities",
+  "sections.userResponsibilities.content": "As a user of FindClass.nz, you agree to:",
+  "sections.userResponsibilities.item1": "Provide accurate, current, and complete information when creating an account",
+  "sections.userResponsibilities.item2": "Maintain the security of your account credentials",
+  "sections.userResponsibilities.item3": "Use our services only for lawful purposes and in accordance with these Terms",
+
+  "sections.tutorTerms.title": "Tutor Terms",
+  "sections.tutorTerms.content": "If you are a tutor using our platform, you agree to:",
+  "sections.tutorTerms.item1": "Provide accurate information about your qualifications, experience, and services",
+  "sections.tutorTerms.item2": "Conduct classes in a professional manner",
+  "sections.tutorTerms.item3": "Respect students and other platform users",
+
+  "sections.platformRights.title": "Platform Rights and Content Moderation",
+  "sections.platformRights.content": "FindClass.nz reserves the following rights to maintain a safe and trustworthy platform:",
+  "sections.platformRights.item1": "The right to remove any course, content, or information that violates our policies or terms of service",
+  "sections.platformRights.item2": "The right to suspend or ban users who receive excessive reports or violate our community guidelines",
+  "sections.platformRights.item3": "The right to suspend or ban tutors whose courses receive excessive negative reports or complaints",
+  "sections.platformRights.item4": "The right to terminate accounts without prior notice for severe violations or repeated policy breaches",
+  "sections.platformRights.item5": "The right to cooperate with law enforcement authorities when required by law",
+
+  "sections.liability.title": "Limitation of Liability",
+  "sections.liability.content": "FindClass.nz acts as an intermediary platform connecting students and tutors. We are not responsible for the quality, accuracy, or outcomes of educational services provided by tutors. While we strive to verify tutor qualifications, we cannot guarantee the accuracy of all information posted on our platform. Users are encouraged to exercise their own judgment when selecting courses and tutors.",
+
+  "sections.termination.title": "Termination",
+  "sections.termination.content": "We reserve the right to terminate or suspend your account and access to our services at our sole discretion, without prior notice, for conduct that we believe violates these Terms or is harmful to other users, us, or third parties.",
+
+  "sections.changes.title": "Changes to Terms",
+  "sections.changes.content": "We may modify these Terms at any time. We will notify users of any material changes by posting the new Terms on this page and updating the 'Last updated' date. Your continued use of our services after any changes constitutes acceptance of the new Terms.",
+
+  "sections.contact.title": "Contact Us",
+  "sections.contact.content": "If you have any questions about these Terms, please contact us at:",
+  "sections.contact.email": "support@findclass.nz"
+}

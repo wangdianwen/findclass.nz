@@ -1,0 +1,171 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.courseList {
+  @include card-base;
+  padding: 0;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4 $spacing-5;
+  border-bottom: 1px solid $color-border-light;
+  flex-wrap: wrap;
+  gap: $spacing-4;
+  background: $color-bg-secondary;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+}
+
+.searchInput {
+  width: 240px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.statusFilter {
+  min-width: 110px;
+}
+
+.createButton {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.tableWrapper {
+  overflow: hidden;
+}
+
+.courseTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: $spacing-4 $spacing-5;
+    text-align: left;
+    border-bottom: 1px solid $color-border-light;
+    height: 72px;
+  }
+
+  th {
+    background: $color-bg-secondary;
+    font-weight: $font-weight-medium;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+    white-space: nowrap;
+  }
+
+  // Action column - narrow
+  .actionsCol {
+    width: 120px;
+    text-align: center;
+  }
+
+  // Price column - narrow
+  .priceCol {
+    width: 80px;
+  }
+
+  tbody tr {
+    transition: background $transition-fast;
+
+    &:hover {
+      background: $color-bg-secondary;
+    }
+  }
+}
+
+.courseInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.courseImage {
+  width: 80px;
+  height: 60px;
+  border-radius: $radius-sm;
+  object-fit: cover;
+  background: $color-bg-tertiary;
+}
+
+.courseDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.courseTitle {
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+
+  @media (max-width: 992px) {
+    max-width: 180px;
+  }
+}
+
+.courseMeta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.subjectTag {
+  background: $color-bg-tertiary;
+  padding: 2px $spacing-2;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+}
+
+.coursePrice {
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  font-size: $font-size-sm;
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-16 $spacing-6;
+
+  @media (max-width: 768px) {
+    padding: $spacing-8 $spacing-4;
+  }
+}
+
+.emptyIcon {
+  font-size: 64px;
+  color: $color-text-muted;
+  margin-bottom: $spacing-4;
+}
+
+.emptyTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-2;
+}
+
+.emptyDescription {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-6;
+}

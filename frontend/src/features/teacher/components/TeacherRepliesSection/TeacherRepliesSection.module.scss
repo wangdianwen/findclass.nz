@@ -1,0 +1,347 @@
+// ============================================
+// TeacherRepliesSection Styles
+// ============================================
+
+.repliesSection {
+  padding: 0;
+}
+
+// Filter Row
+.filterRow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filterItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.filterLabel {
+  font-size: 14px;
+  color: #595959;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+// Review Card
+.reviewCard {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.reviewHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.categoryBadge {
+  background: #f0f5ff;
+  color: #2f54eb;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.reviewUser {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reviewAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #1890ff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.reviewMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reviewName {
+  font-weight: 500;
+  color: #262626;
+}
+
+.reviewCourse {
+  font-size: 13px;
+  color: #8c8c8c;
+}
+
+.reviewRating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.star {
+  color: #d9d9d9;
+  font-size: 14px;
+
+  &.filled {
+    color: #faad14;
+  }
+}
+
+.ratingNumber {
+  font-weight: 500;
+  color: #faad14;
+}
+
+.reviewDate {
+  font-size: 13px;
+  color: #8c8c8c;
+}
+
+.reviewTitle {
+  font-weight: 500;
+  color: #262626;
+  margin-bottom: 8px;
+}
+
+.reviewContent {
+  color: #595959;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.reviewTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tag {
+  background: #f5f5f5;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: #595959;
+}
+
+// Reply Section
+.replySection {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.replyLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #8c8c8c;
+  margin-bottom: 8px;
+}
+
+.replyIcon {
+  font-size: 14px;
+}
+
+.replyContent {
+  display: flex;
+  gap: 8px;
+}
+
+.replyAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #52c41a;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.replyText {
+  flex: 1;
+}
+
+.replyAuthor {
+  font-size: 13px;
+  font-weight: 500;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.replyBody {
+  font-size: 13px;
+  color: #595959;
+  line-height: 1.5;
+}
+
+// Reply Form
+.replyForm {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #d9d9d9;
+}
+
+.replyTextarea {
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: #1890ff;
+    outline: none;
+  }
+}
+
+.replyActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.charCount {
+  font-size: 13px;
+  color: #8c8c8c;
+
+  &.warning {
+    color: #faad14;
+  }
+
+  &.danger {
+    color: #ff4d4f;
+  }
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+}
+
+// Templates
+.templatesSection {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #d9d9d9;
+}
+
+.templatesTitle {
+  font-size: 13px;
+  color: #8c8c8c;
+  margin-bottom: 8px;
+}
+
+.templatesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.templateButton {
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #595959;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #1890ff;
+    color: #1890ff;
+  }
+}
+
+// Empty State
+.emptyState {
+  text-align: center;
+  padding: 48px 24px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px dashed #d9d9d9;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  color: #d9d9d9;
+  margin-bottom: 16px;
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: #262626;
+  margin-bottom: 8px;
+}
+
+.emptyDesc {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .statsRow {
+    flex-direction: column;
+  }
+
+  .statCard {
+    min-width: 100%;
+  }
+
+  .reviewHeader {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .replyActions {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+}

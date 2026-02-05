@@ -1,0 +1,81 @@
+{
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to access your account",
+    "google": "Google",
+    "wechat": "WeChat",
+    "or": "or continue with"
+  },
+  "register": {
+    "title": "Create Account",
+    "subtitle": "Join us to discover amazing courses",
+    "termsPrefix": "By signing up, you agree to our ",
+    "termsLink": "Terms of Service",
+    "termsSeparator": " and ",
+    "privacyLink": "Privacy Policy",
+    "haveAccount": "Already have an account?"
+  },
+  "forgotPassword": {
+    "title": "Reset Password",
+    "subtitle": "Enter your email address and we'll send you a link to reset your password",
+    "successTitle": "Check Your Email",
+    "successText": "We've sent a password reset link to {{email}}. Please check your inbox and follow the instructions.",
+    "goToLogin": "Go to Login",
+    "rememberPassword": "Remember your password?"
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "subtitle": "Enter your email and new password to reset your password",
+    "rememberPassword": "Remember your password?"
+  },
+  "placeholder": {
+    "email": "Enter your email",
+    "password": "Enter password",
+    "newPassword": "Enter new password",
+    "confirmPassword": "Confirm your password",
+    "code": "Verification code"
+  },
+  "button": {
+    "login": "Sign In",
+    "register": "Sign Up Free",
+    "getCode": "Get Code",
+    "resendCount": "Resend ({{time}}s)",
+    "sendResetLink": "Send Reset Link",
+    "resetPassword": "Reset Password",
+    "retry": "Try Again"
+  },
+  "link": {
+    "register": "Sign Up Free",
+    "login": "Sign In",
+    "forgotPassword": "Forgot Password?"
+  },
+  "validation": {
+    "emailRequired": "Please enter your email",
+    "invalidEmail": "Please enter a valid email address",
+    "codeRequired": "Please enter the verification code",
+    "passwordRequired": "Please create a password",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "passwordLowercase": "Password must contain at least one lowercase letter",
+    "passwordUppercase": "Password must contain at least one uppercase letter",
+    "passwordNumber": "Password must contain at least one number",
+    "confirmPasswordRequired": "Please confirm your password",
+    "passwordsDoNotMatch": "Passwords do not match"
+  },
+  "codeSent": "Verification code sent to {{email}}",
+  "loginSuccess": "Login successful! Welcome back!",
+  "registerSuccess": "Registration successful! Welcome to FindClass!",
+  "resetSuccess": "Password reset successfully!",
+  "resetLinkSent": "Password reset link sent!",
+  "wechatLogin": {
+    "title": "WeChat Login",
+    "scanInstruction": "Scan with WeChat to login",
+    "hint": "Please scan the QR code with WeChat",
+    "polling": "scanning...",
+    "timeout": "Login timed out, please try again",
+    "error": "Login failed, please try again",
+    "mockScan": "Simulate Scan (Dev Only)"
+  },
+  "error": {
+    "network": "Network error. Please try again."
+  }
+}

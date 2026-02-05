@@ -1,0 +1,478 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// Form container - no padding, let parent control
+.formBody {
+  // No padding, compact design
+}
+
+// Form groups (sections) - matches Teacher Onboarding
+.formGroup {
+  margin-bottom: $spacing-6;
+  clear: both;
+  position: relative;
+  z-index: 1;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Section with divider
+.formSection {
+  margin-bottom: $spacing-5;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Section title with accent bar - matches Teacher Onboarding
+.groupTitle {
+  display: flex;
+  align-items: center;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0 0 $spacing-4;
+  padding-bottom: $spacing-2;
+  border-bottom: 1px solid $color-border-light;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: $color-primary;
+    border-radius: 2px;
+    margin-right: $spacing-2;
+  }
+}
+
+// Media section - extra spacing from description
+.formGroupMedia {
+  margin-top: $spacing-10;
+}
+
+// Grid system - matches Teacher Onboarding
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-4;
+  margin-bottom: $spacing-3;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: $spacing-3;
+  }
+}
+
+// Three column grid for compact fields
+.formRowThree {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-4;
+  margin-bottom: $spacing-3;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formCol {
+  min-width: 0;
+}
+
+// Picture-card upload styles
+.pictureCardUpload {
+  position: relative;
+  z-index: 10;
+  clear: both;
+  display: block !important;
+  margin: $spacing-4 0;
+
+  // Ensure upload list is block level
+  :global(.ant-upload-list) {
+    display: block !important;
+    clear: both;
+  }
+
+  // Upload button styling
+  :global(.ant-upload-select) {
+    width: 104px !important;
+    height: 104px !important;
+    margin: 0 8px 8px 0 !important;
+    border: 1px dashed $color-border !important;
+    border-radius: $radius-md !important;
+    background: transparent !important;
+    transition:
+      border-color $transition-fast,
+      background-color $transition-fast !important;
+    float: left !important;
+
+    &:hover {
+      border-color: $color-primary !important;
+      background: rgba($color-primary, 0.02) !important;
+    }
+  }
+
+  // Upload button content
+  :global(.ant-upload-select-placeholder) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: $color-text-tertiary;
+
+    :global(.anticon) {
+      font-size: 24px;
+      color: $color-text-tertiary;
+    }
+
+    :global(.ant-upload-text) {
+      margin-top: 8px;
+      font-size: $font-size-sm;
+      color: $color-text-tertiary;
+    }
+  }
+
+  // Uploaded image item
+  :global(.ant-upload-list-item) {
+    width: 104px !important;
+    height: 104px !important;
+    margin: 0 8px 8px 0 !important;
+    border-radius: $radius-md !important;
+    border-color: $color-border-light !important;
+
+    &:hover {
+      border-color: $color-primary !important;
+    }
+
+    :global(.ant-upload-list-item-info) {
+      border-radius: $radius-md !important;
+    }
+
+    // Preview image
+    :global(.ant-upload-list-item-image) {
+      object-fit: cover;
+    }
+
+    // Delete button
+    :global(.ant-upload-list-item-actions) {
+      .ant-upload-list-item-delete {
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+    }
+
+    &:hover :global(.ant-upload-list-item-actions .ant-upload-list-item-delete) {
+      opacity: 1;
+    }
+  }
+}
+
+// Form actions footer
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-3;
+  padding: $spacing-4 0;
+  margin-top: $spacing-5;
+  border-top: 1px solid $color-border-light;
+
+  @media (max-width: 768px) {
+    padding: $spacing-3 0;
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// ============================================
+// Ant Design Form Component Overrides
+// Follow Ant Design specifications
+// ============================================
+
+// Form item layout
+:global(.ant-form-item) {
+  margin-bottom: $spacing-3;
+  position: relative;
+}
+
+// Form labels
+:global(.ant-form-item-label) {
+  padding: 0 0 $spacing-1;
+  line-height: 1.5;
+  height: auto;
+
+  > label {
+    font-weight: $font-weight-medium;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+
+    &.ant-form-item-required {
+      &::before {
+        display: inline-block;
+        margin-right: 4px;
+        color: $color-error;
+        font-size: $font-size-sm;
+        font-family: sans-serif;
+        line-height: 1;
+        content: '*';
+      }
+    }
+  }
+}
+
+// Form control input wrapper
+:global(.ant-form-item-control-input) {
+  min-height: 36px;
+}
+
+// Input components
+:global(.ant-input-lg),
+:global(.ant-select-selector),
+:global(.ant-input-number-lg) {
+  border-radius: $radius-md !important;
+  border-color: $color-border !important;
+  background-color: $color-white !important;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease !important;
+  height: 36px !important;
+
+  &:hover {
+    border-color: $color-primary-hover !important;
+  }
+
+  &:focus,
+  &:focus-within {
+    border-color: $color-primary !important;
+    box-shadow: 0 0 0 2px rgba($color-primary, 0.1) !important;
+  }
+}
+
+// Input wrapper (affix wrapper)
+:global(.ant-input-affix-wrapper-lg) {
+  border-radius: $radius-md !important;
+  border-color: $color-border !important;
+  background-color: $color-white !important;
+  padding: 4px 11px !important;
+
+  &:hover {
+    border-color: $color-primary-hover !important;
+  }
+
+  &:focus,
+  &.ant-input-affix-wrapper-focused {
+    border-color: $color-primary !important;
+    box-shadow: 0 0 0 2px rgba($color-primary, 0.1) !important;
+  }
+
+  :global(.ant-input) {
+    background: transparent !important;
+  }
+}
+
+// Input text area
+:global(.ant-input-textarea) {
+  :global(.ant-input) {
+    border-radius: $radius-md !important;
+    border-color: $color-border !important;
+    background-color: $color-white !important;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease !important;
+    resize: vertical;
+    min-height: 160px !important;
+    padding: 16px 12px !important;
+    line-height: 1.8;
+
+    &:hover {
+      border-color: $color-primary-hover !important;
+    }
+
+    &:focus {
+      border-color: $color-primary !important;
+      box-shadow: 0 0 0 2px rgba($color-primary, 0.1) !important;
+    }
+  }
+}
+
+// Input number
+:global(.ant-input-number-lg) {
+  width: 100% !important;
+  border-radius: $radius-md !important;
+
+  :global(.ant-input-number-input) {
+    height: 34px !important;
+  }
+
+  // Prevent addon text from wrapping (important for Chinese characters)
+  :global(.ant-input-number-addon) {
+    white-space: nowrap;
+    padding: 0 $spacing-3;
+  }
+}
+
+// Select component
+:global(.ant-select) {
+  width: 100%;
+
+  &.ant-select-focused {
+    :global(.ant-select-selector) {
+      border-color: $color-primary !important;
+      box-shadow: 0 0 0 2px rgba($color-primary, 0.1) !important;
+    }
+  }
+
+  :global(.ant-select-arrow) {
+    color: $color-text-tertiary;
+  }
+}
+
+// Upload component
+:global(.ant-upload) {
+  // Upload list
+  :global(.ant-upload-list) {
+    display: block !important;
+    clear: both;
+
+    :global(.ant-upload-list-item) {
+      border-radius: $radius-md !important;
+      border-color: $color-border-light !important;
+
+      &:hover {
+        border-color: $color-primary !important;
+      }
+    }
+  }
+}
+
+// ImgCrop wrapper - ensure proper separation
+:global(.ant-img-crop) {
+  display: block !important;
+  clear: both;
+  margin: $spacing-4 0;
+
+  :global(.ant-upload-wrapper) {
+    display: block !important;
+  }
+
+  :global(.ant-upload-list) {
+    display: block !important;
+    clear: both;
+  }
+}
+
+// Help text and extra
+:global(.ant-form-item-explain) {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  min-height: 18px;
+  margin-top: $spacing-1;
+
+  &.ant-form-item-explain-error {
+    color: $color-error;
+  }
+}
+
+// Extra text
+:global(.ant-form-item-extra) {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: $spacing-1;
+}
+
+// Description textarea - auto-growing
+:global(.ant-input-textarea) {
+  :global(.ant-input) {
+    border-radius: $radius-md !important;
+    border-color: $color-border !important;
+    background-color: $color-white !important;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease !important;
+    resize: vertical;
+    padding: 16px 12px !important;
+    line-height: 1.8;
+
+    &:hover {
+      border-color: $color-primary-hover !important;
+    }
+
+    &:focus {
+      border-color: $color-primary !important;
+      box-shadow: 0 0 0 2px rgba($color-primary, 0.1) !important;
+    }
+  }
+
+  // Character count
+  :global(.ant-input-show-count-suffix) {
+    color: $color-text-tertiary;
+  }
+}
+
+// Quill Editor styles
+.quillEditor {
+  clear: both;
+  margin-bottom: $spacing-4;
+
+  :global(.ql-toolbar) {
+    border-radius: $radius-md $radius-md 0 0;
+    border-color: $color-border !important;
+    background: $color-bg-secondary;
+  }
+
+  :global(.ql-container) {
+    border-radius: 0 0 $radius-md $radius-md;
+    border-color: $color-border !important;
+    font-family: inherit;
+    font-size: $font-size-base;
+
+    :global(.ql-editor) {
+      min-height: 120px;
+      line-height: 1.8;
+      color: $color-text-primary;
+
+      &:focus {
+        outline: 2px solid $color-primary;
+        outline-offset: 2px;
+      }
+
+      &:focus:not(:focus-visible) {
+        outline: none;
+      }
+
+      &:focus-visible {
+        outline: 2px solid $color-primary;
+        outline-offset: 2px;
+      }
+
+      &.ql-blank::before {
+        color: $color-text-tertiary;
+        font-style: normal;
+      }
+    }
+  }
+
+  // Error state
+  &.has-error {
+    :global(.ql-toolbar),
+    :global(.ql-container) {
+      border-color: $color-error !important;
+    }
+  }
+}

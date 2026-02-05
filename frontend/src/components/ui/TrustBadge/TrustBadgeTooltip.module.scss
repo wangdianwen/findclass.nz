@@ -1,0 +1,102 @@
+@use '../../../styles/variables' as *;
+
+// ============================================
+// Trust Badge Tooltip - Reusable component
+// ============================================
+
+.tooltipContent {
+  min-width: 280px;
+  max-width: 360px;
+  padding: $spacing-3;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin-bottom: $spacing-2;
+  padding-bottom: $spacing-2;
+  border-bottom: 1px solid rgba($color-border, 0.3);
+}
+
+.icon {
+  font-size: $font-size-lg;
+}
+
+.title {
+  font-weight: 600;
+  font-size: $font-size-sm;
+  flex: 1;
+}
+
+.score {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.description {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  line-height: 1.5;
+  margin-bottom: $spacing-2;
+}
+
+.meta {
+  display: flex;
+  gap: $spacing-2;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  white-space: nowrap;
+}
+
+.weight,
+.range {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  white-space: nowrap;
+}
+
+.weight::after,
+.range::after {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  background: rgba($color-border, 0.5);
+  margin-left: $spacing-2;
+}
+
+.weight:last-child::after,
+.range:last-child::after {
+  display: none;
+}
+
+.trigger {
+  display: inline-flex;
+  cursor: help;
+}
+
+// ============================================
+// Tooltip/Popover overrides
+// ============================================
+
+:global(.trust-tooltip),
+:global(.trust-popover) {
+  max-width: 380px;
+
+  .ant-tooltip-inner,
+  .ant-popover-inner {
+    padding: 0;
+    background: $color-white;
+    border-radius: $radius-lg;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .ant-tooltip-arrow,
+  .ant-popover-arrow {
+    background: $color-white;
+  }
+}

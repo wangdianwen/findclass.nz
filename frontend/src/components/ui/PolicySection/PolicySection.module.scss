@@ -1,0 +1,51 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// Policy section styles - can be imported or included in page styles
+:global(.policy-section) {
+  margin-bottom: $spacing-10;
+
+  @include tablet {
+    margin-bottom: $spacing-8;
+  }
+
+  @include mobile {
+    margin-bottom: $spacing-6;
+  }
+}
+
+:global(.policy-section-title) {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary !important;
+  margin: $spacing-10 0 $spacing-4 0 !important;
+
+  @include tablet {
+    font-size: $font-size-xl;
+    margin: $spacing-8 0 $spacing-3 0 !important;
+  }
+
+  @include mobile {
+    font-size: $font-size-lg;
+    margin: $spacing-6 0 $spacing-2 0 !important;
+  }
+}
+
+:global(.policy-section-content) {
+  color: $color-text-secondary;
+  line-height: 1.8;
+  font-size: $font-size-base;
+  margin-bottom: $spacing-4 !important;
+}
+
+:global(.policy-list) {
+  list-style-type: disc;
+  padding-left: $spacing-6;
+  margin: $spacing-4 0 0 0;
+
+  li {
+    color: $color-text-secondary;
+    line-height: 1.8;
+    margin-bottom: $spacing-2;
+  }
+}

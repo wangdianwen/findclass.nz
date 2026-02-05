@@ -1,0 +1,105 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.reviewForm {
+  background: $color-bg-primary;
+  border-radius: $radius-lg;
+  padding: $spacing-5;
+  border: 1px solid $color-border-light;
+}
+
+.formItem {
+  margin-bottom: $spacing-4;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.ratingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-4;
+  margin-bottom: $spacing-4;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rate {
+  font-size: $font-size-xl;
+
+  :global(.ant-rate-star) {
+    font-size: $font-size-xl;
+  }
+}
+
+.rateSmall {
+  font-size: $font-size-base;
+
+  :global(.ant-rate-star) {
+    font-size: $font-size-base;
+  }
+}
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.tag {
+  cursor: pointer;
+  border-radius: $radius-sm;
+  padding: $spacing-1 $spacing-3;
+  background: $color-bg-secondary;
+  border: 1px solid $color-border-light;
+  color: $color-text-secondary;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+
+  &.tagSelected {
+    background: $color-primary;
+    border-color: $color-primary;
+    color: $color-white;
+
+    &:hover {
+      background: $color-primary-hover;
+      border-color: $color-primary-hover;
+    }
+  }
+}
+
+.tagHint {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-1;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-3;
+  padding-top: $spacing-4;
+  margin-top: $spacing-4;
+  border-top: 1px solid $color-border-light;
+
+  @include mobile {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+@include mobile {
+  .reviewForm {
+    padding: $spacing-4;
+  }
+}

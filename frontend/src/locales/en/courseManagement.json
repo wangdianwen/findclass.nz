@@ -1,0 +1,180 @@
+{
+  "title": "My Courses",
+  "pageTitle": "Course Management",
+  "subtitle": "Manage your courses and track performance",
+  "activeCoursesHint": "You can have a maximum of {{count}} active (published) courses.",
+  "activeCoursesLimitReached": "You have reached the maximum limit of {{count}} active courses. Please pause or delete some courses before creating new ones.",
+
+  "stats": {
+    "totalCourses": "Total Courses",
+    "publishedCourses": "Published",
+    "draftCourses": "Drafts",
+    "pausedCourses": "Paused",
+    "totalStudents": "Total Students",
+    "totalLessons": "Total Lessons",
+    "avgRating": "Avg. Rating",
+    "publishLimitHint": "You can publish up to {{count}} courses"
+  },
+
+  "filters": {
+    "all": "All",
+    "published": "Published",
+    "draft": "Draft",
+    "paused": "Paused",
+    "searchPlaceholder": "Search courses..."
+  },
+
+  "table": {
+    "courseName": "Course Name",
+    "title": "Course Title",
+    "subject": "Subject",
+    "grade": "Grade",
+    "price": "Price",
+    "students": "Students",
+    "status": "Status",
+    "createdAt": "Created",
+    "actions": "Actions"
+  },
+
+  "status": {
+    "published": "Published",
+    "draft": "Draft",
+    "paused": "Paused"
+  },
+
+  "actions": {
+    "create": "Create Course",
+    "edit": "Edit",
+    "preview": "Preview",
+    "more": "More",
+    "publish": "Publish",
+    "pause": "Pause",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this course?",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+
+  "empty": {
+    "title": "No courses yet",
+    "description": "Create your first course to start teaching",
+    "action": "Create Course"
+  },
+
+  "form": {
+    "createTitle": "Create Course",
+    "editTitle": "Edit Course",
+    "basicInfo": "Basic Information",
+    "courseDetails": "Course Details",
+    "pricing": "Pricing",
+    "schedule": "Schedule",
+    "media": "Cover Image",
+
+    "title": "Course Title",
+    "titlePlaceholder": "Enter course title",
+    "subtitle": "Subtitle",
+    "subtitlePlaceholder": "Brief description (optional)",
+
+    "subject": "Subject",
+    "grade": "Grade Level",
+    "teachingMode": "Teaching Mode",
+    "city": "City",
+    "region": "Region",
+    "address": "Specific Address",
+    "lessonCount": "Total Lessons",
+    "price": "Price per Lesson",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe your course in detail, including schedule, teaching method, etc.",
+    "language": "Teaching Language",
+    "coverImage": "Cover Image",
+    "coverImageUpload": "Upload Cover",
+    "coverImageRequired": "Please upload at least one cover image",
+    "coverImageMaxHint": "Maximum {{count}} images, JPG or PNG format",
+    "showAddress": "Show Address",
+    "showAddressTooltip": "Display the address on the course details page. If disabled, only the city will be shown.",
+
+    "titleRequired": "Please enter a course title",
+    "titleTooShort": "Title must be at least 5 characters",
+    "titleTooLong": "Title must not exceed 100 characters",
+    "subjectRequired": "Please select a subject",
+    "gradeRequired": "Please select a grade level",
+    "languageRequired": "Please select a teaching language",
+    "priceRequired": "Please enter a price",
+    "teachingModeRequired": "Please select a teaching mode",
+    "descriptionRequired": "Please enter a description",
+    "descriptionTooShort": "Description must be at least 20 characters",
+    "descriptionTooLong": "Description must not exceed 5000 characters",
+    "lessonCountRequired": "Please enter the number of lessons",
+    "cityRequired": "Please select a city",
+    "regionRequired": "Please select a region",
+    "addressRequired": "Please enter a specific address",
+    "addressPlaceholder": "Enter detailed address (e.g., street number, building name)",
+
+    "lessons": "lessons",
+    "pricePlaceholder": "Enter price",
+    "languagePlaceholder": "Select teaching languages",
+    "teachingModePlaceholder": "Select teaching mode",
+    "cityPlaceholder": "Select city",
+    "regionPlaceholder": "Enter region",
+    "lessonCountPlaceholder": "Number of lessons",
+    "subjectPlaceholder": "Select subject",
+    "gradePlaceholder": "Select grade level",
+
+    "saveDraft": "Save as Draft",
+    "publish": "Publish",
+    "cancel": "Cancel"
+  },
+
+  "messages": {
+    "createSuccess": "Course created successfully",
+    "updateSuccess": "Course updated successfully",
+    "deleteSuccess": "Course deleted successfully",
+    "publishSuccess": "Course published successfully",
+    "pauseSuccess": "Course paused successfully",
+    "error": "An error occurred"
+  },
+
+  "evidence": {
+    "maxSize": "Maximum file size: {{size}}",
+    "upload": "Upload File",
+    "uploadSuccess": "Image uploaded successfully"
+  },
+
+  "subject": {
+    "chinese": "Chinese / Mandarin",
+    "math": "Mathematics",
+    "english": "English",
+    "physics": "Physics",
+    "chemistry": "Chemistry",
+    "biology": "Biology",
+    "science": "General Science",
+    "geography": "Geography",
+    "history": "History",
+    "civics": "Civics / Social Studies",
+    "music": "Music",
+    "art": "Art / Design",
+    "pe": "Physical Education",
+    "it": "IT / Computer Science",
+    "other": "Other"
+  },
+
+  "grade": {
+    "preschool": "Preschool",
+    "primaryLow": "Primary (Grades 1-3)",
+    "primaryHigh": "Primary (Grades 4-6)",
+    "middleSchool": "Middle School",
+    "highSchool": "High School",
+    "adult": "Adult"
+  },
+
+  "teachingMode": {
+    "online": "Online",
+    "offline": "In-person",
+    "both": "Both"
+  },
+
+  "language": {
+    "chinese": "Chinese",
+    "english": "English"
+  }
+}

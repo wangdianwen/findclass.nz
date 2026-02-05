@@ -1,0 +1,116 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.childrenSection {
+  padding: $spacing-4 0;
+}
+
+.header {
+  @include flex-between;
+  margin-bottom: $spacing-6;
+}
+
+.addButton {
+  margin-bottom: $spacing-6;
+}
+
+.childrenList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: $spacing-4;
+}
+
+.childCard {
+  background: $color-bg-primary;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: $spacing-5;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $color-primary;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.childInfo {
+  margin-bottom: $spacing-4;
+}
+
+.childName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-2;
+}
+
+.childDetail {
+  display: flex;
+  gap: $spacing-4;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+}
+
+.childActions {
+  display: flex;
+  gap: $spacing-2;
+  padding-top: $spacing-4;
+  border-top: 1px solid $color-border-light;
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-12 $spacing-6;
+  background: $color-bg-secondary;
+  border-radius: $radius-lg;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  color: $color-text-muted;
+  margin-bottom: $spacing-4;
+}
+
+.emptyTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-2;
+}
+
+.emptyDesc {
+  color: $color-text-secondary;
+  margin-bottom: $spacing-6;
+}
+
+// Modal Form Styles
+.formSection {
+  margin-bottom: $spacing-4;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-4;
+}
+
+.formField {
+  margin-bottom: $spacing-4;
+}
+
+.fieldLabel {
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-2;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .childrenList {
+    grid-template-columns: 1fr;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}

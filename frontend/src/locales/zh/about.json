@@ -1,0 +1,42 @@
+{
+  "title": "关于我们",
+  "lastUpdated": "最后更新：2026年1月",
+
+  "hero.title": "连接学习者与优质教育",
+  "hero.subtitle": "FindClass.nz 致力于帮助新西兰的学生找到合适的课程，同时让优秀的教师获得应有的认可。",
+
+  "story.title": "我们的故事",
+  "story.content1": "FindClass.nz 诞生于一个简单的信念：优质教育应该人人可及，不应被高昂的中介费用阻挡。我们注意到，新西兰许多才华横溢的教师难以触达学生，而学生也常常很难找到适合自己需求的课程。",
+  "story.content2": "我们的平台通过创建一个透明、高效的市场来弥合这一差距，教师可以展示他们的专业知识，学生可以找到符合他们学习目标的课程。我们致力于通过优质数据、真实评价和隐私保护来建立信任。",
+
+  "mission.title": "我们的使命",
+  "mission.freeTutors.title": "教师免费",
+  "mission.freeTutors.description": "个人教师完全免费入驻。我们相信，优秀的教师不应该为了分享知识而付费。",
+  "mission.freeStudents.title": "学生免费",
+  "mission.freeStudents.description": "学生完全免费使用平台。搜索、浏览和预约，无需任何隐藏费用。",
+  "mission.transparency.title": "真实评价",
+  "mission.transparency.description": "透明的评价确保您可以就学习之旅做出明智的决定。",
+
+  "values.title": "我们的价值观",
+  "values.quality.title": "质量第一",
+  "values.quality.description": "我们保持课程内容和教师资质的高标准。",
+  "values.trust.title": "信任与安全",
+  "values.trust.description": "您的隐私和数据安全是我们的首要任务。",
+  "values.accessibility.title": "可及性",
+  "values.accessibility.description": "让所有新西兰人都能获得优质教育。",
+  "values.transparency.title": "透明公开",
+  "values.transparency.description": "透明的价格、真实的评价和诚实的资讯。",
+
+  "trust.title": "信任与安全",
+  "trust.content": "我们认真对待信任问题。所有课程列表都要经过我们的验证流程，我们持续监控质量和真实性。您的个人信息根据我们的隐私政策受到保护。",
+  "trust.badges": {
+    "verified": "已验证教师",
+    "secure": "数据安全",
+    "quality": "优质课程",
+    "transparent": "透明评价"
+  },
+
+  "contact.title": "联系我们",
+  "contact.content": "有疑问或建议？我们期待您的反馈：",
+  "contact.email": "support@findclass.nz"
+}

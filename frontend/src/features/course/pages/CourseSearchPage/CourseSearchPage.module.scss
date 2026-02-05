@@ -1,0 +1,36 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.courseSearchPage {
+  min-height: 100vh;
+  background: $color-bg-primary;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.headerSpacer {
+  height: $size-header-height;
+
+  @include tablet {
+    height: $size-header-height-tablet;
+  }
+
+  @include mobile {
+    height: $size-header-height-mobile;
+  }
+}
+
+.mainContent {
+  max-width: $breakpoint-xl;
+  margin: 0 auto;
+  padding: $spacing-6;
+
+  @include tablet {
+    padding: $spacing-6 $spacing-4;
+  }
+
+  @include mobile {
+    padding: $spacing-4 $spacing-3;
+  }
+}

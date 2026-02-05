@@ -1,0 +1,67 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.avatarSelector {
+  width: 100%;
+}
+
+.avatarGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-3;
+  width: 100%;
+}
+
+.avatarButton {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  min-width: 72px;
+  height: 72px !important;
+  padding: $spacing-2 !important;
+  border: 2px solid $color-border-light !important;
+  border-radius: $radius-lg !important;
+  background: $color-bg-primary !important;
+  transition: all $transition-fast !important;
+
+  &:hover {
+    border-color: $color-primary !important;
+    background: $color-bg-secondary !important;
+  }
+
+  &.ant-radio-button-wrapper-checked {
+    border-color: $color-primary !important;
+    background: rgba($color-primary, 0.1) !important;
+    box-shadow: 0 0 0 2px rgba($color-primary, 0.2) !important;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.avatarImage {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+@include mobile {
+  .avatarGroup {
+    gap: $spacing-2;
+  }
+
+  .avatarButton {
+    min-width: 56px;
+    height: 56px !important;
+    padding: $spacing-1 !important;
+  }
+
+  .avatarImage {
+    width: 44px;
+    height: 44px;
+  }
+}

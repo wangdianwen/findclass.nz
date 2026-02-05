@@ -1,0 +1,246 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.loginPage {
+  min-height: 100vh;
+  background: $color-bg-primary;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-6;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: $color-bg-primary;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
+  padding: $spacing-10 $spacing-8;
+  border: 1px solid $color-border;
+
+  @include mobile {
+    padding: $spacing-8 $spacing-6;
+    max-width: 100%;
+  }
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: $spacing-8;
+
+  @include mobile {
+    margin-bottom: $spacing-6;
+  }
+}
+
+.logoLink {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  text-decoration: none;
+  transition: transform $transition-base;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+.logoImage {
+  height: 36px;
+  width: auto;
+
+  @include mobile {
+    height: 28px;
+  }
+}
+
+.pageTitle {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  text-align: center;
+  margin: 0 0 $spacing-2 0;
+
+  @include mobile {
+    font-size: $font-size-xl;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  text-align: center;
+  margin-bottom: $spacing-8;
+
+  @include mobile {
+    margin-bottom: $spacing-6;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-5;
+
+  @include mobile {
+    gap: $spacing-4;
+  }
+}
+
+.formItem {
+  // Ant Design form item styling
+}
+
+.verificationRow {
+  display: flex;
+  gap: $spacing-3;
+
+  .verificationInput {
+    flex: 1;
+  }
+
+  .getCodeButton {
+    width: 120px;
+    flex-shrink: 0;
+
+    @include mobile {
+      width: 100px;
+    }
+  }
+}
+
+.submitButton {
+  height: 48px;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  margin-top: $spacing-2;
+
+  @include mobile {
+    height: 44px;
+    font-size: $font-size-base;
+  }
+}
+
+// Social Login
+.socialLogin {
+  display: flex;
+  gap: $spacing-6;
+  margin-bottom: $spacing-6;
+  align-items: stretch;
+
+  @include mobile {
+    margin-bottom: $spacing-5;
+  }
+}
+
+// Social button wrapper - ensures consistent height and width for all social login buttons
+.socialButtonWrapper {
+  flex: 1;
+  display: flex;
+  min-height: 40px;
+  flex-basis: 0;
+  min-width: 0;
+
+  // Target Google button iframe wrapper
+  :global(.g_id_signin) {
+    width: 100% !important;
+
+    iframe {
+      width: 100% !important;
+      height: 40px !important;
+    }
+  }
+}
+
+.socialButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+}
+
+.wechatIcon {
+  color: #07c160;
+  font-size: $font-size-lg;
+}
+
+.divider {
+  margin: 0 0 $spacing-6 0;
+  color: $color-text-tertiary;
+  font-size: $font-size-xs;
+
+  @include mobile {
+    margin-bottom: $spacing-5;
+  }
+}
+
+.linkRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @include mobile {
+    justify-content: center;
+    gap: $spacing-4;
+  }
+}
+
+.link {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  text-decoration: none;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $color-primary;
+  }
+}
+
+.divider {
+  color: $color-text-tertiary;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// Error message
+.errorMessage {
+  background: $color-error-bg;
+  border: 1px solid $color-error-light;
+  border-radius: $radius-md;
+  padding: $spacing-3 $spacing-4;
+  color: $color-error;
+  font-size: $font-size-sm;
+  margin-bottom: $spacing-4;
+}
+
+// Success message
+.successMessage {
+  background: $color-success-bg;
+  border: 1px solid $color-success-light;
+  border-radius: $radius-md;
+  padding: $spacing-4;
+  text-align: center;
+  color: $color-success;
+  font-size: $font-size-base;
+  margin-bottom: $spacing-4;
+
+  .successTitle {
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-2;
+  }
+}
+
+// Footer spacer
+.footerSpacer {
+  height: $page-footer-spacing;
+}

@@ -1,0 +1,27 @@
+{
+  "feedback": "Report Issue",
+  "description": "Help us maintain a quality platform by reporting outdated or incorrect course information.",
+
+  "formTitle": "Submit Report",
+  "formDesc": "Fill out the form below to report an issue with a course listing.",
+
+  "form.name": "Name",
+  "form.namePlaceholder": "Your name (optional)",
+  "form.email": "Email",
+  "form.emailPlaceholder": "your@email.com",
+  "form.subject": "Issue Type",
+  "form.subjectPlaceholder": "Select an issue type",
+  "form.subjectExpired": "Information Expired",
+  "form.subjectIncorrect": "Incorrect Information",
+  "form.subjectFake": "Suspicious/Fake Information",
+  "form.subjectInvalidContact": "Invalid Contact",
+  "form.subjectInappropriate": "Inappropriate Content",
+  "form.subjectOther": "Other",
+  "form.message": "Details",
+  "form.messagePlaceholder": "Please describe the issue in detail...",
+  "form.submit": "Submit Report",
+  "form.required": "This field is required",
+  "form.emailInvalid": "Please enter a valid email address",
+  "form.success": "Thank you for your report! We'll review it within 7 working days.",
+  "form.error": "Failed to submit report. Please try again later."
+}

@@ -1,0 +1,81 @@
+{
+  "login": {
+    "title": "欢迎回来",
+    "subtitle": "登录您的账户以访问完整功能",
+    "google": "Google",
+    "wechat": "微信",
+    "or": "或使用以下方式登录"
+  },
+  "register": {
+    "title": "免费注册",
+    "subtitle": "加入我们，发现精彩课程",
+    "termsPrefix": "注册即表示您同意我们的",
+    "termsLink": "服务条款",
+    "termsSeparator": "和",
+    "privacyLink": "隐私政策",
+    "haveAccount": "已有账号？"
+  },
+  "forgotPassword": {
+    "title": "重置密码",
+    "subtitle": "输入您的邮箱地址，我们将发送重置链接到您的邮箱",
+    "successTitle": "请查收邮件",
+    "successText": "我们已向 {{email}} 发送了密码重置链接，请查收邮件并按照说明操作。",
+    "goToLogin": "去登录",
+    "rememberPassword": "想起密码了？"
+  },
+  "resetPassword": {
+    "title": "重置密码",
+    "subtitle": "输入邮箱和新密码以重置密码",
+    "rememberPassword": "想起密码了？"
+  },
+  "placeholder": {
+    "email": "请输入邮箱地址",
+    "password": "请输入密码",
+    "newPassword": "请输入新密码",
+    "confirmPassword": "请确认密码",
+    "code": "请输入验证码"
+  },
+  "button": {
+    "login": "登录",
+    "register": "免费注册",
+    "getCode": "获取验证码",
+    "resendCount": "重新获取({{time}}秒)",
+    "sendResetLink": "发送重置链接",
+    "resetPassword": "重置密码",
+    "retry": "重试"
+  },
+  "link": {
+    "register": "免费注册",
+    "login": "立即登录",
+    "forgotPassword": "忘记密码？"
+  },
+  "validation": {
+    "emailRequired": "请输入邮箱地址",
+    "invalidEmail": "请输入有效的邮箱地址",
+    "codeRequired": "请输入验证码",
+    "passwordRequired": "请设置密码",
+    "passwordMinLength": "密码长度至少为8位",
+    "passwordLowercase": "密码必须包含至少一个小写字母",
+    "passwordUppercase": "密码必须包含至少一个大写字母",
+    "passwordNumber": "密码必须包含至少一个数字",
+    "confirmPasswordRequired": "请确认密码",
+    "passwordsDoNotMatch": "两次输入的密码不一致"
+  },
+  "codeSent": "验证码已发送至 {{email}}",
+  "loginSuccess": "登录成功，欢迎回来！",
+  "registerSuccess": "注册成功，欢迎加入 FindClass！",
+  "resetSuccess": "密码重置成功！",
+  "resetLinkSent": "重置链接已发送！",
+  "wechatLogin": {
+    "title": "微信登录",
+    "scanInstruction": "请使用微信扫码登录",
+    "hint": "请使用微信扫描二维码",
+    "polling": "扫码中...",
+    "timeout": "登录超时，请重试",
+    "error": "登录失败，请重试",
+    "mockScan": "模拟扫码（仅开发环境）"
+  },
+  "error": {
+    "network": "网络错误，请重试"
+  }
+}

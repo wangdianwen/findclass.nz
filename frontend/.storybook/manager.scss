@@ -1,0 +1,17 @@
+// .storybook/manager.scss
+// Storybook UI customization
+
+/* Ensure clean white background for story canvas */
+.sb-show-main {
+  background-color: #ffffff !important;
+}
+
+/* Remove any default tints */
+#storybook-root {
+  background-color: #ffffff;
+}
+
+/* Ensure all components have proper background */
+[data-storybook-root-wrapper] {
+  background-color: #ffffff !important;
+}

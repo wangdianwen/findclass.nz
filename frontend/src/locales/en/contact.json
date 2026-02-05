@@ -1,0 +1,36 @@
+{
+  "contactUs": "Contact Us",
+  "description": "Have questions or need help? Get in touch with our team and we'll respond within 7 working days.",
+
+  "contactInfo": "Contact Information",
+  "email": "Email",
+  "emailAddress": "support@findclass.nz",
+  "responseTime": "We reply within 7 working days",
+
+  "formTitle": "Send Us a Message",
+  "formDesc": "Fill out the form below and we'll get back to you within 7 working days.",
+
+  "form": {
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "subject": "Subject",
+    "subjectPlaceholder": "Select a topic",
+    "subjectGeneral": "General Inquiry",
+    "subjectTechnical": "Technical Issue",
+    "subjectCourse": "Course Related",
+    "subjectTutor": "Tutor Partnership",
+    "subjectInstitution": "Institution Partnership",
+    "subjectOther": "Other",
+    "message": "Message",
+    "messagePlaceholder": "Describe your question or issue...",
+    "submit": "Send Message",
+    "required": "This field is required",
+    "emailInvalid": "Please enter a valid email address",
+    "success": "Message sent successfully! We'll get back to you within 7 working days.",
+    "error": "Failed to send message. Please try again later."
+  },
+
+  "backToHelp": "← Back to Help Centre"
+}

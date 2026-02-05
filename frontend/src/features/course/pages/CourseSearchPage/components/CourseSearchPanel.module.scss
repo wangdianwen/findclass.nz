@@ -1,0 +1,340 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// Search Panel Container - Home page inspired design
+// ============================================
+
+.searchPanel {
+  background: linear-gradient(180deg, $color-bg-secondary 0%, $color-bg-tertiary 100%);
+  padding: $spacing-8 $spacing-6;
+  border-radius: $radius-xl;
+  margin-bottom: $spacing-10;
+
+  @include tablet {
+    padding: $spacing-6 $spacing-4;
+    margin-bottom: $spacing-8;
+  }
+
+  @include mobile {
+    padding: $spacing-4 $spacing-3;
+    margin-bottom: $spacing-6;
+  }
+}
+
+// ============================================
+// Search Section
+// ============================================
+
+.searchSection {
+  margin-bottom: $spacing-6;
+
+  @include mobile {
+    margin-bottom: $spacing-4;
+  }
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: $size-button-height-lg;
+  padding: $spacing-1;
+  background: $color-bg-primary;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  transition:
+    border-color $transition-base,
+    box-shadow $transition-base;
+
+  &:hover {
+    border-color: $color-primary;
+    box-shadow: $shadow-md;
+  }
+
+  &:focus-within {
+    border-color: $color-primary;
+    box-shadow: $shadow-focus;
+  }
+
+  @include mobile {
+    height: $size-button-height-md;
+  }
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  width: $spacing-5;
+  height: $spacing-5;
+  margin-left: $spacing-3;
+  color: $color-text-tertiary;
+  font-size: $spacing-4;
+}
+
+.searchInput {
+  flex: 1;
+  height: 100%;
+  padding: 0 $spacing-3;
+  border: none;
+  background: transparent;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+
+  &::placeholder {
+    color: $color-text-tertiary;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: -2px;
+  }
+
+  @include mobile {
+    font-size: $font-size-base;
+  }
+}
+
+.clearSearch {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $spacing-5;
+  height: $spacing-5;
+  margin-right: $spacing-2;
+  border: none;
+  border-radius: 50%;
+  background: $color-border;
+  color: $color-text-secondary;
+  font-size: $font-size-base;
+  cursor: pointer;
+  transition:
+    background-color $transition-fast,
+    color $transition-fast;
+
+  &:hover {
+    background: $color-text-secondary;
+    color: $color-bg-primary;
+  }
+}
+
+// ============================================
+// Filter Row
+// ============================================
+
+.filterRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  margin-top: $spacing-4;
+
+  @include tablet {
+    flex-wrap: wrap;
+  }
+
+  @include mobile {
+    gap: $spacing-2;
+    margin-top: $spacing-3;
+  }
+}
+
+.filterItem {
+  flex: 1;
+  min-width: 0;
+
+  // Ant Design Select within filter item - full width
+  :global(.ant-select),
+  :global(.ant-cascader) {
+    width: 100%;
+  }
+
+  @include tablet {
+    flex: 0 0 calc(33.333% - #{$spacing-3});
+
+    &:nth-last-child(-n + 3) {
+      margin-top: 0;
+    }
+  }
+
+  @include mobile {
+    flex: 0 0 calc(50% - #{$spacing-2});
+
+    &:nth-last-child(-n + 2) {
+      margin-top: 0;
+    }
+  }
+}
+
+.clearButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-1;
+  width: 100%;
+  height: 40px; // Match antd Select large size
+  padding: 0 $spacing-2;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  background: $color-bg-primary;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition:
+    border-color $transition-fast,
+    color $transition-fast,
+    background-color $transition-fast;
+
+  &:hover {
+    border-color: $color-error;
+    color: $color-error;
+    background: $color-error-bg;
+  }
+
+  @include mobile {
+    height: 32px; // Match antd Select default size
+    padding: 0 $spacing-2;
+    font-size: $font-size-xs;
+  }
+}
+
+// ============================================
+// Results Section
+// ============================================
+
+.resultsSection {
+  margin-top: $spacing-8;
+  display: flex;
+  flex-direction: column;
+  min-height: 800px;
+
+  @include tablet {
+    margin-top: $spacing-6;
+    min-height: 600px;
+  }
+
+  @include mobile {
+    margin-top: $spacing-4;
+    min-height: 500px;
+  }
+}
+
+.resultsHeader {
+  margin-bottom: $spacing-6;
+
+  @include mobile {
+    margin-bottom: $spacing-4;
+  }
+}
+
+.resultsCount {
+  display: flex;
+  align-items: baseline;
+  gap: $spacing-2;
+
+  .countNumber {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+
+    @include mobile {
+      font-size: $font-size-xl;
+    }
+  }
+
+  .countText {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+
+    @include mobile {
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+// ============================================
+// Course Grid
+// ============================================
+
+.courseGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-6;
+
+  @include desktop-sm {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: $spacing-4;
+  }
+
+  @include mobile {
+    gap: $spacing-3;
+  }
+}
+
+// ============================================
+// Pagination
+// ============================================
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacing-4;
+  margin-top: $spacing-16;
+  margin-bottom: $spacing-8;
+  padding: $spacing-4;
+
+  @include mobile {
+    margin-top: $spacing-12;
+    margin-bottom: $spacing-6;
+    padding: $spacing-3;
+    gap: $spacing-3;
+  }
+}
+
+.pageButton {
+  min-width: 100px;
+
+  @include mobile {
+    min-width: 80px;
+    font-size: $font-size-sm;
+  }
+}
+
+// ============================================
+// Empty State
+// ============================================
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-12 $spacing-4;
+  color: $color-text-secondary;
+
+  h3 {
+    font-size: $font-size-xl;
+    margin-bottom: $spacing-2;
+    color: $color-text-primary;
+  }
+
+  p {
+    font-size: $font-size-base;
+  }
+
+  @include mobile {
+    padding: $spacing-8 $spacing-2;
+  }
+}
+
+.emptyIcon {
+  font-size: 48px;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-4;
+
+  @include mobile {
+    font-size: 36px;
+  }
+}

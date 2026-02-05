@@ -1,0 +1,58 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.announcementBar {
+  background: linear-gradient(90deg, $color-warning-bg 0%, $color-amber-50 100%);
+  padding: $spacing-2 $spacing-4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-3;
+  position: relative;
+  border-bottom: 1px solid $color-amber-light;
+
+  @media (max-width: $breakpoint-sm) {
+    padding: $spacing-1 $spacing-3;
+  }
+}
+
+.announcementIcon {
+  color: $color-warning;
+  font-size: $font-size-base;
+}
+
+.announcementContent {
+  flex: 1;
+  overflow: hidden;
+}
+
+.announcementText {
+  color: $color-amber-dark;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (max-width: $breakpoint-sm) {
+    font-size: $font-size-xs;
+  }
+}
+
+.announcementClose {
+  background: none;
+  border: none;
+  color: $color-warning;
+  cursor: pointer;
+  padding: $spacing-1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+  border-radius: $radius-sm;
+}
+
+.announcementClose:hover {
+  background: rgba($color-warning, 0.1);
+}

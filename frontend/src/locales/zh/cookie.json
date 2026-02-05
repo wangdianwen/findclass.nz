@@ -1,0 +1,72 @@
+{
+  "title": "我们使用 Cookie",
+  "description": "我们使用 Cookie 来改善您的体验。您的数据安全对我们很重要。",
+  "learnMore": "了解更多",
+  "decline": "拒绝",
+  "customize": "自定义",
+  "acceptAll": "接受全部",
+  "preferencesTitle": "Cookie 偏好设置",
+  "cancel": "取消",
+  "save": "保存设置",
+  "selectCategories": "选择您希望接受的 Cookie 类型",
+  "required": "必要",
+  "privacyPolicy": "阅读我们的隐私政策",
+  "terms": "使用条款",
+  "cookiePolicy": "Cookie 政策",
+  "lastUpdated": "最后更新：2026年1月",
+
+  "category.necessary": "必要 Cookie",
+  "category.necessaryDesc": "这些 Cookie 是网站运行所必需的，无法禁用。",
+  "category.analytics": "分析 Cookie",
+  "category.analyticsDesc": "帮助我们了解网站的使用情况，以改进用户体验。",
+  "category.functional": "功能 Cookie",
+  "category.functionalDesc": "记住您的偏好设置，如语言和地区。",
+
+  "sections.introduction.title": "简介",
+  "sections.introduction.content": "FindClass.nz（'我们'）使用 Cookie、会话存储和类似的跟踪技术来改善您在我们网站上的体验。本政策解释了这些技术是什么、我们如何使用它们，以及您关于其使用的选择。",
+
+  "sections.whatAreCookies.title": "什么是 Cookie 和存储技术？",
+  "sections.whatAreCookies.content": "Cookie 和类似的存储技术是存储在您设备（电脑、平板或手机）上的小型文本文件或数据，当您访问网站时生成。它们帮助网站正常运行并提供更好的用户体验。我们同时使用 Cookie 和会话存储——会话存储仅在浏览器会话期间保存数据，并在您关闭标签页时自动清除。",
+
+  "sections.typesOfCookies.title": "我们使用的 Cookie 类型",
+  "sections.typesOfCookies.content": "我们使用以下类型的 Cookie：",
+
+  "sections.types.essential.title": "必要 Cookie",
+  "sections.types.essential.description": "这些 Cookie 对于网站的正常运行是必要的。它们支持页面导航、安全、网络管理等核心功能。",
+  "sections.types.essential.examples": "示例：会话 ID、登录认证、安全令牌。",
+
+  "sections.types.performance.title": "性能 Cookie",
+  "sections.types.performance.description": "这些 Cookie 通过收集有关页面访问和错误的匿名信息，帮助我们了解访问者如何与我们的网站互动。",
+  "sections.types.performance.examples": "示例：Google Analytics、页面加载时间、错误跟踪。",
+
+  "sections.types.functionality.title": "功能 Cookie",
+  "sections.types.functionality.description": "这些 Cookie 使我们能够记住您做出的选择（如语言偏好、地区或自定义选择）并提供增强功能。",
+  "sections.types.functionality.examples": "示例：语言设置、地区选择、保存的偏好设置。",
+
+  "sections.types.targeting.title": "定向/广告 Cookie",
+  "sections.types.targeting.description": "这些 Cookie 用于向您投放与您相关的广告。它们还可以限制您看到广告的次数。",
+  "sections.types.targeting.examples": "示例：广告个性化、社交媒体集成、再营销像素。",
+
+  "sections.howWeUse.title": "我们如何使用 Cookie",
+  "sections.howWeUse.content": "我们出于以下目的使用 Cookie：",
+  "sections.howWeUse.item1": "提供和维护我们的服务",
+  "sections.howWeUse.item2": "记住您的偏好和设置",
+  "sections.howWeUse.item3": "分析我们网站的使用情况并改进用户体验",
+  "sections.howWeUse.item4": "个性化内容和广告",
+
+  "sections.cookieManagement.title": "管理您的 Cookie 偏好",
+  "sections.cookieManagement.content": "您有权接受、拒绝或自定义您的 Cookie 偏好设置。您可以通过以下方式管理您的偏好：",
+  "sections.cookieManagement.item1": "首次访问我们网站时显示的 Cookie 同意横幅",
+  "sections.cookieManagement.item2": "您的浏览器设置（大多数浏览器允许您阻止或删除 Cookie）",
+  "sections.cookieManagement.item3": "Cookie 同意横幅中的 Cookie 偏好设置工具",
+
+  "sections.thirdParty.title": "第三方 Cookie",
+  "sections.thirdParty.content": "一些 Cookie 由出现在我们页面上的第三方服务放置。我们无法控制这些第三方 Cookie。第三方可能会将 Cookie 用于其自己的目的，我们建议您查阅其隐私政策以获取更多信息。",
+
+  "sections.updates.title": "本政策的更新",
+  "sections.updates.content": "我们可能会不时更新本 Cookie 政策，以反映技术、立法或我们业务实践的变化。我们将通过在我们的网站上发布更新后的政策并标注修订的'最后更新'日期来通知您任何重大更改。",
+
+  "sections.contact.title": "联系我们",
+  "sections.contact.content": "如果您对我们使用 Cookie 或本 Cookie 政策有任何疑问，请通过以下方式联系我们：",
+  "sections.contact.email": "support@findclass.nz"
+}

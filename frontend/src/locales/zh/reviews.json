@@ -1,0 +1,124 @@
+{
+  "pageTitle": "评价",
+  "title": "课程评价",
+  "reviewsCount": "{{count}}条评价",
+  "noReviews": "暂无评价",
+  "writeReview": "撰写评价",
+  "viewAll": "查看全部",
+
+  "daysAgo": {
+    "today": "今天",
+    "yesterday": "昨天",
+    "days": "{{days}}天前"
+  },
+
+  "stats": {
+    "averageRating": "{{rating}}分",
+    "totalReviews": "{{count}}条评价",
+    "ratingDistribution": "评分分布",
+    "fiveStar": "5星",
+    "fourStar": "4星",
+    "threeStar": "3星",
+    "twoStar": "2星",
+    "oneStar": "1星"
+  },
+
+  "filter": {
+    "all": "全部",
+    "fiveStar": "五星",
+    "fourStar": "四星",
+    "threeStar": "三星",
+    "twoStar": "二星",
+    "oneStar": "一星"
+  },
+
+  "sort": {
+    "recent": "最新发布",
+    "helpful": "最有帮助"
+  },
+
+  "rating": {
+    "overall": "综合评分",
+    "teaching": "教学能力",
+    "course": "课程质量",
+    "communication": "沟通互动",
+    "punctuality": "时间守时",
+    "placeholder": "请选择评分"
+  },
+
+  "form": {
+    "title": "评价标题",
+    "titlePlaceholder": "简单概括您的体验",
+    "content": "详细评价",
+    "contentPlaceholder": "分享您的学习体验...",
+    "tags": "选择标签",
+    "tagsHint": "最多选择3个标签",
+    "submit": "提交评价",
+    "submitting": "提交中...",
+    "success": "评价提交成功！",
+    "error": "评价提交失败，请重试",
+    "edit": "编辑评价",
+    "editing": "保存中...",
+    "editSuccess": "评价已更新！",
+    "cancel": "取消"
+  },
+
+  "tags": {
+    "teachingSerious": "教学认真",
+    "patient": "有耐心",
+    "greatProgress": "收获很大",
+    "easyToUnderstand": "通俗易懂",
+    "responsible": "作业负责",
+    "punctual": "时间观念强",
+    "friendly": "亲和力强",
+    "goodCourse": "课程质量好"
+  },
+
+  "card": {
+    "helpful": "有帮助",
+    "helpfulCount": "人觉得有帮助",
+    "report": "举报",
+    "reply": "回复",
+    "edit": "编辑",
+    "edited": "已编辑",
+    "daysAgo": "{{days}}天前",
+    "today": "今天",
+    "yesterday": "昨天"
+  },
+
+  "reply": {
+    "label": "教师回复",
+    "placeholder": "撰写回复...",
+    "submit": "提交回复",
+    "success": "回复提交成功！",
+    "empty": "暂无回复"
+  },
+
+  "errors": {
+    "ratingRequired": "请选择评分",
+    "contentRequired": "请输入评价内容",
+    "contentTooShort": "评价至少需要10个字符",
+    "contentTooLong": "评价不能超过1000个字符",
+    "titleTooShort": "标题不能超过200个字符",
+    "maxTags": "最多只能选择3个标签",
+    "notEligible": "您还没有完成该课程，无法评价",
+    "alreadyReviewed": "您已经评价过该课程"
+  },
+
+  "eligibility": {
+    "title": "如何撰写评价",
+    "description": "完成课程后即可撰写评价，分享您的学习体验。",
+    "button": "去我的课程"
+  },
+
+  "report": {
+    "reason": "举报原因",
+    "reasonPlaceholder": "请选择原因",
+    "details": "详细内容",
+    "detailsPlaceholder": "请提供更多说明（选填）",
+    "reasonSpam": "垃圾或误导信息",
+    "reasonInappropriate": "不当内容",
+    "reasonFake": "虚假评价",
+    "reasonOther": "其他原因"
+  }
+}

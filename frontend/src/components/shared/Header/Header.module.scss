@@ -1,0 +1,433 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.header {
+  background: $color-bg-primary;
+  box-shadow: $shadow-md;
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+  border-bottom: 1px solid $color-border;
+}
+
+.headerContent {
+  max-width: $breakpoint-xl;
+  margin: 0 auto;
+  padding: 0 $spacing-6;
+  height: $size-header-height;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  @include tablet {
+    padding: 0 $spacing-3;
+    gap: $spacing-2;
+  }
+
+  @include mobile {
+    padding: 0 $spacing-2;
+    gap: $spacing-2;
+    height: $size-header-height-tablet;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: 0 $spacing-2;
+    gap: $spacing-2;
+    height: $size-header-height-mobile;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+
+  @include mobile {
+    flex-shrink: 0;
+  }
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: transform $transition-base;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+.logoImage {
+  height: 36px;
+  width: auto;
+
+  @include tablet {
+    height: 28px;
+  }
+
+  @include mobile {
+    height: 24px;
+  }
+}
+
+.logoIcon {
+  font-size: $font-size-5xl;
+  filter: drop-shadow(0 2px 4px rgba($color-primary, 0.3));
+
+  @include mobile {
+    font-size: $font-size-xl;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    font-size: $font-size-lg;
+  }
+}
+
+.logoText {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-bold;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-hover 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  @include tablet {
+    font-size: $font-size-base;
+  }
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.nav {
+  display: flex;
+  gap: $spacing-8;
+
+  @include tablet {
+    display: none;
+  }
+}
+
+.navLink {
+  color: $color-text-secondary;
+  text-decoration: none;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-base;
+  transition: all $transition-base;
+  padding: $spacing-2 0;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: $spacing-1;
+    background: linear-gradient(90deg, $color-primary, $color-cyan-light);
+    transition: width $transition-slow;
+  }
+
+  &:hover {
+    color: $color-primary;
+
+    &::after {
+      width: 100%;
+    }
+  }
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+
+  @include tablet {
+    gap: $spacing-1;
+    flex-shrink: 0;
+  }
+}
+
+.authButtons {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+
+  @include tablet {
+    gap: $spacing-1;
+  }
+}
+
+.authLink {
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.loginButton {
+  padding: 0 $spacing-4;
+  height: 36px;
+  font-size: $font-size-sm;
+  border: 1px solid $color-border !important;
+  border-radius: $radius-md;
+  color: $color-text-primary !important;
+  background: transparent !important;
+
+  &:hover {
+    border-color: $color-primary !important;
+    color: $color-primary !important;
+    background: $color-bg-secondary !important;
+  }
+
+  &:active {
+    border-color: $color-primary !important;
+    color: $color-primary !important;
+  }
+
+  @include mobile {
+    padding: 0 $spacing-3;
+    font-size: $font-size-xs;
+    height: 32px;
+  }
+}
+
+.registerButton {
+  padding: 0 $spacing-4;
+  height: 36px;
+  font-size: $font-size-sm;
+
+  @include mobile {
+    padding: 0 $spacing-3;
+    font-size: $font-size-xs;
+    height: 32px;
+  }
+}
+
+// User avatar styles
+.userAvatarButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-1 $spacing-3;
+  background: $color-bg-secondary;
+  border: 1px solid $color-border;
+  border-radius: $radius-full;
+  cursor: pointer;
+  transition: all $transition-base;
+  text-decoration: none;
+
+  &:hover {
+    background: $color-bg-tertiary;
+    border-color: $color-primary-light;
+  }
+
+  @include mobile {
+    padding: $spacing-1 $spacing-2;
+    gap: $spacing-1;
+  }
+}
+
+.avatarImage {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+
+  @include mobile {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.avatarFallback {
+  background: $color-primary;
+  color: white;
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  font-size: $font-size-sm !important;
+
+  @include mobile {
+    width: 24px !important;
+    height: 24px !important;
+    line-height: 24px !important;
+    font-size: $font-size-xs !important;
+  }
+}
+
+.userName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @include tablet {
+    display: none;
+  }
+}
+
+// User dropdown menu
+.userDropdown {
+  :global(.ant-dropdown-menu) {
+    border-radius: $radius-md;
+    box-shadow: $shadow-dropdown;
+    border: 1px solid $color-border;
+    padding: $spacing-2;
+    min-width: 180px;
+  }
+
+  :global(.ant-dropdown-menu-item) {
+    padding: $spacing-2 $spacing-3;
+    border-radius: $radius-sm;
+    font-size: $font-size-sm;
+
+    &:hover {
+      background: $color-bg-secondary;
+    }
+  }
+
+  :global(.ant-dropdown-menu-item-danger) {
+    color: $color-error;
+
+    &:hover {
+      background: $color-error-bg;
+    }
+  }
+}
+
+.citySelect {
+  width: $size-select-width-md;
+}
+
+.subRegionSelect {
+  width: $size-select-width-lg;
+}
+
+.languageSelect {
+  width: $size-select-width-sm;
+}
+
+.languageButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  background: $color-bg-primary;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: $color-primary;
+    background: $color-bg-secondary;
+  }
+}
+
+.flagIcon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.languageMenuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-3;
+  min-width: 120px;
+  padding: $spacing-2 $spacing-1;
+}
+
+.languageMenuFlag {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.languageMenuText {
+  flex: 1;
+  font-size: $font-size-sm;
+}
+
+.checkIcon {
+  color: $color-primary;
+  font-size: $font-size-sm;
+}
+
+.citySelect :global(.ant-select-selector),
+.subRegionSelect :global(.ant-select-selector) {
+  border-radius: $radius-md;
+  border: 1px solid $color-border;
+  background: linear-gradient(135deg, $color-bg-secondary 0%, $color-bg-tertiary 100%);
+  transition: all $transition-base;
+}
+
+.citySelect :global(.ant-select-selector:hover),
+.subRegionSelect :global(.ant-select-selector:hover) {
+  border-color: $color-primary-light;
+}
+
+.citySelect:global(.ant-select-focused) :global(.ant-select-selector),
+.subRegionSelect:global(.ant-select-focused) :global(.ant-select-selector) {
+  border-color: $color-primary;
+  box-shadow: $shadow-focus;
+}
+
+:global(.ant-select-placeholder) {
+  color: $color-text-secondary;
+}
+
+:global(.ant-select-content-value) {
+  color: $color-text-primary;
+}
+
+@media (max-width: $breakpoint-lg) {
+  .headerActions .citySelect,
+  .headerActions .subRegionSelect {
+    width: $size-select-width-xs;
+  }
+
+  .headerActions .citySelect :global(.ant-select-selector),
+  .headerActions .subRegionSelect :global(.ant-select-selector) {
+    padding: 0 $spacing-1;
+    height: $spacing-8;
+    font-size: $font-size-xs;
+  }
+
+  .headerActions :global(.ant-select-selector) {
+    padding: 0 $spacing-2;
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .headerActions .citySelect,
+  .headerActions .subRegionSelect {
+    display: none;
+  }
+
+  .headerActions .languageButton {
+    display: flex;
+  }
+
+  .headerActions :global(.ant-btn) {
+    padding: $spacing-1 $spacing-2;
+    font-size: $font-size-xs;
+    height: $spacing-8;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .headerActions :global(.ant-btn) {
+    padding: $spacing-1 $spacing-2;
+    font-size: $font-size-xs;
+    height: $spacing-7;
+  }
+}

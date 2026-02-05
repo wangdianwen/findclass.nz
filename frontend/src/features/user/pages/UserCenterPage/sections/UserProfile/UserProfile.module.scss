@@ -1,0 +1,281 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-6;
+
+  @include mobile {
+    gap: $spacing-5;
+  }
+
+  .section {
+    background: $color-bg-secondary;
+    border-radius: $radius-lg;
+    padding: $spacing-6;
+
+    @include mobile {
+      padding: $spacing-4;
+    }
+
+    .sectionHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: $spacing-5;
+
+      @include mobile {
+        margin-bottom: $spacing-4;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: $spacing-3;
+      }
+    }
+
+    .sectionTitle {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $color-text-primary;
+      margin: 0;
+    }
+  }
+
+  .personalInfo {
+    display: flex;
+    gap: $spacing-6;
+
+    @include mobile {
+      flex-direction: column;
+      gap: $spacing-4;
+    }
+
+    .avatarSection {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: $spacing-4;
+
+      .avatarWrapper {
+        position: relative;
+        width: 100px;
+        height: 100px;
+
+        &:hover .uploadMask {
+          opacity: 1;
+        }
+
+        .ant-avatar {
+          display: block;
+          width: 100%;
+          height: 100%;
+          line-height: 100px;
+        }
+
+        .uploadMask {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity $transition-fast;
+        }
+
+        .cameraIcon {
+          color: white;
+          font-size: $font-size-sm;
+          text-align: center;
+          padding: $spacing-2;
+        }
+      }
+    }
+
+    .avatarSelector {
+      flex: 1;
+      min-width: 0;
+
+      .avatarSelectorTitle {
+        font-size: $font-size-sm;
+        color: $color-text-secondary;
+        margin: 0 0 $spacing-3 0;
+      }
+
+      .ant-tabs {
+        width: 100%;
+      }
+    }
+
+    .infoForm {
+      flex: 1;
+
+      .formRow {
+        display: flex;
+        gap: $spacing-4;
+
+        @include mobile {
+          flex-direction: column;
+          gap: 0;
+        }
+      }
+
+      .formField {
+        flex: 1;
+      }
+
+      .fieldLabel {
+        font-size: $font-size-sm;
+        color: $color-text-secondary;
+        margin-bottom: $spacing-2;
+        display: block;
+      }
+
+      .formActions {
+        display: flex;
+        justify-content: flex-end;
+        gap: $spacing-3;
+        margin-top: $spacing-6;
+        padding-top: $spacing-5;
+        border-top: 1px solid $color-border;
+
+        @include mobile {
+          margin-top: $spacing-4;
+          padding-top: $spacing-4;
+          flex-direction: column-reverse;
+
+          button {
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .infoDisplay {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-4;
+
+      .infoRow {
+        display: flex;
+        gap: $spacing-6;
+
+        @include mobile {
+          flex-direction: column;
+          gap: $spacing-3;
+        }
+      }
+
+      .infoItem {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-1;
+
+        .label {
+          font-size: $font-size-sm;
+          color: $color-text-tertiary;
+        }
+
+        .value {
+          font-size: $font-size-base;
+          color: $color-text-primary;
+        }
+      }
+    }
+  }
+
+  .settingsList {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+  }
+
+  .settingsItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-4;
+    background: $color-bg-primary;
+    border-radius: $radius-md;
+
+    @include mobile {
+      padding: $spacing-3;
+    }
+
+    .itemInfo {
+      flex: 1;
+
+      .itemLabel {
+        font-size: $font-size-base;
+        color: $color-text-primary;
+        margin: 0;
+      }
+
+      .itemDesc {
+        font-size: $font-size-sm;
+        color: $color-text-tertiary;
+        margin: $spacing-1 0 0 0;
+      }
+    }
+
+    .itemAction {
+      flex-shrink: 0;
+    }
+  }
+
+  .passwordForm {
+    margin-top: $spacing-4;
+    padding: $spacing-5;
+    background: $color-bg-primary;
+    border-radius: $radius-md;
+
+    @include mobile {
+      padding: $spacing-4;
+    }
+
+    .formField {
+      margin-bottom: $spacing-4;
+    }
+
+    .formActions {
+      display: flex;
+      justify-content: flex-end;
+      gap: $spacing-3;
+      margin-top: $spacing-5;
+      padding-top: $spacing-4;
+      border-top: 1px solid $color-border;
+
+      @include mobile {
+        flex-direction: column-reverse;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .dangerZone {
+    padding: $spacing-5;
+    background: $color-error-bg;
+    border: 1px solid $color-error-light;
+    border-radius: $radius-md;
+
+    .dangerTitle {
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      color: $color-error;
+      margin: 0 0 $spacing-2 0;
+    }
+
+    .dangerDesc {
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+      margin: 0 0 $spacing-4 0;
+    }
+  }
+}

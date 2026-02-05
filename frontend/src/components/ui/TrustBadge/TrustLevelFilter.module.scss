@@ -1,0 +1,63 @@
+@use '../../../styles/variables' as *;
+
+// ============================================
+// Trust Level Filter - Reusable component
+// ============================================
+
+.filterContainer {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $color-text-secondary;
+  flex-shrink: 0;
+}
+
+.radioGroup {
+  display: flex;
+}
+
+.radioButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-1;
+  height: auto;
+  padding: $spacing-1 $spacing-2;
+  border-radius: $radius-lg;
+  border: 1px solid $color-border;
+  background: $color-white;
+  font-size: $font-size-xs;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+
+  &.selected {
+    border-color: $color-primary;
+    background: rgba($color-primary, 0.05);
+    color: $color-primary;
+    font-weight: 500;
+  }
+
+  // Disable default Ant Design button styles
+  &::before {
+    display: none;
+  }
+}
+
+.optionWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.optionLabel {
+  font-size: $font-size-xs;
+}

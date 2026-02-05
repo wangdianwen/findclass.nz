@@ -1,0 +1,111 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.notificationSection {
+  .notificationHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-4;
+    padding-bottom: $spacing-4;
+    border-bottom: 1px solid $color-border;
+  }
+
+  .notificationActions {
+    display: flex;
+    gap: $spacing-3;
+  }
+}
+
+.notificationList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.notificationCard {
+  background: $color-bg-secondary;
+  border-radius: $radius-lg;
+  padding: $spacing-4;
+  display: flex;
+  gap: $spacing-4;
+  transition: all $transition-fast;
+  border-left: 3px solid transparent;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+
+  &.unread {
+    background: $color-bg-tertiary;
+    border-left-color: $color-primary;
+  }
+
+  .notificationContent {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .notificationTitle {
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+    margin: 0 0 $spacing-1 0;
+  }
+
+  .notificationText {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin: 0 0 $spacing-2 0;
+    line-height: 1.5;
+  }
+
+  .notificationMeta {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+  }
+
+  .notificationActions {
+    display: flex;
+    gap: $spacing-1;
+    flex-shrink: 0;
+    padding-top: $spacing-1;
+  }
+
+  .actionButton {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $color-text-tertiary;
+    border-radius: 50%;
+
+    &:hover {
+      color: $color-primary;
+      background: $color-bg-tertiary;
+    }
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-12 $spacing-6;
+
+  .emptyTitle {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+    margin: 0 0 $spacing-2 0;
+  }
+
+  .emptyDesc {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+    margin: 0;
+  }
+}

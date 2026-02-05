@@ -1,0 +1,130 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-secondary;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: $spacing-8 $spacing-4;
+  min-height: calc(100vh - $size-footer-height);
+
+  @include tablet {
+    padding: $spacing-6 $spacing-3;
+  }
+
+  @include mobile {
+    padding: $spacing-4 $spacing-2;
+  }
+}
+
+.card {
+  background: $color-bg-primary;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
+  padding: $spacing-10;
+  width: 100%;
+  max-width: 420px;
+
+  @include tablet {
+    padding: $spacing-8;
+  }
+
+  @include mobile {
+    padding: $spacing-6 $spacing-4;
+    max-width: 100%;
+  }
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $spacing-6;
+
+  @include mobile {
+    margin-bottom: $spacing-4;
+  }
+}
+
+.logoLink {
+  display: block;
+  transition: transform $transition-base;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+.logoImage {
+  height: 48px;
+  width: auto;
+
+  @include mobile {
+    height: 40px;
+  }
+}
+
+.pageTitle {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  text-align: center;
+  margin: 0 0 $spacing-2 0;
+
+  @include mobile {
+    font-size: $font-size-2xl;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  text-align: center;
+  margin: 0 0 $spacing-8 0;
+
+  @include mobile {
+    margin-bottom: $spacing-6;
+  }
+}
+
+.links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: $spacing-6;
+  font-size: $font-size-sm;
+
+  @include mobile {
+    margin-top: $spacing-4;
+  }
+}
+
+.bottomLinks {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  margin-top: $spacing-6;
+  padding-top: $spacing-6;
+  border-top: 1px solid $color-border-light;
+
+  @include mobile {
+    margin-top: $spacing-5;
+    padding-top: $spacing-4;
+    gap: $spacing-3;
+  }
+}
+
+.footerSpacer {
+  height: $size-footer-height;
+
+  @include tablet {
+    height: $size-footer-height-tablet;
+  }
+
+  @include mobile {
+    height: $size-footer-height-mobile;
+  }
+}

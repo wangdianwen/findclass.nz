@@ -1,0 +1,662 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-3;
+}
+
+.loadingText {
+  color: $color-text-secondary;
+  font-size: $font-size-base;
+}
+
+.spinnerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $color-primary;
+
+  &.spinnerIconSmall {
+    font-size: $font-size-sm;
+  }
+
+  &.spinnerIconMedium {
+    font-size: $font-size-md;
+  }
+
+  &.spinnerIconLarge {
+    font-size: $font-size-xl;
+  }
+}
+
+.skeleton {
+  width: var(--skeleton-width, 100%);
+  height: var(--skeleton-height, 20px);
+  border-radius: var(--skeleton-radius, 4px);
+  background: linear-gradient(
+    90deg,
+    $color-bg-tertiary 25%,
+    $color-border-light 50%,
+    $color-bg-tertiary 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.sectionSkeleton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $color-bg-tertiary;
+  border-radius: $radius-md;
+  height: var(--section-skeleton-height, 200px);
+}
+
+.sectionSkeletonSmall {
+  @extend .sectionSkeleton;
+  height: $spacing-10;
+}
+
+.sectionSkeletonMedium {
+  @extend .sectionSkeleton;
+  height: $spacing-16;
+}
+
+.sectionSkeletonLarge {
+  @extend .sectionSkeleton;
+  height: $spacing-12;
+}
+
+.sectionSkeletonHero {
+  @extend .sectionSkeleton;
+  height: 480px;
+  padding: $spacing-16 $spacing-6;
+  background: linear-gradient(
+    135deg,
+    $color-blue-50 0%,
+    $color-blue-100-light 50%,
+    $color-blue-50 100%
+  );
+
+  @include tablet {
+    height: 400px;
+    padding: $spacing-12 $spacing-4;
+  }
+}
+
+.sectionSkeletonCourses {
+  @extend .sectionSkeleton;
+  min-height: 520px;
+  padding: $spacing-16 $spacing-6;
+  background: $color-bg-primary;
+  border-top: 1px solid $color-border;
+  border-bottom: 1px solid $color-border;
+
+  @include tablet {
+    min-height: 480px;
+    padding: $spacing-12 $spacing-4;
+  }
+}
+
+.sectionSkeletonFeatures {
+  @extend .sectionSkeleton;
+  min-height: 500px;
+  padding: $spacing-16 $spacing-6;
+  background: $color-bg-primary;
+  border-top: 1px solid $color-border;
+  border-bottom: 1px solid $color-border;
+
+  @include tablet {
+    min-height: 450px;
+    padding: $spacing-12 $spacing-4;
+  }
+}
+
+.sectionSkeletonValue {
+  @extend .sectionSkeleton;
+  height: 380px;
+  padding: $spacing-16 $spacing-6;
+  background: $color-bg-secondary;
+
+  @include tablet {
+    height: 350px;
+    padding: $spacing-12 $spacing-4;
+  }
+}
+
+.sectionSkeletonCTA {
+  @extend .sectionSkeleton;
+  height: 280px;
+  background: linear-gradient(135deg, $color-info-bg 0%, $color-blue-100-light 100%);
+}
+
+.sectionSkeletonInstitution {
+  @extend .sectionSkeleton;
+  height: 320px;
+  background: $color-bg-primary;
+}
+
+.skeletonContainer {
+  width: 100%;
+  max-width: 1280px;
+}
+
+.skeletonContainer1200 {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.skeletonContainer800 {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.skeletonSectionTitle {
+  @extend .skeleton;
+  height: 32px;
+  width: 200px;
+  margin-bottom: $spacing-8;
+  border-radius: $radius-lg;
+
+  @include tablet {
+    height: 28px;
+    width: 180px;
+    margin-bottom: $spacing-6;
+  }
+}
+
+.skeletonSectionTitleCenter {
+  @extend .skeleton;
+  height: 40px;
+  width: 300px;
+  margin: 0 auto $spacing-12;
+  border-radius: $radius-lg;
+
+  @include tablet {
+    height: 32px;
+    width: 240px;
+    margin-bottom: $spacing-8;
+  }
+}
+
+.skeletonLineShort {
+  @extend .skeleton;
+  height: 36px;
+  width: 80%;
+  border-radius: $radius-lg;
+
+  @include tablet {
+    height: 28px;
+  }
+}
+
+.skeletonLine {
+  @extend .skeleton;
+  height: 24px;
+  width: 100%;
+  margin-top: $spacing-4;
+  border-radius: $radius-md;
+}
+
+.skeletonLineSm {
+  @extend .skeleton;
+  height: 24px;
+  width: 90%;
+  margin-top: $spacing-3;
+  border-radius: $radius-md;
+}
+
+.skeletonLineNarrow {
+  @extend .skeleton;
+  height: 24px;
+  width: 80%;
+  margin-top: $spacing-4;
+  border-radius: $radius-md;
+}
+
+.skeletonLineCentered {
+  @extend .skeleton;
+  height: 24px;
+  width: 80%;
+  margin-top: $spacing-4;
+  border-radius: $radius-md;
+}
+
+.skeletonStatGrid {
+  margin-top: $spacing-6;
+}
+
+.skeletonContent {
+  width: 100%;
+  max-width: $size-hero-max-width;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-4;
+}
+
+.skeletonTitle {
+  @extend .skeleton;
+  height: 48px;
+  width: 70%;
+  max-width: 700px;
+  border-radius: $radius-lg;
+
+  @include tablet {
+    height: 36px;
+  }
+}
+
+.skeletonSubtitle {
+  @extend .skeleton;
+  height: 24px;
+  width: 50%;
+  max-width: 500px;
+  border-radius: $radius-md;
+}
+
+.skeletonSearchBar {
+  @extend .skeleton;
+  height: 56px;
+  width: 100%;
+  max-width: $size-search-max-width;
+  border-radius: $radius-xl;
+  margin-top: $spacing-2;
+}
+
+.skeletonFilters {
+  @extend .skeleton;
+  height: 32px;
+  width: 70%;
+  max-width: 600px;
+  border-radius: $radius-md;
+  margin-top: $spacing-5;
+}
+
+.skeletonCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-6;
+  width: 100%;
+  max-width: $breakpoint-xl;
+  margin-top: $spacing-8;
+
+  @include desktop-sm {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-4;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skeletonCard {
+  @extend .skeleton;
+  height: 280px;
+  border-radius: $radius-xl;
+
+  @include tablet {
+    height: 260px;
+  }
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-6;
+  width: 100%;
+  max-width: $breakpoint-xl;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-4;
+  }
+}
+
+.skeletonGridItem {
+  @extend .skeleton;
+  height: 200px;
+  border-radius: $radius-xl;
+}
+
+.skeletonStats {
+  display: flex;
+  gap: $spacing-8;
+  margin-top: $spacing-6;
+
+  @include tablet {
+    gap: $spacing-4;
+  }
+}
+
+.skeletonStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.skeletonStatValue {
+  @extend .skeleton;
+  height: 48px;
+  width: 100px;
+  border-radius: $radius-lg;
+
+  @include tablet {
+    height: 40px;
+    width: 80px;
+  }
+}
+
+.skeletonStatLabel {
+  @extend .skeleton;
+  height: 20px;
+  width: 80px;
+  border-radius: $radius-sm;
+}
+
+.skeletonButtons {
+  display: flex;
+  gap: $spacing-4;
+  margin-top: $spacing-6;
+}
+
+.skeletonButton {
+  @extend .skeleton;
+  height: 52px;
+  width: 160px;
+  border-radius: $radius-lg;
+
+  @include tablet {
+    height: 44px;
+    width: 140px;
+  }
+}
+
+.skeletonButtonOutline {
+  @extend .skeleton;
+  height: 52px;
+  width: 140px;
+  border-radius: $radius-lg;
+
+  @include tablet {
+    height: 44px;
+    width: 120px;
+  }
+}
+
+.skeletonText {
+  @extend .skeleton;
+  height: 24px;
+  width: 80%;
+  max-width: 700px;
+  border-radius: $radius-md;
+}
+
+.skeletonRow {
+  display: flex;
+  gap: $spacing-8;
+  margin-top: $spacing-6;
+  width: 100%;
+  max-width: $breakpoint-xl;
+
+  @include tablet {
+    flex-direction: column;
+    gap: $spacing-4;
+  }
+}
+
+.skeletonTextContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.skeletonStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-4;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.skeletonStatSimple {
+  @extend .skeleton;
+  height: 100px;
+  border-radius: $radius-xl;
+
+  @include tablet {
+    height: 80px;
+  }
+}
+
+.skeletonInstitutionCard {
+  @extend .skeleton;
+  height: 260px;
+  width: 100%;
+  max-width: 800px;
+  border-radius: $radius-xl;
+}
+
+.headerSkeleton {
+  height: $size-header-height;
+  background: $color-bg-primary;
+  border-bottom: 1px solid $color-border;
+  display: flex;
+  align-items: center;
+  padding: 0 $spacing-6;
+
+  @include tablet {
+    padding: 0 $spacing-4;
+  }
+
+  @include mobile {
+    padding: 0 $spacing-3;
+  }
+}
+
+.headerSkeletonContent {
+  width: 100%;
+  max-width: $size-content-max-width;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-6;
+
+  @include tablet {
+    gap: $spacing-4;
+  }
+
+  @include mobile {
+    gap: $spacing-3;
+  }
+}
+
+.skeletonLogo {
+  @extend .skeleton;
+  height: 36px;
+  width: 140px;
+  border-radius: $radius-md;
+
+  @include tablet {
+    height: 32px;
+    width: 120px;
+  }
+
+  @include mobile {
+    height: 28px;
+    width: 100px;
+  }
+}
+
+.headerSkeletonNav {
+  display: flex;
+  gap: $spacing-8;
+
+  @include tablet {
+    gap: $spacing-6;
+  }
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.skeletonNavLink {
+  @extend .skeleton;
+  height: 20px;
+  width: 80px;
+  border-radius: $radius-sm;
+
+  @include tablet {
+    width: 70px;
+  }
+}
+
+.headerSkeletonActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+
+  @include tablet {
+    gap: $spacing-2;
+  }
+}
+
+.skeletonSelect {
+  @extend .skeleton;
+  height: 40px;
+  width: 140px;
+  border-radius: $radius-md;
+
+  @include tablet {
+    width: 120px;
+    height: 36px;
+  }
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.skeletonSelectSmall {
+  @extend .skeleton;
+  height: 40px;
+  width: 100px;
+  border-radius: $radius-md;
+
+  @include tablet {
+    width: 90px;
+    height: 36px;
+  }
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.skeletonButton {
+  @extend .skeleton;
+  height: 36px;
+  width: 100px;
+  border-radius: $radius-md;
+
+  @include tablet {
+    height: 32px;
+    width: 90px;
+  }
+
+  @include mobile {
+    width: 80px;
+    height: 32px;
+  }
+}
+
+.skeletonButtonPrimary {
+  @extend .skeleton;
+  height: 36px;
+  width: 110px;
+  border-radius: $radius-md;
+
+  @include tablet {
+    height: 32px;
+    width: 100px;
+  }
+
+  @include mobile {
+    width: 90px;
+    height: 32px;
+  }
+}
+
+.announcementBarSkeleton {
+  background: linear-gradient(90deg, $color-warning-bg 0%, $color-amber-50 100%);
+  padding: $spacing-2 $spacing-4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-3;
+  border-bottom: 1px solid $color-amber-light;
+
+  @include mobile {
+    padding: $spacing-1 $spacing-3;
+  }
+}
+
+.skeletonAnnouncementIcon {
+  @extend .skeleton;
+  height: 16px;
+  width: 16px;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.skeletonAnnouncementText {
+  @extend .skeleton;
+  height: 16px;
+  flex: 1;
+  max-width: 600px;
+  border-radius: $radius-sm;
+
+  @include mobile {
+    height: 14px;
+  }
+}
+
+.skeletonAnnouncementClose {
+  @extend .skeleton;
+  height: 20px;
+  width: 20px;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+
+  @include mobile {
+    height: 18px;
+    width: 18px;
+  }
+}

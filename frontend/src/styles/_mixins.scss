@@ -1,0 +1,157 @@
+@use 'variables' as *;
+
+// ============================================
+// Responsive Mixins
+// ============================================
+
+// Mobile First Breakpoints
+@mixin mobile-sm {
+  @media (max-width: $breakpoint-xs) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin desktop-sm {
+  @media (max-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (max-width: $breakpoint-xl) {
+    @content;
+  }
+}
+
+@mixin desktop-lg {
+  @media (max-width: $breakpoint-2xl) {
+    @content;
+  }
+}
+
+// Container mixin
+@mixin container($max-width: $breakpoint-xl) {
+  width: 100%;
+  max-width: $max-width;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $spacing-6;
+  padding-right: $spacing-6;
+
+  @include tablet {
+    padding-left: $spacing-4;
+    padding-right: $spacing-4;
+  }
+
+  @include mobile {
+    padding-left: $spacing-3;
+    padding-right: $spacing-3;
+  }
+}
+
+// Flex centering
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Text truncation
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin line-clamp($lines) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Aspect ratio
+@mixin aspect-ratio($width, $height) {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    display: block;
+    padding-top: calc(($height / $width) * 100%);
+    width: 100%;
+  }
+
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// Visually hidden (for screen readers)
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Card base
+@mixin card-base {
+  background-color: $color-bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  border: 1px solid $color-border;
+  transition: all $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
+  }
+}
+
+// Smooth scrolling
+@mixin smooth-scroll {
+  scroll-behavior: smooth;
+
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+  }
+}
+
+// Touch-friendly sizing
+@mixin touch-target {
+  min-width: 44px;
+  min-height: 44px;
+
+  @include mobile {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}

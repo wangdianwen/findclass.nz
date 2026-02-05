@@ -1,0 +1,263 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.reviewCard {
+  background: $color-bg-primary;
+  border-radius: $radius-lg;
+  padding: $spacing-5;
+  // no border - clean flat design
+  transition: box-shadow $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-sm;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-3;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.avatar {
+  // no border - clean flat design
+}
+
+.userMeta {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.userName {
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  font-size: $font-size-base;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  color: $color-border;
+  font-size: $font-size-sm;
+
+  &.filled {
+    color: $color-warning;
+  }
+}
+
+.ratingNumber {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-left: $spacing-1;
+}
+
+.date {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.title {
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  font-size: $font-size-base;
+  margin-bottom: $spacing-2;
+  line-height: 1.5;
+}
+
+.content {
+  color: $color-text-secondary;
+  font-size: $font-size-base;
+  line-height: 1.8;
+  margin-bottom: $spacing-3;
+  white-space: pre-wrap;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+  margin-bottom: $spacing-3;
+}
+
+.tag {
+  background: $color-bg-secondary;
+  border: none;
+  border-radius: $radius-sm;
+  color: $color-text-secondary;
+  font-size: $font-size-xs;
+  padding: $spacing-1 $spacing-2;
+}
+
+.courseLink {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-4;
+  margin-bottom: $spacing-3;
+}
+
+.linkItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  font-size: $font-size-sm;
+  color: $color-primary;
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $color-primary-hover;
+    text-decoration: underline;
+  }
+}
+
+.linkIcon {
+  font-size: $font-size-base;
+  color: $color-text-tertiary;
+}
+
+.linkText {
+  font-weight: $font-weight-medium;
+}
+
+.ratingDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-4;
+  padding: $spacing-2 0;
+  margin-bottom: $spacing-2;
+}
+
+.ratingItem {
+  display: flex;
+  align-items: center;
+  font-size: $font-size-sm;
+}
+
+.ratingLabel {
+  color: $color-text-tertiary;
+  margin-right: 4px;
+}
+
+.edited {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  font-style: italic;
+  margin-bottom: $spacing-2;
+}
+
+.reply {
+  background: $color-bg-secondary;
+  border-radius: $radius-md;
+  padding: $spacing-3;
+  margin-bottom: $spacing-3;
+}
+
+.replyLabel {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-2;
+}
+
+.replyIcon {
+  font-size: $font-size-sm;
+}
+
+.replyContent {
+  display: flex;
+  gap: $spacing-2;
+}
+
+.replyAvatar {
+  flex-shrink: 0;
+}
+
+.replyText {
+  flex: 1;
+}
+
+.replyAuthor {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-1;
+}
+
+.replyBody {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding-top: $spacing-2;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+
+  &:hover {
+    color: $color-primary;
+    background: rgba($color-primary, 0.05);
+  }
+}
+
+.actionCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.editSection {
+  margin-top: $spacing-2;
+}
+
+.editButton {
+  color: $color-primary;
+  font-size: $font-size-sm;
+
+  &:hover {
+    color: $color-primary-hover;
+    border-color: $color-primary-hover;
+  }
+}
+
+@include mobile {
+  .reviewCard {
+    padding: $spacing-4;
+  }
+
+  .ratingDetails {
+    gap: $spacing-3;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
+}

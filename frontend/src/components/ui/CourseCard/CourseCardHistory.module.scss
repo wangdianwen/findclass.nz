@@ -1,0 +1,113 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.historyCardWrapper {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-2;
+
+  &:hover {
+    .removeButton {
+      opacity: 1;
+    }
+  }
+}
+
+.historyCardLink {
+  text-decoration: none;
+  display: block;
+  flex: 1;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.historyCard {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-4;
+  padding: $spacing-4;
+  background: $color-bg-primary;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-lg;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $color-primary-light;
+    box-shadow: $shadow-sm;
+  }
+
+  @include mobile {
+    padding: $spacing-3;
+    gap: $spacing-3;
+  }
+}
+
+.cardContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  flex-wrap: wrap;
+
+  .ant-tag {
+    margin: 0;
+    font-size: $font-size-xs;
+    line-height: $line-height-base;
+    padding: 0 $spacing-2;
+    border-radius: $radius-sm;
+  }
+}
+
+.cardTitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+
+.cardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.institution {
+  font-size: $font-size-sm;
+  color: $color-gray-500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lastViewed {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.removeButton {
+  opacity: 0;
+  transition: opacity $transition-fast;
+  padding: $spacing-2;
+  margin-top: $spacing-2;
+
+  &:hover {
+    opacity: 1 !important;
+  }
+}

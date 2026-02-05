@@ -1,0 +1,974 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// Main Layout
+// ============================================
+
+.courseDetailPage {
+  min-height: 100vh;
+  background: $color-bg-primary;
+  overflow-x: hidden;
+  overflow-y: visible;
+  isolation: isolate;
+}
+
+.mainContent {
+  max-width: $breakpoint-xl;
+  margin: 0 auto;
+  padding: $spacing-6;
+  overflow: visible;
+  isolation: isolate;
+
+  @include mobile {
+    padding: $spacing-4;
+  }
+
+  @include mobile-sm {
+    padding: $spacing-3;
+  }
+}
+
+.headerSpacer {
+  height: $size-header-height;
+
+  @include tablet {
+    height: $size-header-height-tablet;
+  }
+
+  @include mobile {
+    height: $size-header-height-mobile;
+  }
+}
+
+// ============================================
+// Breadcrumb
+// ============================================
+
+.breadcrumb {
+  margin-bottom: $spacing-6;
+  color: $color-text-secondary;
+
+  a {
+    color: $color-primary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  span {
+    color: $color-text-primary;
+  }
+
+  @include mobile {
+    margin-bottom: $spacing-4;
+    font-size: $font-size-sm;
+  }
+}
+
+// ============================================
+// Course Header
+// ============================================
+
+.courseHeader {
+  margin-bottom: $spacing-8;
+
+  @include mobile {
+    margin-bottom: $spacing-6;
+  }
+}
+
+.courseTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-3;
+  margin-bottom: $spacing-3;
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
+
+  .titleText {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+  }
+
+  @include mobile {
+    font-size: $font-size-xl;
+  }
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-4;
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
+
+  .rating {
+    display: flex;
+    align-items: center;
+    gap: $spacing-1;
+    color: $color-warning;
+    font-weight: $font-weight-medium;
+  }
+
+  .reviewCount {
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-primary;
+      text-decoration: underline;
+    }
+
+    &:focus {
+      outline: 2px solid $color-primary;
+      outline-offset: 2px;
+      border-radius: $radius-sm;
+    }
+  }
+
+  .updatedAt {
+    display: flex;
+    align-items: center;
+    gap: $spacing-1;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+  }
+
+  @include mobile {
+    gap: $spacing-2;
+    font-size: $font-size-sm;
+  }
+
+  @include mobile-sm {
+    gap: $spacing-1;
+    font-size: $font-size-xs;
+  }
+}
+
+// ============================================
+// Content Grid
+// ============================================
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: $spacing-8;
+  overflow: visible;
+  isolation: isolate;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: $spacing-6;
+  }
+
+  @include mobile {
+    gap: $spacing-4;
+  }
+}
+
+.leftColumn {
+  overflow: visible;
+  min-width: 0;
+}
+
+.rightColumn {
+  overflow: visible;
+  min-width: 0;
+}
+
+// ============================================
+// Image Gallery
+// ============================================
+
+.imageGallery {
+  margin-bottom: $spacing-8;
+
+  @include tablet {
+    margin-bottom: $spacing-6;
+  }
+}
+
+.mainImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: $radius-lg;
+
+  @include mobile {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+.thumbnailRow {
+  display: flex;
+  gap: $spacing-2;
+  margin-top: $spacing-3;
+}
+
+.thumbnail {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: $radius-md;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity $transition-fast;
+
+  &:hover,
+  &.active {
+    opacity: 1;
+  }
+
+  @include mobile {
+    width: 60px;
+    height: 45px;
+  }
+}
+
+// ============================================
+// Info Card (Right Sidebar)
+// ============================================
+
+.infoCard {
+  background: $color-bg-primary;
+  border: 1px solid $color-border;
+  border-radius: $radius-xl;
+  padding: $spacing-6;
+  position: sticky;
+  top: $spacing-6;
+  height: fit-content;
+  width: 100%;
+  max-width: 380px;
+  overflow-x: hidden;
+  overflow-y: visible;
+  isolation: isolate;
+
+  @include tablet {
+    max-width: 100%;
+  }
+
+  @include mobile {
+    padding: $spacing-4;
+    position: static;
+    order: -1;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  @include mobile-sm {
+    padding: $spacing-3;
+  }
+}
+
+.priceSection {
+  margin-bottom: $spacing-6;
+  padding-bottom: $spacing-6;
+  border-bottom: 1px solid $color-border;
+}
+
+.price {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  word-break: break-word;
+
+  @include mobile {
+    font-size: $font-size-xl;
+  }
+
+  .originalPrice {
+    font-size: $font-size-base;
+    font-weight: $font-weight-normal;
+    color: $color-text-tertiary;
+    text-decoration: line-through;
+    margin-left: $spacing-2;
+
+    @include mobile-sm {
+      display: block;
+      margin-left: 0;
+      margin-top: $spacing-1;
+    }
+  }
+
+  .priceUnit {
+    font-size: $font-size-base;
+    font-weight: $font-weight-normal;
+    color: $color-text-secondary;
+  }
+
+  .lessonCount {
+    font-size: $font-size-base;
+    font-weight: $font-weight-normal;
+    color: $color-text-tertiary;
+    word-break: break-word;
+
+    @include mobile-sm {
+      display: block;
+      margin-top: $spacing-1;
+    }
+    margin-left: $spacing-2;
+  }
+}
+
+.infoList {
+  margin-bottom: $spacing-6;
+}
+
+.infoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-3;
+  padding: $spacing-2 0;
+
+  .icon {
+    flex-shrink: 0;
+    width: $spacing-5;
+    height: $spacing-5;
+    color: $color-text-tertiary;
+  }
+
+  .content {
+    flex: 1;
+  }
+
+  .label {
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+    margin-bottom: 2px;
+  }
+
+  .value {
+    font-size: $font-size-base;
+    color: $color-text-primary;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  margin-bottom: $spacing-6;
+}
+
+.contactButton {
+  height: 48px;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+}
+
+.saveButton {
+  height: 44px;
+
+  &.saved {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+
+  .savedIcon {
+    color: #ef4444;
+  }
+}
+
+.contactSection {
+  padding-top: $spacing-4;
+  border-top: 1px solid $color-border;
+}
+
+.contactTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-3;
+}
+
+.contactList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2;
+  background: $color-bg-secondary;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+
+  .icon {
+    color: $color-text-tertiary;
+  }
+}
+
+.reportSection {
+  margin-top: $spacing-4;
+  padding-top: $spacing-4;
+  border-top: 1px solid $color-border;
+  text-align: center;
+}
+
+.reportButton {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+
+  &:hover {
+    color: $color-error;
+  }
+}
+
+// ============================================
+// Tabs
+// ============================================
+
+.tabs {
+  margin-bottom: $spacing-8;
+
+  @include tablet {
+    margin-bottom: $spacing-6;
+  }
+}
+
+.tabList {
+  display: flex;
+  gap: $spacing-1;
+  border-bottom: 1px solid $color-border;
+  margin-bottom: $spacing-6;
+
+  @include mobile {
+    overflow-x: auto;
+    gap: $spacing-2;
+    padding-bottom: $spacing-2;
+  }
+}
+
+.tab {
+  padding: $spacing-3 $spacing-4;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition:
+    color $transition-fast,
+    border-color $transition-fast;
+  white-space: nowrap;
+
+  &:hover {
+    color: $color-primary;
+  }
+
+  &.active {
+    color: $color-primary;
+    border-bottom-color: $color-primary;
+  }
+
+  @include mobile {
+    padding: $spacing-2 $spacing-3;
+    font-size: $font-size-sm;
+  }
+}
+
+.tabPanel {
+  animation: fadeIn 0.2s ease;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+// ============================================
+// Tab Content Sections
+// ============================================
+
+.section {
+  margin-bottom: $spacing-8;
+
+  @include tablet {
+    margin-bottom: $spacing-6;
+  }
+}
+
+.sectionTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-4;
+  padding-bottom: $spacing-2;
+  border-bottom: 1px solid $color-border;
+
+  @include mobile {
+    font-size: $font-size-lg;
+  }
+}
+
+.description {
+  font-size: $font-size-base;
+  line-height: 1.8;
+  color: $color-text-secondary;
+
+  // Support HTML content from rich text editor
+  :global(html) {
+    box-sizing: border-box;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+
+  p {
+    margin: 0 0 $spacing-4;
+    min-height: 1em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  br {
+    display: block;
+    content: '';
+    margin: $spacing-2 0;
+  }
+
+  ul,
+  ol {
+    margin: $spacing-4 0;
+    padding-left: $spacing-6;
+  }
+
+  li {
+    margin-bottom: $spacing-2;
+  }
+
+  strong,
+  b {
+    font-weight: $font-weight-semibold;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+}
+
+// Teacher Section
+.teacherCard {
+  display: flex;
+  gap: $spacing-6;
+  padding: $spacing-6;
+  background: $color-bg-secondary;
+  border-radius: $radius-lg;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: $spacing-4;
+  }
+}
+
+.teacherAvatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+
+  @include mobile {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+.teacherInfo {
+  flex: 1;
+}
+
+.teacherName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-1;
+}
+
+.teacherTitle {
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-3;
+}
+
+.teacherBio {
+  font-size: $font-size-base;
+  line-height: 1.7;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-4;
+  white-space: pre-wrap;
+}
+
+.teacherStats {
+  display: flex;
+  gap: $spacing-6;
+
+  @include mobile {
+    gap: $spacing-4;
+    justify-content: center;
+  }
+}
+
+.teacherStat {
+  text-align: center;
+
+  .value {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-primary;
+  }
+
+  .label {
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+  }
+}
+
+.qualifications {
+  margin-top: $spacing-4;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+
+  @include mobile {
+    justify-content: center;
+  }
+
+  .tag {
+    padding: $spacing-1 $spacing-2;
+    background: $color-bg-primary;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+  }
+}
+
+// Schedule Section
+.scheduleCard {
+  padding: $spacing-6;
+  background: $color-bg-secondary;
+  border-radius: $radius-lg;
+
+  @include mobile {
+    padding: $spacing-4;
+  }
+}
+
+.scheduleItem {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-4;
+  padding: $spacing-3 0;
+  border-bottom: 1px solid $color-border;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  @include mobile {
+    gap: $spacing-3;
+  }
+}
+
+.scheduleIcon {
+  width: $spacing-6;
+  height: $spacing-6;
+  color: $color-primary;
+  flex-shrink: 0;
+}
+
+.scheduleContent {
+  flex: 1;
+}
+
+.scheduleLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-1;
+}
+
+.scheduleValue {
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.scheduleDays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+  margin-top: $spacing-2;
+
+  .dayTag {
+    padding: $spacing-1 $spacing-2;
+    background: $color-bg-primary;
+    border-radius: $radius-sm;
+    font-size: $font-size-sm;
+    color: $color-text-primary;
+  }
+}
+
+// ============================================
+// Similar Courses
+// ============================================
+
+.similarSection {
+  // Visual separator from main content
+  padding-top: $spacing-8;
+  border-top: 1px solid $color-border;
+
+  @include tablet {
+    padding-top: $spacing-6;
+  }
+}
+
+.similarTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-6;
+
+  @include mobile {
+    font-size: $font-size-lg;
+  }
+}
+
+.similarGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-4;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.similarCard {
+  padding: $spacing-4;
+  background: $color-bg-secondary;
+  border-radius: $radius-lg;
+  text-decoration: none;
+  transition:
+    transform $transition-fast,
+    box-shadow $transition-fast;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.similarCardTitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.similarCardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-3;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  overflow-wrap: break-word;
+  word-break: break-word;
+
+  @include mobile-sm {
+    gap: $spacing-2;
+    font-size: $font-size-xs;
+  }
+}
+
+.similarCardPrice {
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+// ============================================
+// Back to Top Button
+// ============================================
+
+.backToTop {
+  position: fixed;
+  right: $spacing-6;
+  bottom: $spacing-6;
+  z-index: 100;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: $color-bg-primary;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-md;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $color-text-secondary;
+  transition:
+    color $transition-fast,
+    border-color $transition-fast,
+    box-shadow $transition-fast;
+
+  &:hover {
+    color: $color-primary;
+    border-color: $color-primary;
+    box-shadow: $shadow-lg;
+  }
+
+  @include mobile {
+    right: $spacing-4;
+    bottom: $spacing-4;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+// ============================================
+// Share Button
+// ============================================
+
+.shareButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-3;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition:
+    color $transition-fast,
+    background-color $transition-fast;
+
+  &:hover {
+    color: $color-primary;
+    background: $color-bg-secondary;
+  }
+}
+
+// ============================================
+// Loading and Error States
+// ============================================
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-16 0;
+  gap: $spacing-4;
+}
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-16 0;
+  gap: $spacing-4;
+  text-align: center;
+
+  h2 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-primary;
+  }
+
+  p {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+  }
+}
+
+// Visually hidden but accessible to screen readers and Playwright
+.errorMessageText {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// E2E test text - visible but unobtrusive
+.testText {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0.01;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+// ============================================
+// WeChat QR Code
+// ============================================
+
+.wechatQrcode {
+  margin-top: $spacing-3;
+  padding: $spacing-3;
+  background: $color-bg-primary;
+  border-radius: $radius-md;
+  text-align: center;
+
+  img {
+    width: 120px;
+    height: 120px;
+    border-radius: $radius-sm;
+  }
+
+  .qrcodeLabel {
+    font-size: $font-size-xs;
+    color: $color-text-tertiary;
+    margin-top: $spacing-2;
+  }
+}
