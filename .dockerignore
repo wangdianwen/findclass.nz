@@ -1,0 +1,59 @@
+# ===========================================
+# FindClass.nz - Unified .dockerignore
+# ===========================================
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+coverage/
+
+# Cache
+.eslintcache
+.prettiercache
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+~*
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Tests
+tests/
+*.test.ts
+*.spec.ts
+
+# Documentation
+*.md
+!README.md
+
+# Frontend specific
+frontend/src/
+frontend/public/
+frontend/index.html
