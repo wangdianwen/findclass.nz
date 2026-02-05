@@ -2,6 +2,8 @@
 
 Course Search Platform - New Zealand (Mono Repo)
 
+[![GitHub](https://img.shields.io/badge/GitHub-wangdianwen%2Ffindclass.nz-blue)](https://github.com/wangdianwen/findclass.nz)
+
 ## Overview
 
 A comprehensive course search and management platform built with TypeScript, featuring:
