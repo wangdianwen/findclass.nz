@@ -1,17 +1,40 @@
+# Dependencies
 node_modules/
+
+# Build outputs
 dist/
+build/
+
+# Environment
 .env
 .env.local
 .env.*.local
+
+# Git
 .git/
 .gitignore
+
+# Logs
 *.log
 coverage/
 .eslintcache
-*.tsbuildinfo
-.DS_Store
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# OS
+.DS_Store
+Thumbs.db
 ~*
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Tests
+tests/
+*.test.ts
+*.spec.ts
