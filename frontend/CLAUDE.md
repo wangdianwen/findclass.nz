@@ -11,7 +11,7 @@
 | 步骤 | 说明 |
 |------|------|
 | **1. 理解需求** | 先理解任务范围和目标，必要时询问澄清问题 |
-| **2. 查找文档** | 调用 `/frontend-dev-guidelines` 等技能，查阅 CLAUDE.md 和 `references/` |
+| **2. 查找文档** | 查阅 `frontend/docs/tech/INDEX.md` 和 CLAUDE.md |
 | **3. 探索代码库** | 找到相关文件，阅读理解现有实现 |
 | **4. 规划任务** | 小任务直接做，复杂任务用 **Plan Mode** (`Shift+Tab`)；用 `TodoWrite` 拆解 |
 | **5. 实现代码** | 遵循项目规范，**提供验证标准**（测试、截图、命令输出） |
@@ -47,7 +47,7 @@
 
 ## 通用规范 | General Guidelines
 
-本项目遵循 **frontend-dev-guidelines** 技能规范，包含：
+本项目遵循 **frontend-dev-guidelines** 规范，包含：
 
 - 项目结构与组件开发
 - SCSS 样式规范
@@ -55,7 +55,7 @@
 - 测试与 Storybook
 - Git 工作流
 
-> **Quick Ref** 见下方章节。**详细规范** 调用 `/frontend-dev-guidelines` 技能。
+> **Quick Ref** 见下方章节。**详细规范** 见 `frontend/docs/tech/INDEX.md`。
 
 ---
 
@@ -376,7 +376,7 @@ src/services/
 
 ## 详细规范 | Detailed Guidelines
 
-需要深入了解？请调用 **frontend-dev-guidelines** 技能：
+需要深入了解？请查阅 **frontend-dev-guidelines** (`frontend/docs/tech/INDEX.md`)：
 
 | 主题         | 文件                         |
 | ------------ | ---------------------------- |
@@ -398,15 +398,15 @@ src/services/
 | 问题 | 解决方案 |
 | ---- | -------- |
 | 颜色/样式 | 参考 `_variables.scss` |
-| SCSS 错误 | 调用 `/frontend-dev-guidelines` 查看 SCSS 章节 |
+| SCSS 错误 | 见 `frontend/docs/tech/INDEX.md` → SCSS 章节 |
 | 测试失败 | 添加 `data-testid`，使用 `canvasElement.querySelector` |
 | E2E 测试失败 | 运行 `npx playwright test --project=chromium --debug` |
 | E2E 端口问题 | 检查 dev server 端口 (默认 3001) |
 | E2E 超时 | 增加 `actionTimeout`/`navigationTimeout` |
 | i18n 不工作 | 检查命名空间前缀 (无前缀) |
 | Lint/TS 错误 | 运行 `npm run lint && npx tsc --noEmit` |
-| Storybook 问题 | 调用 `/frontend-dev-guidelines` 查看 Storybook 章节 |
-| 组件结构 | 调用 `/frontend-dev-guidelines` 查看 Components 章节 |
+| Storybook 问题 | 见 `frontend/docs/tech/INDEX.md` → Storybook 章节 |
+| 组件结构 | 见 `frontend/docs/tech/INDEX.md` → Components 章节 |
 | 设计问题 | 参考 DESIGN.md |
 | MSW Mock 不工作 | 检查 `src/mocks/handlers.ts` |
 | E2E 数据不足 | 参考 `src/test/e2e/setup/test-data.ts` |

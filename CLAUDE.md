@@ -158,6 +158,33 @@ Required env vars (see `.env.base`):
 - **Frontend**: Vitest + React Testing Library + MSW, Playwright for E2E
 - Tests follow pattern: `tests/unit/{module}/{file}.test.ts`
 
+## Frontend Guidelines
+
+**IMPORTANT**: When working on any frontend code, you MUST refer to `frontend/CLAUDE.md` for detailed guidelines including:
+
+- React + TypeScript coding standards
+- SCSS styling conventions
+- i18n (internationalization) patterns
+- Component structure and Storybook requirements
+- Testing requirements (data-testid, etc.)
+- Git workflow specific to frontend
+
+Always check `frontend/CLAUDE.md` before making changes to frontend code.
+
+## Backend Guidelines
+
+**IMPORTANT**: When working on any backend code, you MUST refer to `backend/CLAUDE.md` for detailed guidelines including:
+
+- Express.js + TypeScript coding standards
+- Error handling with `ErrorCode` enum
+- DynamoDB single-table design patterns
+- JWT authentication and security practices
+- API response format (`createSuccessResponse`)
+- Testing requirements (80% coverage, auth module 100%)
+- Path aliases: `@src/*`, `@core/*`, `@shared/*`, `@modules/*`, `@config/*`
+
+Always check `backend/CLAUDE.md` before making changes to backend code.
+
 ## Notes
 
 - All imports use path aliases (configured in `tsconfig.json`)
