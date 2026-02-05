@@ -56,10 +56,10 @@ npm run dev:backend & npm run dev:frontend
 
 ```bash
 # Run backend tests
-npm run test:backend
+cd backend && npm run test:unit
 
 # Run frontend tests
-npm run test:frontend
+cd frontend && npm run test:unit
 
 # Run all tests
 npm run test:backend && npm run test:frontend
