@@ -11,7 +11,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    root: '.',
+    root: __dirname,
     include: ['tests/**/*.test.ts'],
     exclude: ['node_modules'],
     coverage: {
@@ -53,6 +53,16 @@ export default defineConfig({
         test: {
           include: ['tests/integration/**/*.test.ts'],
           setupFiles: ['tests/integration/setup.integration.ts'],
+        },
+        resolve: {
+          alias: {
+            '@src/': backendSrc,
+            '@core/': path.join(backendSrc, 'core'),
+            '@shared/': path.join(backendSrc, 'shared'),
+            '@modules/': path.join(backendSrc, 'modules'),
+            '@lambda/': path.join(backendSrc, 'lambda'),
+            '@config/': path.join(backendSrc, 'config'),
+          },
         },
         plugins: [tsconfigPaths()],
       },
