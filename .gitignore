@@ -84,7 +84,6 @@ test-results/
 .docker/
 .localstack/
 .aws-sam/
-.dockerignore
 
 # ------------------------------------------
 # Temporary Files
