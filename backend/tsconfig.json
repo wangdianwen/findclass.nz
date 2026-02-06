@@ -27,12 +27,12 @@
     },
 
     // Type Definitions
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals", "node"],
 
     // Backend Specific
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "scripts/**/*"],
   "exclude": ["node_modules", "dist", "tests/**/*.test.ts"],
 }
