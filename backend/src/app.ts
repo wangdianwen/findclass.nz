@@ -111,8 +111,8 @@ export function createApp(): Application {
     keyGenerator: req => req.ip || 'unknown',
   });
 
-  // Disable rate limiting in test environments
-  const isTestEnv = config.env === NodeEnv.Test;
+  // Disable rate limiting in test environments (check both config and process.env for reliability)
+  const isTestEnv = config.env === NodeEnv.Test || process.env.NODE_ENV === 'test';
   if (!isTestEnv) {
     app.use('/api', generalLimiter);
     app.use(`/api/${config.apiVersion}/auth`, authLimiter);
