@@ -85,7 +85,9 @@ describe('US1: User Registration (PostgreSQL)', () => {
       expect(profileResponse.body.data.user.email).toBe(uniqueEmail.toLowerCase());
 
       // Verify in database
-      const dbResult = await pool.query('SELECT * FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      const dbResult = await pool.query('SELECT * FROM users WHERE email = $1', [
+        uniqueEmail.toLowerCase(),
+      ]);
       expect(dbResult.rows.length).toBe(1);
       expect(dbResult.rows[0].name).toBe('Test User');
 
@@ -143,7 +145,9 @@ describe('US1: User Registration (PostgreSQL)', () => {
       expect(updateResponse.body.data.user.name).toBe('Updated Name');
 
       // Verify in database
-      const dbResult = await pool.query('SELECT name FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      const dbResult = await pool.query('SELECT name FROM users WHERE email = $1', [
+        uniqueEmail.toLowerCase(),
+      ]);
       expect(dbResult.rows[0].name).toBe('Updated Name');
 
       await cleanupTestUser(uniqueEmail);
@@ -269,7 +273,9 @@ describe('US1: User Registration (PostgreSQL)', () => {
       expect(loginResponse.body.success).toBe(true);
 
       // Verify in database
-      const dbResult = await pool.query('SELECT email FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      const dbResult = await pool.query('SELECT email FROM users WHERE email = $1', [
+        uniqueEmail.toLowerCase(),
+      ]);
       expect(dbResult.rows[0].email).toBe(uniqueEmail.toLowerCase());
 
       await cleanupTestUser(uniqueEmail);
@@ -319,7 +325,9 @@ describe('US1: User Registration (PostgreSQL)', () => {
       expect(conflictCount).toBe(2);
 
       // Verify only one user in database
-      const dbResult = await pool.query('SELECT COUNT(*) FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      const dbResult = await pool.query('SELECT COUNT(*) FROM users WHERE email = $1', [
+        uniqueEmail.toLowerCase(),
+      ]);
       expect(parseInt(dbResult.rows[0].count)).toBe(1);
 
       await cleanupTestUser(uniqueEmail);

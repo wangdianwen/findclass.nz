@@ -35,22 +35,24 @@ vi.mock('@core/logger', () => ({
 // Test Data Factories
 // ============================================
 
-function createMockTeacher(overrides: Partial<{
-  id: string;
-  user_id: string;
-  display_name: string;
-  bio: string | undefined;
-  teaching_subjects: string[];
-  teaching_modes: string[];
-  locations: string[];
-  trust_level: string;
-  verification_status: string;
-  average_rating: number;
-  total_reviews: number;
-  total_students: number;
-  created_at: Date;
-  updated_at: Date;
-}> = {}) {
+function createMockTeacher(
+  overrides: Partial<{
+    id: string;
+    user_id: string;
+    display_name: string;
+    bio: string | undefined;
+    teaching_subjects: string[];
+    teaching_modes: string[];
+    locations: string[];
+    trust_level: string;
+    verification_status: string;
+    average_rating: number;
+    total_reviews: number;
+    total_students: number;
+    created_at: Date;
+    updated_at: Date;
+  }> = {}
+) {
   return {
     id: 'tchr_123',
     user_id: 'usr_123',
@@ -70,17 +72,19 @@ function createMockTeacher(overrides: Partial<{
   };
 }
 
-function createMockQualification(overrides: Partial<{
-  id: string;
-  teacher_id: string;
-  type: string;
-  name: string;
-  institution: string | undefined;
-  year: number | undefined;
-  file_url: string | undefined;
-  status: string;
-  created_at: Date;
-}> = {}) {
+function createMockQualification(
+  overrides: Partial<{
+    id: string;
+    teacher_id: string;
+    type: string;
+    name: string;
+    institution: string | undefined;
+    year: number | undefined;
+    file_url: string | undefined;
+    status: string;
+    created_at: Date;
+  }> = {}
+) {
   return {
     id: 'qual_123',
     teacher_id: 'tchr_123',
@@ -95,15 +99,17 @@ function createMockQualification(overrides: Partial<{
   };
 }
 
-function createMockCourse(overrides: Partial<{
-  id: string;
-  teacher_id: string;
-  course_id: string;
-  course_title: string | undefined;
-  course_category: string | undefined;
-  course_price: number | undefined;
-  created_at: Date;
-}> = {}) {
+function createMockCourse(
+  overrides: Partial<{
+    id: string;
+    teacher_id: string;
+    course_id: string;
+    course_title: string | undefined;
+    course_category: string | undefined;
+    course_price: number | undefined;
+    created_at: Date;
+  }> = {}
+) {
   return {
     id: 'tc_123',
     teacher_id: 'tchr_123',
@@ -120,7 +126,11 @@ function createMockCourse(overrides: Partial<{
 // Import after mocks are set up
 // ============================================
 
-import type { TrustLevel, VerificationStatus, TeachingMode as SharedTeachingMode } from '@shared/types';
+import type {
+  TrustLevel,
+  VerificationStatus,
+  TeachingMode as SharedTeachingMode,
+} from '@shared/types';
 import type {
   TeacherProfile,
   CreateTeacherDTO,
@@ -307,7 +317,9 @@ describe('Teachers Service (PostgreSQL)', () => {
         locations: ['Auckland'],
       };
 
-      await expect(createTeacher(createDto)).rejects.toThrow('Teacher profile already exists for this user');
+      await expect(createTeacher(createDto)).rejects.toThrow(
+        'Teacher profile already exists for this user'
+      );
     });
 
     it('should create teacher with qualifications', async () => {
@@ -321,16 +333,18 @@ describe('Teachers Service (PostgreSQL)', () => {
       mockPool.query.mockResolvedValueOnce({ rows: [newTeacher] });
       // Insert qualification
       mockPool.query.mockResolvedValueOnce({
-        rows: [{
-          id: 'qual_new',
-          teacher_id: newTeacher.user_id,
-          type: 'DEGREE',
-          name: 'PhD in Chemistry',
-          institution: 'University of Otago',
-          year: 2020,
-          status: 'PENDING',
-          created_at: new Date(),
-        }],
+        rows: [
+          {
+            id: 'qual_new',
+            teacher_id: newTeacher.user_id,
+            type: 'DEGREE',
+            name: 'PhD in Chemistry',
+            institution: 'University of Otago',
+            year: 2020,
+            status: 'PENDING',
+            created_at: new Date(),
+          },
+        ],
       });
 
       const createDto: CreateTeacherDTO = {
@@ -409,7 +423,9 @@ describe('Teachers Service (PostgreSQL)', () => {
         displayName: 'Updated Name',
       };
 
-      await expect(updateTeacher('tchr_123', updateDto)).rejects.toThrow('Failed to update teacher');
+      await expect(updateTeacher('tchr_123', updateDto)).rejects.toThrow(
+        'Failed to update teacher'
+      );
     });
 
     it('should update teaching subjects', async () => {
@@ -515,9 +531,7 @@ describe('Teachers Service (PostgreSQL)', () => {
     });
 
     it('should filter teachers by location', async () => {
-      const aucklandTeachers = [
-        createMockTeacher({ id: 'tchr_1', locations: ['Auckland'] }),
-      ];
+      const aucklandTeachers = [createMockTeacher({ id: 'tchr_1', locations: ['Auckland'] })];
 
       mockPool.query.mockResolvedValue({ rows: aucklandTeachers });
 
@@ -528,9 +542,7 @@ describe('Teachers Service (PostgreSQL)', () => {
     });
 
     it('should filter teachers by minimum rating', async () => {
-      const highRatedTeachers = [
-        createMockTeacher({ id: 'tchr_1', average_rating: 4.8 }),
-      ];
+      const highRatedTeachers = [createMockTeacher({ id: 'tchr_1', average_rating: 4.8 })];
 
       mockPool.query.mockResolvedValue({ rows: highRatedTeachers });
 
@@ -541,10 +553,7 @@ describe('Teachers Service (PostgreSQL)', () => {
     });
 
     it('should apply pagination', async () => {
-      const teachers = [
-        createMockTeacher({ id: 'tchr_1' }),
-        createMockTeacher({ id: 'tchr_2' }),
-      ];
+      const teachers = [createMockTeacher({ id: 'tchr_1' }), createMockTeacher({ id: 'tchr_2' })];
 
       mockPool.query.mockResolvedValue({ rows: teachers });
 
@@ -570,7 +579,11 @@ describe('Teachers Service (PostgreSQL)', () => {
         return Promise.resolve({ rows: [updatedTeacher] });
       });
 
-      const result = await updateVerificationStatus('tchr_123', 'APPROVED' as VerificationStatus, 'A' as TrustLevel);
+      const result = await updateVerificationStatus(
+        'tchr_123',
+        'APPROVED' as VerificationStatus,
+        'A' as TrustLevel
+      );
 
       expect(result).toBeDefined();
       expect(result.verification_status).toBe('APPROVED');
@@ -580,7 +593,9 @@ describe('Teachers Service (PostgreSQL)', () => {
     it('should throw error when teacher not found', async () => {
       mockPool.query.mockResolvedValue({ rows: [] });
 
-      await expect(updateVerificationStatus('nonexistent', 'APPROVED')).rejects.toThrow('Teacher not found');
+      await expect(updateVerificationStatus('nonexistent', 'APPROVED')).rejects.toThrow(
+        'Teacher not found'
+      );
     });
 
     it('should throw error when update fails', async () => {
@@ -592,7 +607,9 @@ describe('Teachers Service (PostgreSQL)', () => {
         return Promise.resolve({ rows: [] });
       });
 
-      await expect(updateVerificationStatus('tchr_123', 'APPROVED')).rejects.toThrow('Failed to update verification status');
+      await expect(updateVerificationStatus('tchr_123', 'APPROVED')).rejects.toThrow(
+        'Failed to update verification status'
+      );
     });
   });
 
@@ -650,17 +667,19 @@ describe('Teachers Service (PostgreSQL)', () => {
           return Promise.resolve({ rows: [mockTeacher] });
         }
         return Promise.resolve({
-          rows: [{
-            id: 'qual_new',
-            teacher_id: mockTeacher.id,
-            type: 'DEGREE',
-            name: 'PhD in Education',
-            institution: 'University of Auckland',
-            year: 2022,
-            file_url: null,
-            status: 'PENDING',
-            created_at: new Date(),
-          }],
+          rows: [
+            {
+              id: 'qual_new',
+              teacher_id: mockTeacher.id,
+              type: 'DEGREE',
+              name: 'PhD in Education',
+              institution: 'University of Auckland',
+              year: 2022,
+              file_url: null,
+              status: 'PENDING',
+              created_at: new Date(),
+            },
+          ],
         });
       });
 
@@ -686,7 +705,9 @@ describe('Teachers Service (PostgreSQL)', () => {
         name: 'Teaching Certificate',
       };
 
-      await expect(addQualification('nonexistent', addQualDto)).rejects.toThrow('Teacher not found');
+      await expect(addQualification('nonexistent', addQualDto)).rejects.toThrow(
+        'Teacher not found'
+      );
     });
 
     it('should add experience qualification', async () => {
@@ -701,14 +722,16 @@ describe('Teachers Service (PostgreSQL)', () => {
           return Promise.resolve({ rows: [mockTeacher] });
         }
         return Promise.resolve({
-          rows: [{
-            id: experienceQual.id,
-            teacher_id: experienceQual.teacher_id,
-            type: experienceQual.type,
-            name: experienceQual.name,
-            status: 'PENDING',
-            created_at: experienceQual.created_at,
-          }],
+          rows: [
+            {
+              id: experienceQual.id,
+              teacher_id: experienceQual.teacher_id,
+              type: experienceQual.type,
+              name: experienceQual.name,
+              status: 'PENDING',
+              created_at: experienceQual.created_at,
+            },
+          ],
         });
       });
 
@@ -927,7 +950,9 @@ describe('Teachers Service (PostgreSQL)', () => {
         return Promise.reject(new Error('Database error'));
       });
 
-      await expect(updateVerificationStatus('tchr_123', 'APPROVED')).rejects.toThrow('Database error');
+      await expect(updateVerificationStatus('tchr_123', 'APPROVED')).rejects.toThrow(
+        'Database error'
+      );
     });
 
     it('should handle repository error for updateTeacherRating', async () => {
@@ -941,15 +966,17 @@ describe('Teachers Service (PostgreSQL)', () => {
     it('should add course to teacher successfully', async () => {
       const now = new Date();
       mockPool.query.mockResolvedValue({
-        rows: [{
-          id: 'tc_new',
-          teacher_id: 'tchr_123',
-          course_id: 'course_123',
-          course_title: 'Calculus I',
-          course_category: 'Mathematics',
-          course_price: 99.99,
-          created_at: now,
-        }],
+        rows: [
+          {
+            id: 'tc_new',
+            teacher_id: 'tchr_123',
+            course_id: 'course_123',
+            course_title: 'Calculus I',
+            course_category: 'Mathematics',
+            course_price: 99.99,
+            created_at: now,
+          },
+        ],
       });
 
       const result = await addCourseToTeacher('tchr_123', 'course_123', 99.99);
@@ -961,7 +988,9 @@ describe('Teachers Service (PostgreSQL)', () => {
     it('should handle repository error', async () => {
       mockPool.query.mockRejectedValue(new Error('Database error'));
 
-      await expect(addCourseToTeacher('tchr_123', 'course_123', 99.99)).rejects.toThrow('Database error');
+      await expect(addCourseToTeacher('tchr_123', 'course_123', 99.99)).rejects.toThrow(
+        'Database error'
+      );
     });
   });
 
@@ -969,7 +998,9 @@ describe('Teachers Service (PostgreSQL)', () => {
     it('should handle repository error', async () => {
       mockPool.query.mockRejectedValue(new Error('Database error'));
 
-      await expect(removeCourseFromTeacher('tchr_123', 'course_123')).rejects.toThrow('Database error');
+      await expect(removeCourseFromTeacher('tchr_123', 'course_123')).rejects.toThrow(
+        'Database error'
+      );
     });
   });
 
@@ -990,7 +1021,9 @@ describe('Teachers Service (PostgreSQL)', () => {
     it('should handle repository error', async () => {
       mockPool.query.mockRejectedValue(new Error('Database error'));
 
-      await expect(updateQualificationStatus('qual_123', 'APPROVED')).rejects.toThrow('Database error');
+      await expect(updateQualificationStatus('qual_123', 'APPROVED')).rejects.toThrow(
+        'Database error'
+      );
     });
   });
 
@@ -1050,13 +1083,15 @@ describe('Teachers Service (PostgreSQL)', () => {
     it('should handle repository error', async () => {
       mockPool.query.mockRejectedValue(new Error('Database error'));
 
-      await expect(submitTeacherOnboarding('usr_123', {
-        displayName: 'John Doe',
-        bio: 'Experienced teacher',
-        teachingSubjects: ['Mathematics'],
-        teachingModes: ['ONLINE' as SharedTeachingMode],
-        locations: ['Auckland'],
-      })).rejects.toThrow('Database error');
+      await expect(
+        submitTeacherOnboarding('usr_123', {
+          displayName: 'John Doe',
+          bio: 'Experienced teacher',
+          teachingSubjects: ['Mathematics'],
+          teachingModes: ['ONLINE' as SharedTeachingMode],
+          locations: ['Auckland'],
+        })
+      ).rejects.toThrow('Database error');
     });
   });
 
@@ -1064,17 +1099,19 @@ describe('Teachers Service (PostgreSQL)', () => {
     it('should upload qualification successfully', async () => {
       const now = new Date();
       mockPool.query.mockResolvedValue({
-        rows: [{
-          id: 'qual_new',
-          teacher_id: 'tchr_123',
-          type: 'DEGREE',
-          name: 'PhD',
-          institution: null,
-          year: null,
-          file_url: null,
-          status: 'PENDING',
-          created_at: now,
-        }],
+        rows: [
+          {
+            id: 'qual_new',
+            teacher_id: 'tchr_123',
+            type: 'DEGREE',
+            name: 'PhD',
+            institution: null,
+            year: null,
+            file_url: null,
+            status: 'PENDING',
+            created_at: now,
+          },
+        ],
       });
 
       const result = await uploadQualification('tchr_123', {
@@ -1090,10 +1127,12 @@ describe('Teachers Service (PostgreSQL)', () => {
     it('should handle repository error', async () => {
       mockPool.query.mockRejectedValue(new Error('Database error'));
 
-      await expect(uploadQualification('tchr_123', {
-        type: 'DEGREE',
-        name: 'PhD',
-      })).rejects.toThrow('Database error');
+      await expect(
+        uploadQualification('tchr_123', {
+          type: 'DEGREE',
+          name: 'PhD',
+        })
+      ).rejects.toThrow('Database error');
     });
   });
 });

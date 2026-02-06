@@ -27,7 +27,14 @@ vi.mock('@core/logger', () => ({
 
 // Import after mocks are set up
 import { createCoursesService } from '@modules/courses/courses.service';
-import { CourseCategory, CourseSourceType, CourseStatus, PriceType, TrustLevel, VerificationStatus } from '@shared/types';
+import {
+  CourseCategory,
+  CourseSourceType,
+  CourseStatus,
+  PriceType,
+  TrustLevel,
+  VerificationStatus,
+} from '@shared/types';
 import { SortBy } from '@modules/courses/courses.types';
 
 describe('Courses Service (PostgreSQL)', () => {
@@ -279,9 +286,9 @@ describe('Courses Service (PostgreSQL)', () => {
 
       const { updateCourse } = createCoursesService(mockPool as unknown as Pool);
 
-      await expect(
-        updateCourse('nonexistent', { title: 'New Title' })
-      ).rejects.toThrow('Course not found');
+      await expect(updateCourse('nonexistent', { title: 'New Title' })).rejects.toThrow(
+        'Course not found'
+      );
     });
 
     it('should update multiple fields', async () => {
@@ -827,10 +834,11 @@ describe('Courses Service (PostgreSQL)', () => {
       expect(result).toBeDefined();
       expect(result?.average_rating).toBe(4.8);
       expect(result?.total_reviews).toBe(15);
-      expect(mockPool.query).toHaveBeenCalledWith(
-        expect.stringContaining('UPDATE courses'),
-        [4.8, 15, 'course_123']
-      );
+      expect(mockPool.query).toHaveBeenCalledWith(expect.stringContaining('UPDATE courses'), [
+        4.8,
+        15,
+        'course_123',
+      ]);
     });
 
     it('should return null when course not found', async () => {

@@ -77,10 +77,9 @@ describe('US10-Cancel: Cancel Role Application (PostgreSQL)', () => {
       expect(cancelResponse.body.success).toBe(true);
 
       // Verify application is cancelled - status should be CANCELLED
-      const dbResult = await pool.query(
-        'SELECT status FROM role_applications WHERE id = $1',
-        [applicationId]
-      );
+      const dbResult = await pool.query('SELECT status FROM role_applications WHERE id = $1', [
+        applicationId,
+      ]);
       expect(dbResult.rows[0].status).toBe('CANCELLED');
 
       await cleanupTestUser(uniqueEmail);

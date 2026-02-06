@@ -65,7 +65,9 @@ describe('US1: Profile Management (PostgreSQL)', () => {
       expect(response.body.data.user.name).toBe('Updated Name');
 
       // Verify in database
-      const dbResult = await pool.query('SELECT name FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      const dbResult = await pool.query('SELECT name FROM users WHERE email = $1', [
+        uniqueEmail.toLowerCase(),
+      ]);
       expect(dbResult.rows[0].name).toBe('Updated Name');
 
       await cleanupTestUser(uniqueEmail);

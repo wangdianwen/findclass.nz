@@ -88,19 +88,29 @@ async function cleanupTestData(pool: Pool) {
   // Clean up test data in correct order (respecting foreign keys)
   try {
     await pool.query('DELETE FROM role_application_history');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM role_applications');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM sessions');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM verification_codes');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM users');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
 }
 
 // Integration test hooks

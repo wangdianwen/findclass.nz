@@ -20,13 +20,15 @@ export interface TestUser {
 /**
  * Create a test user in the database
  */
-export async function createTestUser(overrides: {
-  email?: string;
-  password?: string;
-  name?: string;
-  role?: UserRole;
-  status?: UserStatus;
-} = {}): Promise<TestUser> {
+export async function createTestUser(
+  overrides: {
+    email?: string;
+    password?: string;
+    name?: string;
+    role?: UserRole;
+    status?: UserStatus;
+  } = {}
+): Promise<TestUser> {
   const pool = getTestPool();
   const email = overrides.email ?? `test-${Date.now()}@example.com`;
   const password = overrides.password ?? 'SecurePass123!';
@@ -108,10 +110,7 @@ export async function createTestSession(userId: string, jti: string = 'test-jti'
 /**
  * Create a role application for testing
  */
-export async function createTestRoleApplication(
-  userId: string,
-  role: UserRole = UserRole.TEACHER
-) {
+export async function createTestRoleApplication(userId: string, role: UserRole = UserRole.TEACHER) {
   const pool = getTestPool();
 
   const result = await pool.query(

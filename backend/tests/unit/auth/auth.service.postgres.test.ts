@@ -148,11 +148,7 @@ vi.mock('@modules/auth/role-application.repository', () => ({
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { sendVerificationEmail } from '@shared/smtp/email.service';
-import {
-  addTokenToBlacklist,
-  generateToken,
-  generateRefreshToken,
-} from '@shared/middleware/auth';
+import { addTokenToBlacklist, generateToken, generateRefreshToken } from '@shared/middleware/auth';
 import { UserRole, UserStatus } from '@shared/types';
 import { AuthType } from '@modules/auth/auth.types';
 import {
@@ -168,18 +164,20 @@ import {
 } from '@modules/auth/auth.service';
 
 // Test data factories
-function createMockUser(overrides: Partial<{
-  id: string;
-  email: string;
-  name: string;
-  password_hash: string;
-  role: UserRole;
-  status: UserStatus;
-  language: string;
-  phone: string;
-  created_at: Date;
-  updated_at: Date;
-}> = {}) {
+function createMockUser(
+  overrides: Partial<{
+    id: string;
+    email: string;
+    name: string;
+    password_hash: string;
+    role: UserRole;
+    status: UserStatus;
+    language: string;
+    phone: string;
+    created_at: Date;
+    updated_at: Date;
+  }> = {}
+) {
   return {
     id: 'usr_test123',
     email: 'test@example.com',

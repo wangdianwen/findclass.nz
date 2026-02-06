@@ -93,13 +93,15 @@ function getRoleApplicationRepository(): RoleApplicationRepository {
 /**
  * Create a test user in the database
  */
-export async function createTestUser(overrides: {
-  email?: string;
-  password?: string;
-  name?: string;
-  role?: UserRole;
-  status?: UserStatus;
-} = {}): Promise<TestUser> {
+export async function createTestUser(
+  overrides: {
+    email?: string;
+    password?: string;
+    name?: string;
+    role?: UserRole;
+    status?: UserStatus;
+  } = {}
+): Promise<TestUser> {
   const pool = getTestPool();
   const email = overrides.email ?? `test-${Date.now()}@example.com`;
   const password = overrides.password ?? 'SecurePass123!';
@@ -130,12 +132,14 @@ export async function createTestUser(overrides: {
 /**
  * Create a test user using the UserRepository
  */
-export async function createTestUserWithRepository(overrides: {
-  email?: string;
-  password?: string;
-  name?: string;
-  role?: UserRole;
-} = {}): Promise<User> {
+export async function createTestUserWithRepository(
+  overrides: {
+    email?: string;
+    password?: string;
+    name?: string;
+    role?: UserRole;
+  } = {}
+): Promise<User> {
   const email = overrides.email ?? `test-${Date.now()}@example.com`;
   const password = overrides.password ?? 'SecurePass123!';
   const name = overrides.name ?? 'Test User';
@@ -244,21 +248,27 @@ export async function createStudentUser(): Promise<TestUser> {
 /**
  * Create a teacher profile for testing
  */
-export async function createTestTeacher(userId: string, overrides: {
-  displayName?: string;
-  bio?: string;
-  teachingYears?: number;
-  qualifications?: string[];
-  verified?: boolean;
-  teachingModes?: string[];
-  locations?: string[];
-} = {}): Promise<TestTeacher> {
+export async function createTestTeacher(
+  userId: string,
+  overrides: {
+    displayName?: string;
+    bio?: string;
+    teachingYears?: number;
+    qualifications?: string[];
+    verified?: boolean;
+    teachingModes?: string[];
+    locations?: string[];
+  } = {}
+): Promise<TestTeacher> {
   const pool = getTestPool();
 
   const displayName = overrides.displayName ?? '张老师';
   const bio = overrides.bio ?? '我是数学老师，有10年教学经验';
   const teachingYears = overrides.teachingYears ?? 10;
-  const qualifications = overrides.qualifications ?? ['Bachelor of Education', 'Math Certification'];
+  const qualifications = overrides.qualifications ?? [
+    'Bachelor of Education',
+    'Math Certification',
+  ];
   const verified = overrides.verified ?? false;
   const teachingModes = overrides.teachingModes ?? ['ONLINE', 'OFFLINE'];
   const locations = overrides.locations ?? ['Auckland', 'Wellington'];
@@ -288,23 +298,26 @@ export async function createTestTeacher(userId: string, overrides: {
 /**
  * Create a course for testing
  */
-export async function createTestCourse(teacherId: string, overrides: {
-  title?: string;
-  description?: string;
-  category?: string;
-  price?: number;
-  teachingModes?: string[];
-  locations?: string[];
-  targetAgeGroups?: string[];
-  maxClassSize?: number;
-  status?: string;
-} = {}): Promise<TestCourse> {
+export async function createTestCourse(
+  teacherId: string,
+  overrides: {
+    title?: string;
+    description?: string;
+    category?: string;
+    price?: number;
+    teachingModes?: string[];
+    locations?: string[];
+    targetAgeGroups?: string[];
+    maxClassSize?: number;
+    status?: string;
+  } = {}
+): Promise<TestCourse> {
   const pool = getTestPool();
 
   const title = overrides.title ?? 'Math Grade 9-10';
   const description = overrides.description ?? 'High school math tutoring';
   const category = overrides.category ?? 'Mathematics';
-  const price = overrides.price ?? 50.00;
+  const price = overrides.price ?? 50.0;
   const teachingModes = overrides.teachingModes ?? ['ONLINE', 'OFFLINE'];
   const locations = overrides.locations ?? ['Auckland'];
   const targetAgeGroups = overrides.targetAgeGroups ?? ['13-15'];
@@ -315,7 +328,18 @@ export async function createTestCourse(teacherId: string, overrides: {
     `INSERT INTO courses (teacher_id, title, description, category, price, price_type, teaching_modes, locations, target_age_groups, max_class_size, status, average_rating, total_reviews)
      VALUES ($1, $2, $3, $4, $5, 'per_lesson', $6, $7, $8, $9, $10, 4.8, 5)
      RETURNING id`,
-    [teacherId, title, description, category, price, teachingModes, locations, targetAgeGroups, maxClassSize, status]
+    [
+      teacherId,
+      title,
+      description,
+      category,
+      price,
+      teachingModes,
+      locations,
+      targetAgeGroups,
+      maxClassSize,
+      status,
+    ]
   );
 
   return {
@@ -350,34 +374,54 @@ export async function cleanupTestData(): Promise<void> {
 
   try {
     await pool.query('DELETE FROM role_application_history');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM role_applications');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM sessions');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM verification_codes');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM reviews');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM learning_records');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM children');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM courses');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM teachers');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
   try {
     await pool.query('DELETE FROM users');
-  } catch { /* table might not exist */ }
+  } catch {
+    /* table might not exist */
+  }
 }
 
 /**

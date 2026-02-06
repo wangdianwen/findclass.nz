@@ -7,7 +7,11 @@
 import 'reflect-metadata';
 import request from 'supertest';
 import { getApp, getTestPool } from '../setup.postgres';
-import { createTestUser, cleanupTestUser, createTestVerificationCode } from '../fixtures/test-users.postgres';
+import {
+  createTestUser,
+  cleanupTestUser,
+  createTestVerificationCode,
+} from '../fixtures/test-users.postgres';
 import { describe, expect, it, beforeAll, afterAll, beforeEach } from 'vitest';
 import { Pool } from 'pg';
 
@@ -80,7 +84,9 @@ describe('US1: User Registration (PostgreSQL)', () => {
       expect(profileResponse.body.data.user.email).toBe(uniqueEmail.toLowerCase());
 
       // Verify user exists in database
-      const dbResult = await pool.query('SELECT * FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      const dbResult = await pool.query('SELECT * FROM users WHERE email = $1', [
+        uniqueEmail.toLowerCase(),
+      ]);
       expect(dbResult.rows.length).toBe(1);
       expect(dbResult.rows[0].name).toBe('Test User');
     });
@@ -134,7 +140,9 @@ describe('US1: User Registration (PostgreSQL)', () => {
       expect(updateResponse.body.data.user.name).toBe('Updated Name');
 
       // Verify in database
-      const dbResult = await pool.query('SELECT name FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      const dbResult = await pool.query('SELECT name FROM users WHERE email = $1', [
+        uniqueEmail.toLowerCase(),
+      ]);
       expect(dbResult.rows[0].name).toBe('Updated Name');
     });
   });
@@ -256,7 +264,9 @@ describe('US1: User Registration (PostgreSQL)', () => {
       expect(loginResponse.body.success).toBe(true);
 
       // Verify in database
-      const dbResult = await pool.query('SELECT email FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      const dbResult = await pool.query('SELECT email FROM users WHERE email = $1', [
+        uniqueEmail.toLowerCase(),
+      ]);
       expect(dbResult.rows[0].email).toBe(uniqueEmail.toLowerCase());
     });
 
@@ -302,7 +312,9 @@ describe('US1: User Registration (PostgreSQL)', () => {
       expect(conflictCount).toBe(2);
 
       // Verify only one user in database
-      const dbResult = await pool.query('SELECT COUNT(*) FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      const dbResult = await pool.query('SELECT COUNT(*) FROM users WHERE email = $1', [
+        uniqueEmail.toLowerCase(),
+      ]);
       expect(parseInt(dbResult.rows[0].count)).toBe(1);
     });
   });

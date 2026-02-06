@@ -355,7 +355,9 @@ describe('Auth Middleware (PostgreSQL)', () => {
         throw new Error('jwt malformed');
       });
 
-      expect(() => verifyRefreshToken('malformed-token')).toThrow('Refresh token verification failed');
+      expect(() => verifyRefreshToken('malformed-token')).toThrow(
+        'Refresh token verification failed'
+      );
     });
   });
 

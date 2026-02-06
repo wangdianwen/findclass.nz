@@ -129,9 +129,9 @@ describe('Users Service (PostgreSQL)', () => {
     it('should throw error when user not found', async () => {
       mockPool.query.mockResolvedValue({ rows: [] });
 
-      await expect(
-        updateUserProfile('nonexistent', { name: 'New Name' })
-      ).rejects.toThrow('User not found');
+      await expect(updateUserProfile('nonexistent', { name: 'New Name' })).rejects.toThrow(
+        'User not found'
+      );
     });
   });
 
