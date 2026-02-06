@@ -3,12 +3,14 @@
  * Vitest configuration that detects test type based on file path
  */
 
+// MUST be the first statement - before ANY imports
+process.env.NODE_ENV = 'test';
+process.env.NODE_CONFIG_DIR = resolve(process.cwd(), 'src/config/env');
+
 import 'reflect-metadata';
 
 import { config } from 'dotenv';
 import { resolve } from 'path';
-
-process.env.NODE_ENV = NodeEnv.Test;
 
 const configDir = resolve(process.cwd(), 'src/config/env');
 
@@ -16,7 +18,14 @@ const configDir = resolve(process.cwd(), 'src/config/env');
 const baseResult = config({ path: resolve(configDir, '.env.base') });
 if (baseResult.error) {
   // eslint-disable-next-line no-console
-  console.warn(`⚠️  Could not load base config: ${baseResult.error.message}`);
+  console.warn(`Could not load base config: ${baseResult.error.message}`);
+}
+
+// Load test-specific configuration
+const testResult = config({ path: resolve(configDir, '.env.test') });
+if (testResult.error) {
+  // eslint-disable-next-line no-console
+  console.warn(`Could not load test config: ${testResult.error.message}`);
 }
 
 import { beforeAll, afterAll, beforeEach } from 'vitest';

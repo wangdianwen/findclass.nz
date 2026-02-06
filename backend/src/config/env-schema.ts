@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 // ==================== 环境类型定义 ====================
 
+// Use string literals to avoid initialization order issues
 export const NodeEnv = {
   Development: 'development',
   Production: 'production',
@@ -12,10 +13,11 @@ export type NodeEnv = (typeof NodeEnv)[keyof typeof NodeEnv];
 
 // ==================== 环境变量验证 ====================
 
+// Valid NODE_ENV values as a constant array
+const NODE_ENV_VALUES = ['development', 'production', 'test'] as const;
+
 export const envSchema = z.object({
-  NODE_ENV: z
-    .enum([NodeEnv.Development, NodeEnv.Production, NodeEnv.Test])
-    .default(NodeEnv.Development),
+  NODE_ENV: z.enum(NODE_ENV_VALUES).default('development'),
   PORT: z.coerce.number().default(3000),
   API_VERSION: z.string().default('v1'),
   FRONTEND_URL: z.string().url().default('http://localhost:3000'),
