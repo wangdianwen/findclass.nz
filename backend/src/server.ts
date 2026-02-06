@@ -7,7 +7,7 @@ import { createApp } from './app';
 import { getConfig, validateConfig } from './config';
 import { logger } from './core/logger';
 import { checkCacheHealth, checkRateLimitsHealth } from './shared/db/cache';
-import { tableExists, listTables } from './shared/db/dynamodb';
+import { tableExists } from './shared/db/dynamodb';
 
 interface HealthCheckResult {
   status: 'healthy' | 'degraded' | 'unhealthy';
@@ -44,11 +44,15 @@ async function performHealthCheck(): Promise<HealthCheckResult> {
     services.rateLimits = false;
   }
 
-  // Check DynamoDB
+  // Check DynamoDB (optional - can be null when using PostgreSQL only)
   try {
     const config = getConfig();
-    const exists = await tableExists(config.dynamodb.tableName);
-    services.dynamodb = exists;
+    if (config.dynamodb?.tableName) {
+      const exists = await tableExists(config.dynamodb.tableName);
+      services.dynamodb = exists;
+    } else {
+      services.dynamodb = true; // Consider healthy if DynamoDB is not configured
+    }
   } catch {
     services.dynamodb = false;
   }
@@ -74,32 +78,26 @@ async function startServer(): Promise<void> {
 
     const config = getConfig();
 
-    if (config.env === 'development') {
-      try {
-        const tables = await listTables();
-        logger.info('DynamoDB tables found', { tables });
-      } catch (error) {
-        logger.warn('DynamoDB connection failed', {
-          error: (error as Error).message,
-        });
-      }
-    } else {
+    // DynamoDB is optional (can be null when using PostgreSQL only)
+    if (config.dynamodb?.tableName) {
       try {
         const tableName = await tableExists(config.dynamodb.tableName);
         if (tableName) {
           logger.info('DynamoDB connection verified', {
-            tableName: config.env === 'development' ? tableName : '[REDACTED]',
+            tableName: '[REDACTED]',
           });
         } else {
           logger.error('DynamoDB table not found', {
-            tableName: config.env === 'development' ? config.dynamodb.tableName : '[REDACTED]',
+            tableName: '[REDACTED]',
           });
           process.exit(1);
         }
       } catch (error) {
         logger.error('DynamoDB connection failed', { error: (error as Error).message });
-        process.exit(1);
+        // Don't exit - DynamoDB is optional now
       }
+    } else {
+      logger.info('DynamoDB not configured (using PostgreSQL only)');
     }
 
     const app = createApp();

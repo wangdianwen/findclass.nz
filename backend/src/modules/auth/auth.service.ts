@@ -1,35 +1,33 @@
 /**
  * Auth Module - Service
- * Handles authentication logic
+ * Handles authentication logic using PostgreSQL
  */
 
 import bcrypt from 'bcryptjs';
 import jwt, { type Secret } from 'jsonwebtoken';
 import crypto from 'crypto';
-import { v4 as uuidv4 } from 'uuid';
-import { UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { getPool } from '@shared/db/postgres/client';
 import { getConfig } from '../../config';
 import { logger } from '@core/logger';
 import { createAppError, ErrorCode } from '@core/errors';
-import type { User } from '@shared/types';
 import { UserStatus, UserRole } from '@shared/types';
 import {
-  getItem,
-  createEntityKey,
-  updateItem,
-  getDynamoDBDocClient,
-  transactWrite,
-  queryItems,
-  putItem,
-} from '@shared/db/dynamodb';
+  UserRepository,
+  type User,
+  type CreateUserDTO,
+  type UpdateUserDTO,
+} from './user.repository';
 import {
-  getFromCache,
-  setCache,
-  deleteFromCache,
-  incrementRateLimit,
-  CacheKeys,
-} from '@shared/db/cache';
-import { addTokenToBlacklist, isTokenBlacklisted } from '@shared/middleware/auth';
+  SessionRepository,
+  hashToken,
+} from './session.repository';
+import {
+  VerificationCodeRepository,
+} from './verification.repository';
+import {
+  RoleApplicationRepository,
+  type ApplicationStatus,
+} from './role-application.repository';
 import type {
   AuthResponse,
   RegisterDto,
@@ -37,8 +35,6 @@ import type {
   UserRoleInfo,
   RoleApplicationResponse,
   UserRolesResponse,
-  RoleApplication,
-  RoleApplicationHistory,
   RoleApplicationDetailResponse,
 } from './auth.types';
 import { AuthType, RoleApplicationStatus } from './auth.types';
@@ -50,11 +46,19 @@ import { sendVerificationEmail } from '@shared/smtp/email.service';
 
 // Verification code configuration
 const VERIFICATION_CODE_TTL = 300; // 5 minutes
-const RATE_LIMIT_WINDOW = 60; // 1 minute
-const RATE_LIMIT_MAX = 3; // Max 3 requests per minute
 
-// Role application TTL (30 days for pending applications)
-const ROLE_APPLICATION_TTL = 30 * 24 * 60 * 60;
+/**
+ * Get repositories (creates new instances with pool client)
+ */
+function getRepositories() {
+  const pool = getPool();
+  return {
+    userRepository: new UserRepository(pool),
+    sessionRepository: new SessionRepository(pool),
+    verificationRepository: new VerificationCodeRepository(pool),
+    roleApplicationRepository: new RoleApplicationRepository(pool),
+  };
+}
 
 // Service methods
 export async function register(data: RegisterDto): Promise<{
@@ -72,70 +76,33 @@ export async function register(data: RegisterDto): Promise<{
   const bcryptRounds = config.auth.bcryptRounds;
   const passwordHash = await bcrypt.hash(password, bcryptRounds);
 
-  const userId = `usr_${uuidv4()}`;
-  const { PK, SK } = createEntityKey('USER', userId);
-  const now = new Date().toISOString();
+  const { userRepository } = getRepositories();
 
-  const user: User = {
-    PK,
-    SK,
-    entityType: 'USER',
-    dataCategory: 'USER',
-    id: userId,
-    email,
-    name,
-    phone,
-    passwordHash,
-    role,
-    status: UserStatus.ACTIVE,
-    language: language || 'zh',
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  const emailPK = `EMAIL#${email}`;
-  const emailSK = 'METADATA';
-
-  const emailItem = {
-    PK: emailPK,
-    SK: emailSK,
-    entityType: 'EMAIL',
-    dataCategory: 'USER',
-    email,
-    userId,
-    createdAt: now,
-  };
-
-  try {
-    await transactWrite([
-      {
-        put: {
-          item: emailItem,
-          conditionExpression: 'attribute_not_exists(PK)',
-        },
-      },
-      {
-        put: {
-          item: user as unknown as Record<string, unknown>,
-          conditionExpression: 'attribute_not_exists(PK)',
-        },
-      },
-    ]);
-  } catch (error: any) {
-    if (error.name === 'TransactionCanceledException') {
-      throw createAppError('Email already registered', ErrorCode.AUTH_EMAIL_EXISTS);
-    }
-    throw error;
+  // Check if email already exists
+  const existingUser = await userRepository.findByEmail(email);
+  if (existingUser) {
+    throw createAppError('Email already registered', ErrorCode.AUTH_EMAIL_EXISTS);
   }
 
-  logger.info('User registered successfully', { userId, email });
+  const createUserDTO: CreateUserDTO = {
+    email,
+    password_hash: passwordHash,
+    name,
+    phone,
+    role,
+    language,
+  };
+
+  const user = await userRepository.create(createUserDTO);
+
+  logger.info('User registered successfully', { userId: user.id, email });
 
   const token = generateAccessToken({
-    userId,
+    userId: user.id,
     email,
     role,
   });
-  const refreshToken = generateRefreshToken(userId);
+  const refreshToken = generateRefreshToken(user.id);
 
   return {
     user,
@@ -150,25 +117,27 @@ export async function login(data: LoginDto): Promise<AuthResponse> {
 
   logger.info('User login attempt', { email });
 
+  const { userRepository } = getRepositories();
+
   // Find user by email
-  const user = await getUserByEmail(email);
+  const user = await userRepository.findByEmail(email);
   if (!user) {
     throw createAppError('Invalid email or password', ErrorCode.AUTH_INVALID_TOKEN);
   }
 
   // Verify password
-  const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+  const isValidPassword = await bcrypt.compare(password, user.password_hash);
   if (!isValidPassword) {
     throw createAppError('Invalid email or password', ErrorCode.AUTH_INVALID_TOKEN);
   }
 
-  // Re-fetch user by primary key to ensure strong consistency (e.g., after status update)
-  const latestUser = await getUserById(user.id);
+  // Re-fetch user to ensure strong consistency
+  const latestUser = await userRepository.findById(user.id);
   if (!latestUser) {
     throw createAppError('User not found', ErrorCode.USER_NOT_FOUND);
   }
 
-  // Check user status using latest data
+  // Check user status
   if (latestUser.status === UserStatus.DISABLED) {
     throw createAppError('Account is disabled', ErrorCode.FORBIDDEN);
   }
@@ -186,7 +155,7 @@ export async function login(data: LoginDto): Promise<AuthResponse> {
   return {
     token,
     refreshToken,
-    expiresIn: 7 * 24 * 60 * 60, // 7 days
+    expiresIn: 7 * 24 * 60 * 60,
     user: {
       id: latestUser.id,
       email: latestUser.email,
@@ -197,53 +166,32 @@ export async function login(data: LoginDto): Promise<AuthResponse> {
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
-  const normalizedEmail = email.toLowerCase();
-
-  try {
-    const emailPK = `EMAIL#${normalizedEmail}`;
-    const emailItem = await getItem<{ userId: string }>({
-      PK: emailPK,
-      SK: 'METADATA',
-    });
-
-    if (emailItem && emailItem.userId) {
-      const { PK, SK } = createEntityKey('USER', emailItem.userId);
-      const user = await getItem<User>({ PK, SK });
-      return user;
-    }
-  } catch (error) {
-    logger.error('Email lookup failed.', { email, error });
-  }
-
-  return null;
+  const { userRepository } = getRepositories();
+  return userRepository.findByEmail(email);
 }
 
 export async function getUserById(userId: string): Promise<User | null> {
-  const { PK, SK } = createEntityKey('USER', userId);
-  return getItem<User>({ PK, SK });
+  const { userRepository } = getRepositories();
+  return userRepository.findById(userId);
 }
 
 export async function updateUserPassword(userId: string, newPasswordHash: string): Promise<void> {
-  const { PK, SK } = createEntityKey('USER', userId);
+  const { userRepository } = getRepositories();
 
-  await updateItem({ PK, SK }, 'SET passwordHash = :passwordHash, updatedAt = :updatedAt', {
-    ':passwordHash': newPasswordHash,
-    ':updatedAt': new Date().toISOString(),
-  });
-}
+  await userRepository.update(userId, {
+    name: undefined, // Won't update name
+    phone: undefined,
+    avatar_url: undefined,
+    role: undefined,
+    status: undefined,
+  } as UpdateUserDTO);
 
-export async function verifyToken(token: string): Promise<User | null> {
-  try {
-    const config = getConfig();
-    const decoded = jwt.verify(token, config.jwt.secret as Secret, {
-      algorithms: ['HS256'],
-    }) as {
-      userId: string;
-    };
-    return await getUserById(decoded.userId);
-  } catch {
-    return null;
-  }
+  // Actually update the password directly
+  const pool = getPool();
+  await pool.query(
+    'UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2',
+    [newPasswordHash, userId]
+  );
 }
 
 /**
@@ -263,27 +211,27 @@ export async function sendVerificationCode(
   logger.info('Sending verification code', { email, type });
 
   try {
-    // Check rate limit using DynamoDB (key includes type for independent rate limiting)
-    const rateLimitKey = `${email}:${type}`;
-    const rateLimitResult = await incrementRateLimit(
-      rateLimitKey,
-      'email',
-      RATE_LIMIT_MAX,
-      RATE_LIMIT_WINDOW
-    );
+    const { verificationRepository } = getRepositories();
 
-    if (!rateLimitResult.allowed) {
+    // Check rate limit - find recent code
+    const hasRecentCode = await verificationRepository.hasRecentCode(email, type);
+    if (hasRecentCode) {
       throw createAppError(
         'Rate limit exceeded. Please try again later.',
         ErrorCode.RATE_LIMIT_EXCEEDED
       );
     }
 
-    // Generate and store code using DynamoDB TTL cache
+    // Generate and store code
     const code = generateVerificationCode();
-    const codeKey = CacheKeys.verify(email, type);
+    const expiresAt = new Date(Date.now() + VERIFICATION_CODE_TTL * 1000);
 
-    await setCache(codeKey, 'VERIFY', code, VERIFICATION_CODE_TTL);
+    await verificationRepository.create({
+      email,
+      code,
+      type,
+      expires_at: expiresAt,
+    });
 
     // Send verification email via AWS SES
     const emailSent = await sendVerificationEmail({
@@ -320,20 +268,13 @@ export async function sendVerificationCode(
  * Verify the code entered by user
  */
 export async function verifyCode(email: string, code: string, type: AuthType): Promise<boolean> {
-  const codeKey = CacheKeys.verify(email, type);
+  const { verificationRepository } = getRepositories();
 
-  const storedCode = await getFromCache<string>(codeKey, 'VERIFY');
+  const result = await verificationRepository.verifyAndMarkUsed(email, code, type);
 
-  if (!storedCode) {
-    throw createAppError('Verification code expired or not found', ErrorCode.AUTH_CODE_EXPIRED);
+  if (!result.valid) {
+    throw createAppError(result.error || 'Verification code expired', ErrorCode.AUTH_CODE_EXPIRED);
   }
-
-  if (storedCode !== code) {
-    throw createAppError('Invalid verification code', ErrorCode.AUTH_INVALID_CODE);
-  }
-
-  // Delete the used code
-  await deleteFromCache(codeKey, 'VERIFY');
 
   logger.info('Verification code validated successfully', { email, type });
   return true;
@@ -363,8 +304,9 @@ export async function rotateRefreshToken(oldRefreshToken: string): Promise<{
     throw createAppError('Invalid token type', ErrorCode.AUTH_INVALID_REFRESH_TOKEN);
   }
 
-  // Check if token is blacklisted (with retry for eventual consistency)
-  const isBlacklisted = await isTokenBlacklisted(decoded.jti);
+  // Check if token is blacklisted
+  const { sessionRepository } = getRepositories();
+  const isBlacklisted = await sessionRepository.isBlacklisted(decoded.jti);
   if (isBlacklisted) {
     throw createAppError('Token has been revoked', ErrorCode.AUTH_INVALID_REFRESH_TOKEN);
   }
@@ -375,12 +317,12 @@ export async function rotateRefreshToken(oldRefreshToken: string): Promise<{
     throw createAppError('User not found', ErrorCode.USER_NOT_FOUND);
   }
 
-  if (user.status === UserStatus.DISABLED || user.status === ('DELETED' as any)) {
+  if (user.status === UserStatus.DISABLED) {
     throw createAppError('Account is disabled', ErrorCode.FORBIDDEN);
   }
 
   // Add old token to blacklist
-  await addTokenToBlacklist(decoded.jti);
+  await sessionRepository.addToBlacklist(decoded.jti, user.id, hashToken(oldRefreshToken), new Date());
 
   // Generate new tokens
   const newAccessToken = generateAccessToken({
@@ -413,12 +355,14 @@ export async function logout(
     hasRefreshToken: !!refreshToken,
   });
 
+  const { sessionRepository } = getRepositories();
+
   if (accessToken) {
     try {
       const config = getConfig();
       const decoded = jwt.verify(accessToken, config.jwt.secret as Secret) as { jti?: string };
       if (decoded.jti) {
-        await addTokenToBlacklist(decoded.jti);
+        await sessionRepository.addToBlacklist(decoded.jti, userId, hashToken(accessToken), new Date());
       }
     } catch {
       // Token might be invalid, ignore
@@ -430,7 +374,7 @@ export async function logout(
       const config = getConfig();
       const decoded = jwt.verify(refreshToken, config.jwt.secret as Secret) as { jti?: string };
       if (decoded.jti) {
-        await addTokenToBlacklist(decoded.jti);
+        await sessionRepository.addToBlacklist(decoded.jti, userId, hashToken(refreshToken), new Date());
       }
     } catch {
       // Token might be invalid, ignore
@@ -462,45 +406,24 @@ export async function updateCurrentUser(
     };
   }
 ): Promise<User> {
-  const { PK, SK } = createEntityKey('USER', userId);
+  const { userRepository } = getRepositories();
 
-  const updateExpressions: string[] = [];
-  const expressionAttributeValues: Record<string, unknown> = {
-    ':updatedAt': new Date().toISOString(),
-  };
-  const expressionAttributeNames: Record<string, string> = {};
+  const updateData: UpdateUserDTO = {};
 
   if (data.name !== undefined) {
-    updateExpressions.push('#n = :name');
-    expressionAttributeValues[':name'] = data.name;
-    expressionAttributeNames['#n'] = 'name';
+    updateData.name = data.name;
   }
 
   if (data.phone !== undefined) {
-    updateExpressions.push('phone = :phone');
-    expressionAttributeValues[':phone'] = data.phone;
+    updateData.phone = data.phone;
   }
 
-  if (data.profile !== undefined) {
-    updateExpressions.push('profile = :profile');
-    expressionAttributeValues[':profile'] = data.profile;
+  if (data.profile?.avatar !== undefined) {
+    updateData.avatar_url = data.profile.avatar;
   }
 
-  updateExpressions.push('updatedAt = :updatedAt');
+  const updatedUser = await userRepository.update(userId, updateData);
 
-  const command = new UpdateCommand({
-    TableName: process.env.DYNAMODB_TABLE_NAME || 'FindClass-MainTable',
-    Key: { PK, SK },
-    UpdateExpression: `SET ${updateExpressions.join(', ')}`,
-    ExpressionAttributeValues: expressionAttributeValues,
-    ExpressionAttributeNames:
-      Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
-    ReturnValues: 'ALL_NEW',
-  });
-
-  await getDynamoDBDocClient().send(command);
-
-  const updatedUser = await getUserById(userId);
   if (!updatedUser) {
     throw createAppError('User not found after update', ErrorCode.USER_NOT_FOUND);
   }
@@ -519,7 +442,6 @@ export async function requestPasswordReset(email: string): Promise<{ expiresIn: 
   const user = await getUserByEmail(email);
 
   // Only send verification code if user exists
-  // This prevents unnecessary email sending while still preventing user enumeration
   if (user) {
     const result = await sendVerificationCode(email, AuthType.FORGOT_PASSWORD);
     return result;
@@ -528,7 +450,7 @@ export async function requestPasswordReset(email: string): Promise<{ expiresIn: 
   // Log internally for monitoring, but don't expose to caller
   logger.info('Password reset for non-existent email (no email sent)', { email });
 
-  // Return success to prevent user enumeration, but with a fake expiresIn
+  // Return success to prevent user enumeration
   return { expiresIn: VERIFICATION_CODE_TTL };
 }
 
@@ -573,50 +495,35 @@ export async function getUserRoles(userId: string): Promise<UserRolesResponse> {
     throw createAppError('User not found', ErrorCode.USER_NOT_FOUND);
   }
 
-  // Get pending role application
-  const { PK } = createEntityKey('USER', userId);
-  const pendingApplications = await queryItems<{
-    id: string;
-    role: UserRole;
-    status: RoleApplicationStatus;
-    appliedAt: string;
-    reason?: string;
-    comment?: string;
-    processedAt?: string;
-  }>({
-    keyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':pk': PK,
-      ':sk': 'ROLE#',
-    },
-  });
+  const { roleApplicationRepository } = getRepositories();
 
-  const pendingApplication = pendingApplications.items?.find(
-    app => app.status === RoleApplicationStatus.PENDING
-  );
+  // Get pending role application
+  const pendingApplication = await roleApplicationRepository.findPendingByUserId(userId);
+
+  // Get all role applications for history
+  const applications = await roleApplicationRepository.findByUserId(userId);
 
   // Build role history from applications
   const roles: UserRoleInfo[] = [];
-  const processedApplications =
-    pendingApplications.items?.filter(app => app.status !== RoleApplicationStatus.PENDING) || [];
 
   // Add current role
   roles.push({
     role: user.role,
     status: RoleApplicationStatus.APPROVED,
-    appliedAt: user.createdAt,
-    processedAt: user.createdAt,
+    appliedAt: user.created_at.toISOString(),
+    processedAt: user.created_at.toISOString(),
   });
 
   // Add processed role change applications
-  for (const app of processedApplications) {
-    roles.push({
-      role: app.role,
-      status: app.status,
-      appliedAt: app.appliedAt,
-      processedAt: app.processedAt,
-      comment: app.comment,
-    });
+  for (const app of applications) {
+    if (app.status !== RoleApplicationStatus.PENDING) {
+      roles.push({
+        role: app.role,
+        status: app.status as RoleApplicationStatus,
+        appliedAt: app.applied_at.toISOString(),
+        processedAt: app.reviewed_at?.toISOString(),
+      });
+    }
   }
 
   return {
@@ -626,8 +533,8 @@ export async function getUserRoles(userId: string): Promise<UserRolesResponse> {
       ? {
           applicationId: pendingApplication.id,
           role: pendingApplication.role,
-          status: pendingApplication.status,
-          appliedAt: pendingApplication.appliedAt,
+          status: pendingApplication.status as RoleApplicationStatus,
+          appliedAt: pendingApplication.applied_at.toISOString(),
         }
       : undefined,
   };
@@ -653,69 +560,27 @@ export async function applyForRole(
     throw createAppError(`You already have the ${role} role`, ErrorCode.VALIDATION_ERROR);
   }
 
-  // Check if there's already a pending application (check both cache and DynamoDB)
-  const cachedAppId = await getFromCache<string>(CacheKeys.roleApplication(userId), 'ROLE_APP');
+  const { roleApplicationRepository } = getRepositories();
 
-  if (cachedAppId) {
+  // Check if there's already a pending application
+  const hasPending = await roleApplicationRepository.hasPendingApplication(userId);
+  if (hasPending) {
     throw createAppError('You already have a pending role application', ErrorCode.VALIDATION_ERROR);
   }
 
-  const { PK } = createEntityKey('USER', userId);
-  const existingApplications = await queryItems<{
-    id: string;
-    role: UserRole;
-    status: RoleApplicationStatus;
-  }>({
-    keyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':pk': PK,
-      ':sk': 'ROLE#',
-    },
+  const application = await roleApplicationRepository.create({
+    user_id: userId,
+    role,
+    reason,
   });
 
-  const pendingApp = existingApplications.items?.find(
-    app => app.status === RoleApplicationStatus.PENDING
-  );
-
-  if (pendingApp) {
-    throw createAppError('You already have a pending role application', ErrorCode.VALIDATION_ERROR);
-  }
-
-  const applicationId = `role_${uuidv4()}`;
-  const now = new Date().toISOString();
-
-  const application = {
-    PK: `USER#${userId}`,
-    SK: `ROLE#${applicationId}`,
-    entityType: 'ROLE_APPLICATION',
-    dataCategory: 'USER',
-    id: applicationId,
-    userId,
-    role,
-    status: RoleApplicationStatus.PENDING,
-    reason,
-    appliedAt: now,
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  await setCache(
-    CacheKeys.roleApplication(userId),
-    'ROLE_APP',
-    applicationId,
-    ROLE_APPLICATION_TTL
-  );
-
-  // Save role application to DynamoDB
-  await putItem(application);
-
-  logger.info('Role application submitted', { userId, role, applicationId });
+  logger.info('Role application submitted', { userId, role, applicationId: application.id });
 
   return {
-    applicationId,
-    role,
-    status: RoleApplicationStatus.PENDING,
-    appliedAt: now,
+    applicationId: application.id,
+    role: application.role,
+    status: application.status as RoleApplicationStatus,
+    appliedAt: application.applied_at.toISOString(),
   };
 }
 
@@ -739,20 +604,9 @@ export async function approveRoleApplication(
     throw createAppError('Only administrators can process role applications', ErrorCode.FORBIDDEN);
   }
 
-  // Scan to find the application by id (since we don't know the user PK)
-  // In production, use a GSI on 'id' or store userId in a separate index
-  const { scanItems } = await import('@shared/db/dynamodb');
+  const { roleApplicationRepository, userRepository } = getRepositories();
 
-  const scanResult = await scanItems<RoleApplication>({
-    filterExpression: 'entityType = :entityType AND id = :id',
-    expressionAttributeValues: {
-      ':entityType': 'ROLE_APPLICATION',
-      ':id': applicationId,
-    },
-  });
-
-  const application = scanResult.items[0];
-
+  const application = await roleApplicationRepository.findById(applicationId);
   if (!application) {
     throw createAppError('Role application not found', ErrorCode.NOT_FOUND);
   }
@@ -761,53 +615,15 @@ export async function approveRoleApplication(
     throw createAppError('Application is not in pending status', ErrorCode.VALIDATION_ERROR);
   }
 
-  const now = new Date().toISOString();
-  const newStatus = approved ? RoleApplicationStatus.APPROVED : RoleApplicationStatus.REJECTED;
+  const newStatus: ApplicationStatus = approved ? 'APPROVED' : 'REJECTED';
 
-  // Update application status (use expressionAttributeNames to avoid reserved keyword issues)
-  await updateItem(
-    { PK: application.PK, SK: application.SK },
-    'SET #s = :status, #c = :comment, processedBy = :processedBy, processedAt = :processedAt, updatedAt = :updatedAt',
-    {
-      ':status': newStatus,
-      ':comment': comment || (approved ? 'Approved' : 'Rejected'),
-      ':processedBy': adminId,
-      ':processedAt': now,
-      ':updatedAt': now,
-    },
-    undefined,
-    { '#s': 'status', '#c': 'comment' }
-  );
+  // Update application status
+  await roleApplicationRepository.updateStatus(applicationId, newStatus, adminId, comment);
 
   // If approved, update user's role
   if (approved) {
-    const { PK: userPK, SK: userSK } = createEntityKey('USER', application.userId);
-    await updateItem(
-      { PK: userPK, SK: userSK },
-      'SET #r = :role, updatedAt = :updatedAt',
-      {
-        ':role': application.role,
-        ':updatedAt': now,
-      },
-      undefined,
-      { '#r': 'role' }
-    );
+    await userRepository.update(application.user_id, { role: application.role });
   }
-
-  // Create history record
-  const historyRecord = {
-    PK: `ENTITY#ROLE_APPLICATION#${applicationId}`,
-    SK: `HISTORY#${applicationId}#${now}`,
-    entityType: 'ROLE_APPLICATION_HISTORY',
-    dataCategory: 'APPLICATION',
-    applicationId,
-    action: newStatus,
-    comment: comment || (approved ? 'Approved' : 'Rejected'),
-    performedBy: adminId,
-    performedAt: now,
-    createdAt: now,
-  };
-  await putItem(historyRecord);
 
   logger.info('Role application processed', {
     applicationId,
@@ -815,7 +631,6 @@ export async function approveRoleApplication(
     approved,
     newStatus,
     comment,
-    processedAt: now,
   });
 }
 
@@ -825,46 +640,19 @@ export async function approveRoleApplication(
 export async function cancelRoleApplication(applicationId: string, userId: string): Promise<void> {
   logger.info('Cancelling role application', { applicationId, userId });
 
-  // First find the application to check ownership
-  const { scanItems } = await import('@shared/db/dynamodb');
+  const { roleApplicationRepository } = getRepositories();
 
-  const scanResult = await scanItems<RoleApplication>({
-    filterExpression: 'entityType = :entityType AND id = :id',
-    expressionAttributeValues: {
-      ':entityType': 'ROLE_APPLICATION',
-      ':id': applicationId,
-    },
-  });
+  const cancelled = await roleApplicationRepository.cancel(applicationId, userId);
 
-  const application = scanResult.items[0];
-
-  if (!application) {
-    throw createAppError('Role application not found', ErrorCode.NOT_FOUND);
+  if (!cancelled) {
+    throw createAppError('Role application not found or cannot be cancelled', ErrorCode.NOT_FOUND);
   }
-
-  if (application.userId !== userId) {
-    throw createAppError('You can only cancel your own applications', ErrorCode.FORBIDDEN);
-  }
-
-  if (application.status !== RoleApplicationStatus.PENDING) {
-    throw createAppError('Only pending applications can be cancelled', ErrorCode.VALIDATION_ERROR);
-  }
-
-  // Delete the application
-  const { deleteItem } = await import('@shared/db/dynamodb');
-  await deleteItem({ PK: application.PK, SK: application.SK });
-
-  // Clear cache
-  const { deleteFromCache } = await import('@shared/db/cache');
-  const { CacheKeys } = await import('@shared/db/cache');
-  await deleteFromCache(CacheKeys.roleApplication(userId), 'ROLE_APP');
 
   logger.info('Role application cancelled', { applicationId, userId });
 }
 
 /**
  * Get pending role applications (admin only)
- * Uses GSI for efficient queries on status field
  */
 export async function getPendingRoleApplications(
   adminId: string,
@@ -891,111 +679,89 @@ export async function getPendingRoleApplications(
     throw createAppError('Only administrators can view pending applications', ErrorCode.FORBIDDEN);
   }
 
-  // Query applications with PENDING status using GSI
-  // For MVP, we'll scan the RoleApplication entity type
-  const { scanItems } = await import('@shared/db/dynamodb');
+  const { roleApplicationRepository } = getRepositories();
+  const applications = await roleApplicationRepository.findPending(limit);
 
-  const pendingApps = await scanItems<RoleApplication>({
-    filterExpression: 'entityType = :entityType AND #status = :status',
-    expressionAttributeValues: {
-      ':entityType': 'ROLE_APPLICATION',
-      ':status': RoleApplicationStatus.PENDING,
-    },
-    expressionAttributeNames: {
-      '#status': 'status',
-    },
-    limit,
-  });
-
-  return (pendingApps.items || []).map(app => ({
+  return applications.map(app => ({
     id: app.id,
-    userId: app.userId,
+    userId: app.user_id,
     role: app.role,
-    status: app.status,
+    status: app.status as RoleApplicationStatus,
     reason: app.reason,
-    appliedAt: app.appliedAt,
+    appliedAt: app.applied_at.toISOString(),
   }));
 }
 
 /**
- * Get application history (admin only)
+ * Get application history
  */
 export async function getApplicationHistory(
   applicationId: string
-): Promise<RoleApplicationHistory[]> {
+): Promise<Array<{
+  id: string;
+  applicationId: string;
+  action: string;
+  performedBy?: string;
+  note?: string;
+  createdAt: string;
+}>> {
   logger.info('Getting application history', { applicationId });
 
-  // Find the application first
-  const { scanItems } = await import('@shared/db/dynamodb');
+  const { roleApplicationRepository } = getRepositories();
+  const application = await roleApplicationRepository.getWithHistory(applicationId);
 
-  const appResult = await scanItems<RoleApplication>({
-    filterExpression: 'entityType = :entityType AND id = :id',
-    expressionAttributeValues: {
-      ':entityType': 'ROLE_APPLICATION',
-      ':id': applicationId,
-    },
-  });
-
-  const application = appResult.items[0];
   if (!application) {
     throw createAppError('Role application not found', ErrorCode.NOT_FOUND);
   }
 
-  // Query history items
-  const historyResult = await scanItems<RoleApplicationHistory>({
-    filterExpression: 'entityType = :entityType AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':entityType': 'ROLE_APPLICATION_HISTORY',
-      ':sk': `HISTORY#${applicationId}`,
-    },
-  });
-
-  return (historyResult.items || []).sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  return application.history.map(h => ({
+    id: h.id,
+    applicationId: h.application_id,
+    action: h.action,
+    performedBy: h.performed_by,
+    note: h.comment,
+    createdAt: h.created_at.toISOString(),
+  }));
 }
 
 /**
- * Get detailed application with history (admin only)
+ * Get detailed application with history
  */
 export async function getApplicationDetail(
   applicationId: string
 ): Promise<RoleApplicationDetailResponse> {
   logger.info('Getting application detail', { applicationId });
 
-  const { scanItems } = await import('@shared/db/dynamodb');
+  const { roleApplicationRepository } = getRepositories();
+  const application = await roleApplicationRepository.getWithHistory(applicationId);
 
-  // Find the application
-  const appResult = await scanItems<RoleApplication & { userName?: string }>({
-    filterExpression: 'entityType = :entityType AND id = :id',
-    expressionAttributeValues: {
-      ':entityType': 'ROLE_APPLICATION',
-      ':id': applicationId,
-    },
-  });
-
-  const application = appResult.items[0];
   if (!application) {
     throw createAppError('Role application not found', ErrorCode.NOT_FOUND);
   }
 
-  // Get history
-  const history = await getApplicationHistory(applicationId);
+  const processedByName = application.reviewed_by
+    ? (await getUserById(application.reviewed_by))?.name
+    : undefined;
 
   return {
     applicationId: application.id,
-    userId: application.userId,
+    userId: application.user_id,
     role: application.role,
-    status: application.status,
+    status: application.status as RoleApplicationStatus,
     reason: application.reason,
-    appliedAt: application.appliedAt,
-    processedAt: application.processedAt,
-    processedBy: application.processedBy,
-    processedByName: application.processedBy
-      ? (await getUserById(application.processedBy))?.name
-      : undefined,
+    appliedAt: application.applied_at.toISOString(),
+    processedAt: application.reviewed_at?.toISOString(),
+    processedBy: application.reviewed_by,
+    processedByName,
     comment: application.comment,
-    history,
+    history: application.history.map(h => ({
+      id: h.id,
+      applicationId: h.application_id,
+      action: h.action,
+      performedBy: h.performed_by || '',
+      note: h.comment || undefined,
+      createdAt: h.created_at.toISOString(),
+    })),
   };
 }
 
@@ -1007,38 +773,34 @@ export async function getUserApplications(
 ): Promise<RoleApplicationDetailResponse[]> {
   logger.info('Getting user applications', { userId });
 
-  const { PK } = createEntityKey('USER', userId);
+  const { roleApplicationRepository } = getRepositories();
+  const applications = await roleApplicationRepository.findByUserId(userId);
 
-  const applicationsResult = await queryItems<RoleApplication>({
-    keyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':pk': PK,
-      ':sk': 'ROLE#',
-    },
-  });
-
-  const applications = applicationsResult.items || [];
-
-  // Get history for each application
   const detailedApplications: RoleApplicationDetailResponse[] = [];
 
   for (const app of applications) {
-    const history = await getApplicationHistory(app.id);
+    const history = await roleApplicationRepository.getWithHistory(app.id);
     detailedApplications.push({
       applicationId: app.id,
-      userId: app.userId,
+      userId: app.user_id,
       role: app.role,
-      status: app.status,
+      status: app.status as RoleApplicationStatus,
       reason: app.reason,
-      appliedAt: app.appliedAt,
-      processedAt: app.processedAt,
-      processedBy: app.processedBy,
+      appliedAt: app.applied_at.toISOString(),
+      processedAt: app.reviewed_at?.toISOString(),
+      processedBy: app.reviewed_by,
       comment: app.comment,
-      history,
+      history: history?.history.map(h => ({
+        id: h.id,
+        applicationId: h.application_id,
+        action: h.action,
+        performedBy: h.performed_by || '',
+        note: h.comment || undefined,
+        createdAt: h.created_at.toISOString(),
+      })) || [],
     });
   }
 
-  // Sort by appliedAt descending
   return detailedApplications.sort(
     (a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime()
   );

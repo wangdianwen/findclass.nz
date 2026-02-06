@@ -1,16 +1,17 @@
 /**
  * Authentication Middleware
  * JWT-based authentication for protected routes
+ * Uses PostgreSQL for token blacklist
  */
 
 import type { Request, Response, NextFunction } from 'express';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
+import { getPool } from '@shared/db/postgres/client';
 import { getConfig } from '../../config';
 import { logger } from '../../core/logger';
 import { UnauthorizedError, ErrorCode } from '../../core/errors';
 import { createErrorResponse } from '../types/api';
-import { getFromCache, setCache, CacheKeys } from '../db/cache';
 import { getUserById } from '../../modules/auth/auth.service';
 
 // Extend Express Request type
@@ -37,38 +38,58 @@ export interface AuthenticatedRequest extends Request {
   user: JwtPayload;
 }
 
-const BLACKLIST_TTL_SECONDS = 86400;
+interface SessionRow {
+  id: string;
+  token_jti: string;
+  status: string;
+  expires_at: Date;
+}
 
 /**
- * Add token to blacklist
+ * Add token to blacklist using PostgreSQL
  */
 export async function addTokenToBlacklist(jti: string): Promise<void> {
-  const key = CacheKeys.session(jti);
-  logger.debug('Adding token to blacklist', { jti, key });
-  await setCache(key, 'SESSION', 'revoked', BLACKLIST_TTL_SECONDS);
+  const pool = getPool();
+
+  // First try to update if exists
+  const updateResult = await pool.query(
+    `UPDATE sessions SET status = 'REVOKED' WHERE token_jti = $1 RETURNING id`,
+    [jti]
+  );
+
+  if (updateResult.rows.length === 0) {
+    // Insert new record (for tokens that weren't stored)
+    const id = crypto.randomUUID();
+    await pool.query(
+      `INSERT INTO sessions (id, token_jti, status, expires_at, created_at)
+       VALUES ($1, $2, 'REVOKED', NOW() + interval '1 day', NOW())
+       ON CONFLICT (token_jti) DO NOTHING`,
+      [id, jti]
+    );
+  }
+
   logger.info('Token added to blacklist', { jti });
 }
 
 /**
- * Check if token is blacklisted
- * Uses retry to handle DynamoDB eventual consistency
+ * Check if token is blacklisted using PostgreSQL
  */
 export async function isTokenBlacklisted(jti: string): Promise<boolean> {
   if (!jti) return false;
 
-  const key = CacheKeys.session(jti);
+  const pool = getPool();
 
   try {
-    for (let attempt = 0; attempt < 3; attempt++) {
-      const result = await getFromCache<string>(key, 'SESSION');
-      if (result !== null) {
-        return result === 'revoked';
-      }
-      if (attempt < 2) {
-        await new Promise(resolve => setTimeout(resolve, 50 * (attempt + 1)));
-      }
-    }
-    return false;
+    const result = await pool.query<SessionRow>(
+      `SELECT 1 FROM sessions
+       WHERE token_jti = $1
+       AND status = 'REVOKED'
+       AND expires_at > NOW()
+       LIMIT 1`,
+      [jti]
+    );
+
+    return result.rows.length > 0;
   } catch {
     return false;
   }

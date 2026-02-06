@@ -3,7 +3,7 @@
  * Uses connection pooling with pg library
  */
 
-import { Pool, PoolClient, QueryResult } from 'pg';
+import { Pool, QueryResult } from 'pg';
 import { logger } from '../../core/logger';
 
 let pool: Pool | null = null;
@@ -27,7 +27,7 @@ export function getPool(): Pool {
       maxUses: 7500, // Close and replace a client after 7500 queries
     });
 
-    pool.on('error', (err) => {
+    pool.on('error', (err: Error) => {
       logger.error('Unexpected error on idle PostgreSQL client', { error: err.message });
     });
 
@@ -42,16 +42,9 @@ export function getPool(): Pool {
 }
 
 /**
- * Get a client from the pool for transactions
- */
-export async function getClient(): Promise<PoolClient> {
-  return getPool().connect();
-}
-
-/**
  * Execute a query using the pool
  */
-export async function query<T = unknown>(
+export async function query<T extends Record<string, unknown>>(
   text: string,
   values?: unknown[]
 ): Promise<QueryResult<T>> {
@@ -69,32 +62,11 @@ export async function query<T = unknown>(
 }
 
 /**
- * Execute a transaction with multiple statements
- */
-export async function transaction<T>(
-  callback: (client: PoolClient) => Promise<T>
-): Promise<T> {
-  const client = await getClient();
-
-  try {
-    await client.query('BEGIN');
-    const result = await callback(client);
-    await client.query('COMMIT');
-    return result;
-  } catch (error) {
-    await client.query('ROLLBACK');
-    throw error;
-  } finally {
-    client.release();
-  }
-}
-
-/**
  * Check if PostgreSQL is healthy
  */
 export async function checkHealth(): Promise<boolean> {
   try {
-    const result = await query('SELECT 1');
+    const result = await query<{ '?column?': number }>('SELECT 1 as result');
     return result.rowCount === 1;
   } catch {
     return false;

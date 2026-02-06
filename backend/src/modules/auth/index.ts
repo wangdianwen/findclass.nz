@@ -5,6 +5,34 @@
 export * from './auth.types';
 export { authRoutes } from './routes';
 
+// Export repositories
+export {
+  UserRepository,
+  type User,
+  type CreateUserDTO,
+  type UpdateUserDTO,
+} from './user.repository';
+
+export {
+  SessionRepository,
+  type Session,
+  type CreateSessionDTO,
+  hashToken,
+} from './session.repository';
+
+export {
+  VerificationCodeRepository,
+  type VerificationCode,
+  type CreateVerificationCodeDTO,
+} from './verification.repository';
+
+export {
+  RoleApplicationRepository,
+  type RoleApplication,
+  type CreateRoleApplicationDTO,
+  type ApplicationStatus,
+} from './role-application.repository';
+
 // Export function-based controllers
 export {
   registerController,
