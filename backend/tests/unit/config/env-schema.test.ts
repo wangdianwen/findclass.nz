@@ -155,16 +155,6 @@ describe('envSchema', () => {
         expect(result.data.AWS_REGION).toBe('us-east-1');
       }
     });
-
-    it('should accept localhost DynamoDB endpoint for development', () => {
-      const env = createCustomEnv({ DYNAMODB_ENDPOINT: 'http://localhost:4566' });
-      const result = envSchema.safeParse(env);
-
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.DYNAMODB_ENDPOINT).toBe('http://localhost:4566');
-      }
-    });
   });
 
   describe('JWT configuration', () => {

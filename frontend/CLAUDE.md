@@ -8,40 +8,40 @@
 
 ### 工作流程步骤
 
-| 步骤 | 说明 |
-|------|------|
-| **1. 理解需求** | 先理解任务范围和目标，必要时询问澄清问题 |
-| **2. 查找文档** | 查阅 `frontend/docs/tech/INDEX.md` 和 CLAUDE.md |
-| **3. 探索代码库** | 找到相关文件，阅读理解现有实现 |
-| **4. 规划任务** | 小任务直接做，复杂任务用 **Plan Mode** (`Shift+Tab`)；用 `TodoWrite` 拆解 |
-| **5. 实现代码** | 遵循项目规范，**提供验证标准**（测试、截图、命令输出） |
-| **6. 验证** | `npm run format && npm run lint && npx tsc --noEmit && npm run test` |
-| **7. 先行自审** | 创建 PR 前自行审查变更，构建确认无错误 |
-| **8. 提交** | 向用户展示变更，经确认后执行提交（可用 `/commit-push-pr`） |
-| **9. 复盘总结** | 回顾特殊情况、解决方案，判断是否需要更新文档 |
+| 步骤              | 说明                                                                      |
+| ----------------- | ------------------------------------------------------------------------- |
+| **1. 理解需求**   | 先理解任务范围和目标，必要时询问澄清问题                                  |
+| **2. 查找文档**   | 查阅 `frontend/docs/tech/INDEX.md` 和 CLAUDE.md                           |
+| **3. 探索代码库** | 找到相关文件，阅读理解现有实现                                            |
+| **4. 规划任务**   | 小任务直接做，复杂任务用 **Plan Mode** (`Shift+Tab`)；用 `TodoWrite` 拆解 |
+| **5. 实现代码**   | 遵循项目规范，**提供验证标准**（测试、截图、命令输出）                    |
+| **6. 验证**       | `npm run format && npm run lint && npx tsc --noEmit && npm run test`      |
+| **7. 先行自审**   | 创建 PR 前自行审查变更，构建确认无错误                                    |
+| **8. 提交**       | 向用户展示变更，经确认后执行提交（可用 `/commit-push-pr`）                |
+| **9. 复盘总结**   | 回顾特殊情况、解决方案，判断是否需要更新文档                              |
 
 ### 核心原则
 
-| 原则 | 说明 |
-|------|------|
-| **给验证方式** | 提供测试、截图或预期输出，让 Claude 能自检 |
-| **先探索后规划** | 复杂任务用 Plan Mode 分离研究和执行 |
-| **精确上下文** | 越具体的指令，需要纠正的次数越少 |
-| **及时纠正** | 两次纠正后仍出错？用 `/clear` 重置对话 |
-| **双会话模式** | 会话 A 写代码，会话 B 审查，互不干扰 |
-| **小型 PR** | 变更尽量小而专注，减少审查负担 |
+| 原则             | 说明                                       |
+| ---------------- | ------------------------------------------ |
+| **给验证方式**   | 提供测试、截图或预期输出，让 Claude 能自检 |
+| **先探索后规划** | 复杂任务用 Plan Mode 分离研究和执行        |
+| **精确上下文**   | 越具体的指令，需要纠正的次数越少           |
+| **及时纠正**     | 两次纠正后仍出错？用 `/clear` 重置对话     |
+| **双会话模式**   | 会话 A 写代码，会话 B 审查，互不干扰       |
+| **小型 PR**      | 变更尽量小而专注，减少审查负担             |
 
 ### Claude Code 技巧
 
-| 操作 | 方式 |
-|------|------|
+| 操作           | 方式                                                 |
+| -------------- | ---------------------------------------------------- |
 | 进入 Plan Mode | `Shift+Tab` 切换，或 `claude --permission-mode plan` |
-| 重置对话 | `/clear` |
-| 回溯 | `/rewind` 或双击 `Esc` |
-| 子代理探索 | `"use subagents to investigate X"` |
-| 重命名会话 | `/rename session-name` |
-| 一键提交 | `/commit-push-pr` |
-| 恢复会话 | `claude --continue` |
+| 重置对话       | `/clear`                                             |
+| 回溯           | `/rewind` 或双击 `Esc`                               |
+| 子代理探索     | `"use subagents to investigate X"`                   |
+| 重命名会话     | `/rename session-name`                               |
+| 一键提交       | `/commit-push-pr`                                    |
+| 恢复会话       | `claude --continue`                                  |
 
 ---
 
@@ -395,32 +395,32 @@ src/services/
 
 ### 开发问题
 
-| 问题 | 解决方案 |
-| ---- | -------- |
-| 颜色/样式 | 参考 `_variables.scss` |
-| SCSS 错误 | 见 `frontend/docs/tech/INDEX.md` → SCSS 章节 |
-| 测试失败 | 添加 `data-testid`，使用 `canvasElement.querySelector` |
-| E2E 测试失败 | 运行 `npx playwright test --project=chromium --debug` |
-| E2E 端口问题 | 检查 dev server 端口 (默认 3001) |
-| E2E 超时 | 增加 `actionTimeout`/`navigationTimeout` |
-| i18n 不工作 | 检查命名空间前缀 (无前缀) |
-| Lint/TS 错误 | 运行 `npm run lint && npx tsc --noEmit` |
-| Storybook 问题 | 见 `frontend/docs/tech/INDEX.md` → Storybook 章节 |
-| 组件结构 | 见 `frontend/docs/tech/INDEX.md` → Components 章节 |
-| 设计问题 | 参考 DESIGN.md |
-| MSW Mock 不工作 | 检查 `src/mocks/handlers.ts` |
-| E2E 数据不足 | 参考 `src/test/e2e/setup/test-data.ts` |
+| 问题            | 解决方案                                               |
+| --------------- | ------------------------------------------------------ |
+| 颜色/样式       | 参考 `_variables.scss`                                 |
+| SCSS 错误       | 见 `frontend/docs/tech/INDEX.md` → SCSS 章节           |
+| 测试失败        | 添加 `data-testid`，使用 `canvasElement.querySelector` |
+| E2E 测试失败    | 运行 `npx playwright test --project=chromium --debug`  |
+| E2E 端口问题    | 检查 dev server 端口 (默认 3001)                       |
+| E2E 超时        | 增加 `actionTimeout`/`navigationTimeout`               |
+| i18n 不工作     | 检查命名空间前缀 (无前缀)                              |
+| Lint/TS 错误    | 运行 `npm run lint && npx tsc --noEmit`                |
+| Storybook 问题  | 见 `frontend/docs/tech/INDEX.md` → Storybook 章节      |
+| 组件结构        | 见 `frontend/docs/tech/INDEX.md` → Components 章节     |
+| 设计问题        | 参考 DESIGN.md                                         |
+| MSW Mock 不工作 | 检查 `src/mocks/handlers.ts`                           |
+| E2E 数据不足    | 参考 `src/test/e2e/setup/test-data.ts`                 |
 
 ### Claude Code 问题
 
-| 问题 | 解决方案 |
-| ---- | -------- |
+| 问题                | 解决方案                          |
+| ------------------- | --------------------------------- |
 | Claude 多次纠正无效 | `/clear` 重置对话，更精确描述需求 |
-| 上下文混乱 | 不同任务间 `/clear` 重置 |
-| 忘记会话内容 | `claude --continue` 恢复最近会话 |
-| 需要并行工作 | 用 Git worktree 创建独立目录 |
-| 想深入探索代码 | 进入 **Plan Mode** (`Shift+Tab`) |
-| 需要特定专家审查 | 开启新会话专门审查 |
+| 上下文混乱          | 不同任务间 `/clear` 重置          |
+| 忘记会话内容        | `claude --continue` 恢复最近会话  |
+| 需要并行工作        | 用 Git worktree 创建独立目录      |
+| 想深入探索代码      | 进入 **Plan Mode** (`Shift+Tab`)  |
+| 需要特定专家审查    | 开启新会话专门审查                |
 
 ---
 

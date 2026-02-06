@@ -9,6 +9,7 @@
 | `npm run dev`                 | Start development server with hot reload |
 | `npm run build`               | Build TypeScript + generate OpenAPI docs |
 | `npm run start`               | Run production server                    |
+| `npm run seed`                | Seed database with sample data           |
 | `npm test`                    | Run all tests                            |
 | `npm run test:unit`           | Run only unit tests                      |
 | `npm run test:coverage`       | Run tests with coverage report           |
@@ -24,10 +25,11 @@
 
 ```
 src/
-├── config/           # Configuration modules
+├── config/           # Configuration modules (env, schema)
 ├── core/             # Core (errors, helpers, logger)
 ├── modules/          # Feature modules (auth, courses, teachers, users)
 ├── shared/           # Shared (db, middleware, types, utils)
+│   └── db/          # Database (PostgreSQL, cache, seeding)
 ├── app.ts            # Express app setup
 ├── server.ts         # Entry point
 └── lambda/           # AWS Lambda handler
@@ -105,14 +107,39 @@ throw createAppError('User not found', ErrorCode.USER_NOT_FOUND);
 - Use fixtures for test data
 - Auth module coverage: 100%, other modules: 80%
 
-## Database (DynamoDB)
+## Database (PostgreSQL)
 
-- **Table**: `FindClass-MainTable` (single-table design)
-- **Key format**:
-  - PK: `ENTITY#<type>` (e.g., `ENTITY#USER`)
-  - SK: `ID#<id>` (e.g., `ID#usr_xxx`)
-- **GSI indexes**: `GSI1-EmailIndex`, `GSI2-EntityIndex`, `GSI3-CourseSearch`
-- **Local development**: Run DynamoDB via Docker (`docker-compose up -d dynamodb-local`)
+- **Primary database**: PostgreSQL 15
+- **Connection**: via `DATABASE_URL` environment variable
+- **Cache**: In-memory cache (Node-Redisman) with PostgreSQL fallback
+- **Rate Limiting**: PostgreSQL-based sliding window counter
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://findclass:findclass_dev@localhost:5432/findclass` |
+| `SEED_SAMPLE_DATA` | Whether to seed sample data | `false` |
+
+### Environment Files
+
+| File | Purpose |
+|------|---------|
+| `.env.base` | Base configuration (shared across all environments) |
+| `.env.local` | Local development overrides |
+| `.env.staging` | Staging environment (with seeded data) |
+| `.env.test` | Test environment (TestContainers) |
+| `.env.prod` | Production environment |
+
+### Database Seeding
+
+For staging/preview environments, run:
+
+```bash
+npm run seed
+# or
+SEED_SAMPLE_DATA=true npm run dev
+```
 
 ## Git Commit Convention
 
@@ -128,4 +155,4 @@ Example: feat(auth): implement password reset
 - Node.js 18+
 - TypeScript 5.x
 - Express.js + JWT + bcrypt
-- DynamoDB for persistence
+- PostgreSQL for persistence
