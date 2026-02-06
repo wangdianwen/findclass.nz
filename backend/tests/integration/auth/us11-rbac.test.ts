@@ -6,17 +6,34 @@
  * I want to have permissions based on my role
  * So that I can access role-appropriate features
  *
- * Test Type: Integration Test
+ * Test Type: Integration Test (PostgreSQL)
  * Path: tests/integration/auth/us11-rbac.test.ts
  */
 
 import 'reflect-metadata';
 import request from 'supertest';
-import { getApp } from '../setup.integration';
-import { describe, expect, it } from 'vitest';
+import { getApp, getTestPool } from '../setup.integration';
+import { cleanupTestUser } from '../fixtures/test-users.postgres';
+import { describe, expect, it, beforeAll, beforeEach } from 'vitest';
+import { Pool } from 'pg';
 import { UserRole } from '@shared/types';
 
-describe('US11: RBAC Permission Control', () => {
+describe('US11: RBAC Permission Control (PostgreSQL)', () => {
+  let pool: Pool;
+
+  beforeAll(() => {
+    pool = getTestPool();
+  });
+
+  beforeEach(async () => {
+    // Clean up before each test
+    await pool.query('DELETE FROM role_application_history');
+    await pool.query('DELETE FROM role_applications');
+    await pool.query('DELETE FROM sessions');
+    await pool.query('DELETE FROM verification_codes');
+    await pool.query('DELETE FROM users');
+  });
+
   // ==================== Happy Path ====================
 
   describe('Happy Path', () => {
@@ -49,6 +66,8 @@ describe('US11: RBAC Permission Control', () => {
         .expect(200);
 
       expect(response.body.success).toBe(true);
+
+      await cleanupTestUser(uniqueEmail);
     });
 
     it('US11-HP-02: TEACHER can access auth endpoints', async () => {
@@ -80,6 +99,8 @@ describe('US11: RBAC Permission Control', () => {
         .expect(200);
 
       expect(response.body.success).toBe(true);
+
+      await cleanupTestUser(uniqueEmail);
     });
 
     it('US11-HP-03: ADMIN can access role approval endpoint', async () => {
@@ -113,6 +134,8 @@ describe('US11: RBAC Permission Control', () => {
 
       // Admin should be able to access the endpoint (not 401/403)
       expect([401, 403]).not.toContain(response.status);
+
+      await cleanupTestUser(uniqueEmail);
     });
   });
 
@@ -124,6 +147,8 @@ describe('US11: RBAC Permission Control', () => {
       const response = await request(getApp()).get('/api/v1/auth/roles').expect(401);
 
       expect(response.body.success).toBe(false);
+
+      await cleanupTestUser('');
     });
 
     it('US11-FC-02: STUDENT cannot approve role applications', async () => {
@@ -156,6 +181,8 @@ describe('US11: RBAC Permission Control', () => {
         .expect(403);
 
       expect(response.body.success).toBe(false);
+
+      await cleanupTestUser(uniqueEmail);
     });
 
     it('US11-FC-03: PARENT cannot approve role applications', async () => {
@@ -188,6 +215,8 @@ describe('US11: RBAC Permission Control', () => {
         .expect(403);
 
       expect(response.body.success).toBe(false);
+
+      await cleanupTestUser(uniqueEmail);
     });
   });
 

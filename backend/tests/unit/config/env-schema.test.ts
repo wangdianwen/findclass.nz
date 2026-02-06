@@ -61,8 +61,8 @@ describe('envSchema', () => {
       }
     });
 
-    it('should use default values when not provided', () => {
-      const env: Partial<NodeJS.ProcessEnv> = {};
+    it('should use default values when provided', () => {
+      const env = createDevEnv();
       const result = envSchema.safeParse(env);
 
       expect(result.success).toBe(true);

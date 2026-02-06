@@ -6,16 +6,14 @@
 import { createApp } from './app';
 import { getConfig, validateConfig } from './config';
 import { logger } from './core/logger';
-import { checkCacheHealth, checkRateLimitsHealth } from './shared/db/cache';
-import { tableExists, listTables } from './shared/db/dynamodb';
+import { runMigrations } from './db/migrate';
+import { getPool } from './shared/db/postgres/client';
 
 interface HealthCheckResult {
   status: 'healthy' | 'degraded' | 'unhealthy';
   timestamp: string;
   services: {
-    cache: boolean;
-    rateLimits: boolean;
-    dynamodb: boolean;
+    postgres: boolean;
   };
   uptime: number;
 }
@@ -25,42 +23,22 @@ interface HealthCheckResult {
  */
 async function performHealthCheck(): Promise<HealthCheckResult> {
   const services = {
-    cache: false,
-    rateLimits: false,
-    dynamodb: false,
+    postgres: false,
   };
 
-  // Check Cache
+  // Check PostgreSQL
   try {
-    services.cache = await checkCacheHealth();
+    const pool = getPool();
+    const result = await pool.query('SELECT 1');
+    services.postgres = result.rows.length > 0;
   } catch {
-    services.cache = false;
+    services.postgres = false;
   }
 
-  // Check Rate Limits
-  try {
-    services.rateLimits = await checkRateLimitsHealth();
-  } catch {
-    services.rateLimits = false;
-  }
-
-  // Check DynamoDB
-  try {
-    const config = getConfig();
-    const exists = await tableExists(config.dynamodb.tableName);
-    services.dynamodb = exists;
-  } catch {
-    services.dynamodb = false;
-  }
-
-  const allHealthy = services.cache && services.rateLimits && services.dynamodb;
+  const allHealthy = services.postgres;
 
   return {
-    status: allHealthy
-      ? 'healthy'
-      : Object.values(services).some(s => s)
-        ? 'degraded'
-        : 'unhealthy',
+    status: allHealthy ? 'healthy' : services.postgres ? 'degraded' : 'unhealthy',
     timestamp: new Date().toISOString(),
     services,
     uptime: process.uptime(),
@@ -74,32 +52,18 @@ async function startServer(): Promise<void> {
 
     const config = getConfig();
 
-    if (config.env === 'development') {
-      try {
-        const tables = await listTables();
-        logger.info('DynamoDB tables found', { tables });
-      } catch (error) {
-        logger.warn('DynamoDB connection failed', {
-          error: (error as Error).message,
-        });
-      }
-    } else {
-      try {
-        const tableName = await tableExists(config.dynamodb.tableName);
-        if (tableName) {
-          logger.info('DynamoDB connection verified', {
-            tableName: config.env === 'development' ? tableName : '[REDACTED]',
-          });
-        } else {
-          logger.error('DynamoDB table not found', {
-            tableName: config.env === 'development' ? config.dynamodb.tableName : '[REDACTED]',
-          });
-          process.exit(1);
-        }
-      } catch (error) {
-        logger.error('DynamoDB connection failed', { error: (error as Error).message });
-        process.exit(1);
-      }
+    // Run database migrations on startup
+    logger.info('Running database migrations...');
+    try {
+      const pool = getPool();
+      const { executed, skipped } = await runMigrations(pool);
+      logger.info('Database migrations completed', {
+        executed: executed.length,
+        skipped: skipped.length,
+      });
+    } catch (error) {
+      logger.error('Database migration failed', { error: (error as Error).message });
+      process.exit(1);
     }
 
     const app = createApp();

@@ -1,29 +1,17 @@
-/**
- * Script to generate a simple API documentation markdown file
- * Full OpenAPI spec generation removed - swagger-jsdoc no longer maintained
- */
-
-import fs from 'fs';
-import path from 'path';
-
-const outputDir = path.join(__dirname, '../docs/api');
-const outputFile = path.join(outputDir, 'api-documentation.md');
-
-// Simple API documentation template
-const docContent = `# FindClass NZ API Documentation
+# FindClass NZ API Documentation
 
 ## Base URL
 
-- Development: \`http://localhost:3000/api/v1\`
-- Production: \`https://api.findclass.nz/api/v1\`
+- Development: `http://localhost:3000/api/v1`
+- Production: `https://api.findclass.nz/api/v1`
 
 ## Authentication
 
 All protected endpoints require a JWT access token in the Authorization header:
 
-\`\`\`
+```
 Authorization: Bearer <access_token>
-\`\`\`
+```
 
 ## Rate Limiting
 
@@ -78,7 +66,3 @@ Authorization: Bearer <access_token>
 | GET /health | Basic health check |
 | GET /health/ready | Readiness check |
 | GET /health/live | Liveness check |
-`;
-
-fs.writeFileSync(outputFile, docContent);
-console.log(`API documentation generated at: ${outputFile}`);

@@ -15,6 +15,7 @@ import { logger, logStream } from './core/logger';
 import { AppError, ErrorCode } from './core/errors';
 import { createErrorResponse } from './shared/types/api';
 import type { AuthenticatedRequest } from './shared/middleware/auth';
+import { initializeSchema } from './shared/db/postgres/schema';
 
 // Import routes
 import { authRoutes } from './modules/auth/routes';
@@ -23,6 +24,30 @@ import { courseRoutes } from './modules/courses/routes';
 import { teacherRoutes } from './modules/teachers/routes';
 import { healthRoutes } from './modules/health/routes';
 import { NodeEnv } from './config/env-schema';
+
+// Initialize database schema
+async function initializeDatabase(): Promise<void> {
+  try {
+    logger.info('Initializing database schema...');
+    await initializeSchema();
+    logger.info('Database schema initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize database schema', { error });
+    throw error;
+  }
+}
+
+// Initialize on module load (will run before app starts accepting requests)
+// Note: In production, consider running migrations separately
+initializeDatabase().catch((err: unknown) => {
+  logger.error('Database initialization failed', {
+    error: err instanceof Error ? err.message : String(err),
+  });
+  // Don't exit in test environment
+  if (process.env.NODE_ENV !== 'test') {
+    process.exit(1);
+  }
+});
 
 // Create Express application
 export function createApp(): Application {

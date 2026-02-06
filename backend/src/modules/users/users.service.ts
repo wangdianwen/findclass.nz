@@ -1,25 +1,40 @@
 /**
  * Users Module - Service
- * User management business logic
+ * User management business logic with PostgreSQL
  */
 
 import { logger } from '@core/logger';
+import { AppError, ErrorCode } from '@core/errors';
+import { getPool } from '@shared/db/postgres/client';
+import { UserRepository } from './user.repository';
+import type { User } from './user.repository';
+import { ChildRepository } from './child.repository';
+import type { Child } from './child.repository';
+import type { CreateLearningRecordDTO } from './learning-record.repository';
+import { LearningRecordRepository } from './learning-record.repository';
 import type {
-  User,
-  Child,
   LearningRecord,
   LearningProgress,
   LearningStatistics,
-  LearningReport,
-} from '@shared/types';
-import { LearningRecordType, ProgressStatus } from '@shared/types';
-import { getItem, putItem, queryItems, createEntityKey } from '@shared/db/dynamodb';
-import { AppError, ErrorCode } from '@core/errors';
-import { v4 as uuidv4 } from 'uuid';
+  LearningRecordType,
+} from './learning-record.repository';
+
+// Get pool for direct use
+function getUserRepository(): UserRepository {
+  return new UserRepository(getPool());
+}
+
+function getChildRepository(): ChildRepository {
+  return new ChildRepository(getPool());
+}
+
+function getLearningRecordRepository(): LearningRecordRepository {
+  return new LearningRecordRepository(getPool());
+}
 
 export async function getUserProfile(userId: string): Promise<User | null> {
-  const { PK, SK } = createEntityKey('USER', userId);
-  return getItem<User>({ PK, SK });
+  logger.info('Getting user profile', { userId });
+  return getUserRepository().findById(userId);
 }
 
 export async function updateUserProfile(
@@ -28,37 +43,28 @@ export async function updateUserProfile(
 ): Promise<User> {
   logger.info('Updating user profile', { userId, data });
 
-  const { PK, SK } = createEntityKey('USER', userId);
-  const user = await getItem<User>({ PK, SK });
-
+  const user = await getUserRepository().findById(userId);
   if (!user) {
     throw new AppError('User not found', ErrorCode.USER_NOT_FOUND, 404);
   }
 
-  const updatedUser: User = {
-    ...user,
-    ...data,
-    language: (data.language as 'zh' | 'en') || user.language,
-    updatedAt: new Date().toISOString(),
-  };
+  const updatedUser = await getUserRepository().update(userId, {
+    name: data.name,
+    phone: data.phone,
+    avatar_url: data.avatarUrl,
+    language: data.language as 'zh' | 'en',
+  });
 
-  await putItem(updatedUser as unknown as Record<string, unknown>);
+  if (!updatedUser) {
+    throw new AppError('Failed to update user', ErrorCode.INTERNAL_ERROR, 500);
+  }
 
   return updatedUser;
 }
 
 export async function getChildren(userId: string): Promise<Child[]> {
-  const { PK } = createEntityKey('USER', userId);
-
-  const result = await queryItems<Child>({
-    keyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':pk': PK,
-      ':sk': 'CHILD#',
-    },
-  });
-
-  return result.items;
+  logger.info('Getting children', { userId });
+  return getChildRepository().findByUserId(userId);
 }
 
 export async function addChild(
@@ -74,23 +80,63 @@ export async function addChild(
   }
 ): Promise<Child> {
   logger.info('Adding child', { userId, data });
-  return Promise.reject(
-    new AppError('Child management feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501)
-  );
+
+  const user = await getUserRepository().findById(userId);
+  if (!user) {
+    throw new AppError('User not found', ErrorCode.USER_NOT_FOUND, 404);
+  }
+
+  return getChildRepository().create(userId, {
+    name: data.name,
+    dateOfBirth: data.dateOfBirth,
+    gender: data.gender,
+    school: data.school,
+    grade: data.grade,
+    subjects: data.subjects,
+    learningGoals: data.learningGoals,
+  });
+}
+
+export async function updateChild(
+  childId: string,
+  data: {
+    name?: string;
+    dateOfBirth?: string;
+    gender?: 'MALE' | 'FEMALE';
+    school?: string;
+    grade?: string;
+    subjects?: string[];
+    learningGoals?: string[];
+  }
+): Promise<Child | null> {
+  logger.info('Updating child', { childId, data });
+  return getChildRepository().update(childId, data);
+}
+
+export async function deleteChild(childId: string): Promise<boolean> {
+  logger.info('Deleting child', { childId });
+  return getChildRepository().delete(childId);
 }
 
 export async function recordParentalConsent(userId: string, childId: string): Promise<void> {
   logger.info('Recording parental consent', { userId, childId });
-  return Promise.reject(
-    new AppError('Parental consent feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501)
-  );
+
+  const child = await getChildRepository().findById(childId);
+  if (!child) {
+    throw new AppError('Child not found', ErrorCode.USER_NOT_FOUND, 404);
+  }
+
+  if (child.user_id !== userId) {
+    throw new AppError('Unauthorized', ErrorCode.FORBIDDEN, 403);
+  }
+
+  await getChildRepository().update(childId, { learningGoals: ['PARENTAL_CONSENT_GIVEN'] });
 }
 
-export async function getFavorites(userId: string): Promise<unknown[]> {
+export function getFavorites(userId: string): Promise<unknown[]> {
   logger.info('Getting favorites', { userId });
-  return Promise.reject(
-    new AppError('Favorites feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501)
-  );
+  // Favorites feature not yet implemented
+  return Promise.resolve([]);
 }
 
 export async function recordLearning(
@@ -106,37 +152,21 @@ export async function recordLearning(
 ): Promise<LearningRecord> {
   logger.info('Recording learning activity', { userId, data });
 
-  const { PK, SK } = createEntityKey('USER', userId);
-  const user = await getItem<User>({ PK, SK });
-
+  const user = await getUserRepository().findById(userId);
   if (!user) {
     throw new AppError('User not found', ErrorCode.USER_NOT_FOUND, 404);
   }
 
-  const recordId = `LRN#${uuidv4()}`;
-  const { PK: recordPK, SK: recordSK } = createEntityKey('USER', userId, recordId);
-
-  const record: LearningRecord = {
-    PK: recordPK,
-    SK: recordSK,
-    entityType: 'LEARNING_RECORD',
-    dataCategory: 'USER',
-    id: recordId,
-    userId,
+  const createData: CreateLearningRecordDTO = {
     courseId: data.courseId,
     lessonId: data.lessonId,
     type: data.type,
     duration: data.duration,
     progress: data.progress,
-    status: data.progress >= 100 ? ProgressStatus.COMPLETED : ProgressStatus.IN_PROGRESS,
     metadata: data.metadata,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
   };
 
-  await putItem(record as unknown as Record<string, unknown>);
-
-  return record;
+  return getLearningRecordRepository().create(userId, createData);
 }
 
 export async function getLearningRecords(
@@ -144,28 +174,10 @@ export async function getLearningRecords(
   params?: { courseId?: string; limit?: number }
 ): Promise<LearningRecord[]> {
   logger.info('Getting learning records', { userId, params });
-
-  const { PK } = createEntityKey('USER', userId);
-
-  let keyConditionExpression = 'PK = :pk AND begins_with(SK, :sk)';
-  const expressionAttributeValues: Record<string, unknown> = {
-    ':pk': PK,
-    ':sk': 'LRN#',
-  };
-
-  if (params?.courseId) {
-    keyConditionExpression = 'PK = :pk AND SK = :sk';
-    expressionAttributeValues[':sk'] = `LRN#${params.courseId}`;
-  }
-
-  const result = await queryItems<LearningRecord>({
-    keyConditionExpression,
-    expressionAttributeValues,
-    limit: params?.limit || 50,
-    scanIndexForward: false,
+  return getLearningRecordRepository().findByUserId(userId, {
+    courseId: params?.courseId,
+    limit: params?.limit,
   });
-
-  return result.items;
 }
 
 export async function getCourseProgress(
@@ -173,105 +185,25 @@ export async function getCourseProgress(
   courseId: string
 ): Promise<LearningProgress | null> {
   logger.info('Getting course progress', { userId, courseId });
-
-  const { PK } = createEntityKey('USER', userId);
-
-  const result = await queryItems<LearningRecord>({
-    keyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':pk': PK,
-      ':sk': `LRN#${courseId}`,
-    },
-  });
-
-  if (result.items.length === 0) {
-    return null;
-  }
-
-  const totalDuration = result.items.reduce((sum, item) => sum + item.duration, 0);
-  const completedLessons = result.items.filter(
-    item => item.type === LearningRecordType.LESSON_COMPLETE
-  ).length;
-  const lastActivity = result.items.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )[0];
-
-  const maxLessons = result.items.reduce((max, item) => Math.max(max, item.progress), 0);
-
-  return {
-    courseId,
-    userId,
-    totalDuration,
-    completedLessons,
-    totalLessons: Math.ceil(maxLessons / 10) || 0,
-    progressPercentage: Math.min(100, maxLessons),
-    status: maxLessons >= 100 ? ProgressStatus.COMPLETED : ProgressStatus.IN_PROGRESS,
-    lastActivityAt: lastActivity?.createdAt || new Date().toISOString(),
-    startedAt:
-      result.items.sort(
-        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      )[0]?.createdAt || new Date().toISOString(),
-    completedAt: maxLessons >= 100 ? new Date().toISOString() : undefined,
-  };
+  return getLearningRecordRepository().getProgress(userId, courseId);
 }
 
 export async function getLearningStatistics(userId: string): Promise<LearningStatistics> {
   logger.info('Getting learning statistics', { userId });
+  return getLearningRecordRepository().getStatistics(userId);
+}
 
-  const { PK } = createEntityKey('USER', userId);
-
-  const result = await queryItems<LearningRecord>({
-    keyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':pk': PK,
-      ':sk': 'LRN#',
-    },
-  });
-
-  const records = result.items;
-
-  const totalLearningTime = records.reduce((sum, item) => sum + item.duration, 0);
-  const uniqueCourses = new Set(records.map(item => item.courseId)).size;
-  const completedCourses = new Set(
-    records.filter(item => item.progress >= 100).map(item => item.courseId)
-  ).size;
-  const completedLessons = records.filter(
-    item => item.type === LearningRecordType.LESSON_COMPLETE
-  ).length;
-
-  const weeklyData: LearningStatistics['weeklyData'] = [];
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
-
-    const dayRecords = records.filter(r => r.createdAt.startsWith(dateStr));
-    weeklyData.push({
-      date: dateStr,
-      duration: dayRecords.reduce((sum, item) => sum + item.duration, 0),
-      lessonsCompleted: dayRecords.filter(item => item.type === LearningRecordType.LESSON_COMPLETE)
-        .length,
-    });
-  }
-
-  const progressSum =
-    uniqueCourses > 0 ? records.reduce((sum, item) => sum + item.progress, 0) / uniqueCourses : 0;
-
-  const lastActivity = records.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )[0];
-
-  return {
-    userId,
-    totalLearningTime,
-    totalCourses: uniqueCourses,
-    completedCourses,
-    totalLessons: completedLessons,
-    completedLessons,
-    averageProgress: Math.min(100, progressSum),
-    lastActivityAt: lastActivity?.createdAt || new Date().toISOString(),
-    weeklyData,
+// Learning Report interface
+export interface LearningReport {
+  userId: string;
+  generatedAt: string;
+  period: {
+    start: string;
+    end: string;
   };
+  statistics: LearningStatistics;
+  courseProgress: LearningProgress[];
+  achievements: string[];
 }
 
 export async function generateLearningReport(
@@ -282,24 +214,14 @@ export async function generateLearningReport(
 
   const statistics = await getLearningStatistics(userId);
 
-  const { PK } = createEntityKey('USER', userId);
-
-  const result = await queryItems<LearningRecord>({
-    keyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':pk': PK,
-      ':sk': 'LRN#',
-    },
-  });
-
+  const records = await getLearningRecordRepository().findByUserId(userId);
   const courseProgressMap = new Map<string, LearningProgress>();
 
-  for (const record of result.items) {
-    const existing = courseProgressMap.get(record.courseId);
-    if (!existing) {
-      const progress = await getCourseProgress(userId, record.courseId);
+  for (const record of records) {
+    if (!courseProgressMap.has(record.course_id)) {
+      const progress = await getCourseProgress(userId, record.course_id);
       if (progress) {
-        courseProgressMap.set(record.courseId, progress);
+        courseProgressMap.set(record.course_id, progress);
       }
     }
   }

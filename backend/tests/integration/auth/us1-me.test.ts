@@ -6,17 +6,33 @@
  * I want to manage my profile information
  * So that I can keep my account information up to date
  *
- * Test Type: Integration Test
+ * Test Type: Integration Test (PostgreSQL)
  * Path: tests/integration/auth/us1-me.test.ts
  */
 
 import 'reflect-metadata';
 import request from 'supertest';
-import { getApp } from '../setup.integration';
-import { createTestUser, cleanupTestUser } from '../fixtures/test-users';
-import { describe, expect, it } from 'vitest';
+import { getApp, getTestPool } from '../setup.integration';
+import { cleanupTestUser } from '../fixtures/test-users.postgres';
+import { describe, expect, it, beforeAll, beforeEach } from 'vitest';
+import { Pool } from 'pg';
 
-describe('US1: Profile Management', () => {
+describe('US1: Profile Management (PostgreSQL)', () => {
+  let pool: Pool;
+
+  beforeAll(() => {
+    pool = getTestPool();
+  });
+
+  beforeEach(async () => {
+    // Clean up before each test
+    await pool.query('DELETE FROM role_application_history');
+    await pool.query('DELETE FROM role_applications');
+    await pool.query('DELETE FROM sessions');
+    await pool.query('DELETE FROM verification_codes');
+    await pool.query('DELETE FROM users');
+  });
+
   // ==================== Happy Path ====================
 
   describe('Happy Path', () => {
@@ -24,7 +40,7 @@ describe('US1: Profile Management', () => {
       const uniqueEmail = `us1-me-hp-02-${Date.now()}@example.com`;
       const password = 'SecurePass123!';
 
-      // 注册用户
+      // Register user
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password,
@@ -32,13 +48,13 @@ describe('US1: Profile Management', () => {
         role: 'PARENT',
       });
 
-      // 登录
+      // Login
       const loginResponse = await request(getApp())
         .post('/api/v1/auth/login')
         .send({ email: uniqueEmail, password })
         .expect(200);
 
-      // 更新个人信息
+      // Update profile
       const response = await request(getApp())
         .put('/api/v1/auth/me')
         .set('Authorization', `Bearer ${loginResponse.body.data.token}`)
@@ -48,6 +64,12 @@ describe('US1: Profile Management', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.data.user.name).toBe('Updated Name');
 
+      // Verify in database
+      const dbResult = await pool.query('SELECT name FROM users WHERE email = $1', [
+        uniqueEmail.toLowerCase(),
+      ]);
+      expect(dbResult.rows[0].name).toBe('Updated Name');
+
       await cleanupTestUser(uniqueEmail);
     });
 
@@ -55,7 +77,7 @@ describe('US1: Profile Management', () => {
       const uniqueEmail = `us1-me-hp-04-${Date.now()}@example.com`;
       const password = 'SecurePass123!';
 
-      // 注册并登录
+      // Register and login
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password,
@@ -68,14 +90,14 @@ describe('US1: Profile Management', () => {
         .send({ email: uniqueEmail, password })
         .expect(200);
 
-      // 获取个人信息
+      // Get profile
       const response = await request(getApp())
         .get('/api/v1/auth/me')
         .set('Authorization', `Bearer ${loginResponse.body.data.token}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data.user.email).toBe(uniqueEmail);
+      expect(response.body.data.user.email).toBe(uniqueEmail.toLowerCase());
       expect(response.body.data.user.name).toBe('Get Profile Test');
 
       await cleanupTestUser(uniqueEmail);
@@ -117,7 +139,7 @@ describe('US1: Profile Management', () => {
       const uniqueEmail = `us1-me-ec-06-${Date.now()}@example.com`;
       const password = 'SecurePass123!';
 
-      // 注册并登录
+      // Register and login
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password,
@@ -130,7 +152,7 @@ describe('US1: Profile Management', () => {
         .send({ email: uniqueEmail, password })
         .expect(200);
 
-      // 更新为包含特殊字符的名称
+      // Update with special characters
       const response = await request(getApp())
         .put('/api/v1/auth/me')
         .set('Authorization', `Bearer ${loginResponse.body.data.token}`)
@@ -147,7 +169,7 @@ describe('US1: Profile Management', () => {
       const uniqueEmail = `us1-me-ec-07-${Date.now()}@example.com`;
       const password = 'SecurePass123!';
 
-      // 注册并登录
+      // Register and login
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password,
@@ -160,7 +182,7 @@ describe('US1: Profile Management', () => {
         .send({ email: uniqueEmail, password })
         .expect(200);
 
-      // 发送空更新
+      // Send empty update
       const response = await request(getApp())
         .put('/api/v1/auth/me')
         .set('Authorization', `Bearer ${loginResponse.body.data.token}`)
@@ -168,6 +190,39 @@ describe('US1: Profile Management', () => {
         .expect(200);
 
       expect(response.body.success).toBe(true);
+
+      await cleanupTestUser(uniqueEmail);
+    });
+
+    it('US1-EC-09: should return proper user info with all fields', async () => {
+      const uniqueEmail = `us1-me-ec-09-${Date.now()}@example.com`;
+      const password = 'SecurePass123!';
+
+      // Register user
+      await request(getApp()).post('/api/v1/auth/register').send({
+        email: uniqueEmail,
+        password,
+        name: 'Full Profile Test',
+        role: 'STUDENT',
+      });
+
+      const loginResponse = await request(getApp())
+        .post('/api/v1/auth/login')
+        .send({ email: uniqueEmail, password })
+        .expect(200);
+
+      // Get profile
+      const response = await request(getApp())
+        .get('/api/v1/auth/me')
+        .set('Authorization', `Bearer ${loginResponse.body.data.token}`)
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.user.id).toBeDefined();
+      expect(response.body.data.user.email).toBe(uniqueEmail.toLowerCase());
+      expect(response.body.data.user.name).toBe('Full Profile Test');
+      expect(response.body.data.user.role).toBe('STUDENT');
+      expect(response.body.data.user.createdAt).toBeDefined();
 
       await cleanupTestUser(uniqueEmail);
     });

@@ -1,19 +1,17 @@
 /**
- * US1: User Registration
+ * US1: User Registration - PostgreSQL Integration Test
  *
- * User Story:
- * As a visitor
- * I want to register with email verification
- * So that I can create an account
- *
- * Test Type: Integration Test (PostgreSQL)
- * Path: tests/integration/auth/us1-registration.test.ts
+ * Tests the complete registration flow with real PostgreSQL database
  */
 
 import 'reflect-metadata';
 import request from 'supertest';
-import { getApp, getTestPool } from '../setup.integration';
-import { cleanupTestUser } from '../fixtures/test-users.postgres';
+import { getApp, getTestPool } from '../setup.postgres';
+import {
+  createTestUser,
+  cleanupTestUser,
+  createTestVerificationCode,
+} from '../fixtures/test-users.postgres';
 import { describe, expect, it, beforeAll, afterAll, beforeEach } from 'vitest';
 import { Pool } from 'pg';
 
@@ -47,6 +45,7 @@ describe('US1: User Registration (PostgreSQL)', () => {
 
       expect(sendCodeResponse.body.success).toBe(true);
       expect(sendCodeResponse.body.data.expiresIn).toBe(300);
+      expect(sendCodeResponse.body.message).toBe('Verification code sent successfully');
 
       // Step 2: Register user
       const registerResponse = await request(getApp())
@@ -84,14 +83,12 @@ describe('US1: User Registration (PostgreSQL)', () => {
       expect(profileResponse.body.success).toBe(true);
       expect(profileResponse.body.data.user.email).toBe(uniqueEmail.toLowerCase());
 
-      // Verify in database
+      // Verify user exists in database
       const dbResult = await pool.query('SELECT * FROM users WHERE email = $1', [
         uniqueEmail.toLowerCase(),
       ]);
       expect(dbResult.rows.length).toBe(1);
       expect(dbResult.rows[0].name).toBe('Test User');
-
-      await cleanupTestUser(uniqueEmail);
     });
 
     it('US1-HP-01: should send verification code successfully', async () => {
@@ -113,8 +110,6 @@ describe('US1: User Registration (PostgreSQL)', () => {
       );
       expect(dbResult.rows.length).toBe(1);
       expect(dbResult.rows[0].used).toBe(false);
-
-      await cleanupTestUser(uniqueEmail);
     });
 
     it('US1-HP-02: should update user profile after registration', async () => {
@@ -149,8 +144,6 @@ describe('US1: User Registration (PostgreSQL)', () => {
         uniqueEmail.toLowerCase(),
       ]);
       expect(dbResult.rows[0].name).toBe('Updated Name');
-
-      await cleanupTestUser(uniqueEmail);
     });
   });
 
@@ -181,8 +174,6 @@ describe('US1: User Registration (PostgreSQL)', () => {
 
       expect(duplicateResponse.body.success).toBe(false);
       expect(duplicateResponse.body.error.detail).toContain('already registered');
-
-      await cleanupTestUser(uniqueEmail);
     });
 
     it('US1-FC-02: should reject missing required fields', async () => {
@@ -277,8 +268,6 @@ describe('US1: User Registration (PostgreSQL)', () => {
         uniqueEmail.toLowerCase(),
       ]);
       expect(dbResult.rows[0].email).toBe(uniqueEmail.toLowerCase());
-
-      await cleanupTestUser(uniqueEmail);
     });
 
     it('US1-EC-02: should handle special characters in name', async () => {
@@ -296,8 +285,6 @@ describe('US1: User Registration (PostgreSQL)', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.user.name).toBe('张老师-Test_2024');
-
-      await cleanupTestUser(uniqueEmail);
     });
 
     it('US1-EC-03: should handle concurrent registration with same email', async () => {
@@ -329,8 +316,103 @@ describe('US1: User Registration (PostgreSQL)', () => {
         uniqueEmail.toLowerCase(),
       ]);
       expect(parseInt(dbResult.rows[0].count)).toBe(1);
+    });
+  });
+});
 
-      await cleanupTestUser(uniqueEmail);
+describe('US2: User Login (PostgreSQL)', () => {
+  let pool: Pool;
+
+  beforeAll(() => {
+    pool = getTestPool();
+  });
+
+  beforeEach(async () => {
+    await pool.query('DELETE FROM role_application_history');
+    await pool.query('DELETE FROM role_applications');
+    await pool.query('DELETE FROM sessions');
+    await pool.query('DELETE FROM verification_codes');
+    await pool.query('DELETE FROM users');
+  });
+
+  describe('Happy Path', () => {
+    it('US2-HP-01: should login successfully with correct credentials', async () => {
+      const testUser = await createTestUser({
+        email: 'login-test@example.com',
+        password: 'SecurePass123!',
+        name: 'Login Test User',
+        role: 'PARENT',
+      });
+
+      const response = await request(getApp())
+        .post('/api/v1/auth/login')
+        .send({ email: testUser.email, password: testUser.password })
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.token).toBeDefined();
+      expect(response.body.data.user.email).toBe(testUser.email.toLowerCase());
+      expect(response.body.data.user.name).toBe(testUser.name);
+    });
+
+    it('US2-HP-02: should return user profile after login', async () => {
+      const testUser = await createTestUser({
+        email: 'profile-test@example.com',
+        password: 'SecurePass123!',
+        name: 'Profile Test',
+        role: 'STUDENT',
+      });
+
+      const response = await request(getApp())
+        .post('/api/v1/auth/login')
+        .send({ email: testUser.email, password: testUser.password })
+        .expect(200);
+
+      expect(response.body.data.user).toBeDefined();
+      expect(response.body.data.user.id).toBeDefined();
+      expect(response.body.data.user.role).toBe('STUDENT');
+    });
+  });
+
+  describe('Failed Cases', () => {
+    it('US2-FC-01: should reject invalid password', async () => {
+      await createTestUser({
+        email: 'wrong-pass@example.com',
+        password: 'CorrectPass123!',
+      });
+
+      const response = await request(getApp())
+        .post('/api/v1/auth/login')
+        .send({ email: 'wrong-pass@example.com', password: 'WrongPassword123!' })
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error.detail).toContain('Invalid email or password');
+    });
+
+    it('US2-FC-02: should reject non-existent user', async () => {
+      const response = await request(getApp())
+        .post('/api/v1/auth/login')
+        .send({ email: 'nonexistent@example.com', password: 'SecurePass123!' })
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    it('US2-FC-03: should reject disabled account', async () => {
+      await createTestUser({
+        email: 'disabled@example.com',
+        password: 'SecurePass123!',
+        status: 'DISABLED',
+      });
+
+      const response = await request(getApp())
+        .post('/api/v1/auth/login')
+        .send({ email: 'disabled@example.com', password: 'SecurePass123!' })
+        .expect(403);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error.detail).toContain('disabled');
     });
   });
 });
