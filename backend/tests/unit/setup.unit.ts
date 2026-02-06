@@ -3,9 +3,7 @@
  * Vitest configuration that detects test type based on file path
  */
 
-import { NodeEnv } from '@src/config/env-schema';
-
-process.env.NODE_ENV = NodeEnv.Test;
+process.env.NODE_ENV = 'test';
 
 // Mock logger functions
 const mockLoggerInfo = () => {};
