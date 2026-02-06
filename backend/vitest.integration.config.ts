@@ -19,6 +19,7 @@ export default defineConfig({
         singleFork: true,
       },
     },
+    setupFiles: [path.resolve(__dirname, 'tests/integration/setup.integration.ts')],
   },
   resolve: {
     alias: {
