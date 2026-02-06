@@ -427,17 +427,7 @@ export const CourseForm: React.FC<CourseFormProps> = ({
           initialValue={[]}
           extra={t('form.coverImageMaxHint', { count: MAX_COVER_IMAGES })}
         >
-          <ImgCrop
-            rotationSlider
-            aspect={16 / 9}
-            cropperProps={{
-              cropSize: { width: 640, height: 360 },
-              zoomable: 3,
-            }}
-            modalProps={{
-              title: t('form.coverImageUpload'),
-            }}
-          >
+          <ImgCrop rotationSlider aspect={16 / 9}>
             <Upload
               className={styles.pictureCardUpload}
               listType="picture-card"

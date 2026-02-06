@@ -10,6 +10,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import crypto from 'crypto';
+import path from 'path';
 import { getConfig } from './config';
 import { logger, logStream } from './core/logger';
 import { AppError, ErrorCode } from './core/errors';
@@ -23,6 +24,7 @@ import { userRoutes } from './modules/users/routes';
 import { courseRoutes } from './modules/courses/routes';
 import { teacherRoutes } from './modules/teachers/routes';
 import { healthRoutes } from './modules/health/routes';
+import { uploadRoutes } from './modules/upload/routes';
 import { NodeEnv } from './config/env-schema';
 
 // Initialize database schema
@@ -129,11 +131,16 @@ export function createApp(): Application {
   // Health check route (no rate limit)
   app.use('/health', healthRoutes);
 
+  // Static file serving for uploaded files
+  const uploadDir = process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads');
+  app.use('/uploads', express.static(uploadDir));
+
   // API routes
   app.use(`/api/${config.apiVersion}/auth`, authRoutes);
   app.use(`/api/${config.apiVersion}/users`, userRoutes);
   app.use(`/api/${config.apiVersion}/courses`, courseRoutes);
   app.use(`/api/${config.apiVersion}/teachers`, teacherRoutes);
+  app.use(`/api/${config.apiVersion}/upload`, uploadRoutes);
 
   // 404 handler
   app.use((req: Request, res: Response) => {

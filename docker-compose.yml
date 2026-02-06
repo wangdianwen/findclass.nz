@@ -50,9 +50,12 @@ services:
       - AWS_REGION=ap-southeast-2
       - DATABASE_URL=postgresql://findclass:findclass_dev@postgres:5432/findclass
       - LOCALSTACK_ENDPOINT=http://localstack:4566
+      - UPLOAD_DIR=/app/uploads
     depends_on:
       - postgres
       - localstack
+    volumes:
+      - uploads-data:/app/uploads
     networks:
       - findclass-network
 
@@ -83,9 +86,12 @@ services:
       - DATABASE_URL=postgresql://findclass:findclass_dev@postgres:5432/findclass
       - LOCALSTACK_ENDPOINT=http://localstack:4566
       - SEED_SAMPLE_DATA=true
+      - UPLOAD_DIR=/app/uploads
     depends_on:
       - postgres
       - localstack
+    volumes:
+      - uploads-data:/app/uploads
     networks:
       - findclass-network
     profiles:
@@ -105,9 +111,12 @@ services:
       - DATABASE_URL=postgresql://findclass:findclass_prod@postgres:5432/findclass
       - LOCALSTACK_ENDPOINT=http://localstack:4566
       - SEED_SAMPLE_DATA=false
+      - UPLOAD_DIR=/app/uploads
     depends_on:
       - postgres
       - localstack
+    volumes:
+      - uploads-data:/app/uploads
     networks:
       - findclass-network
     profiles:
@@ -120,3 +129,4 @@ networks:
 volumes:
   postgres-data:
   localstack-data:
+  uploads-data:

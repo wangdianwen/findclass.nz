@@ -9,6 +9,7 @@ import {
   FileTextOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { uploadApi } from '@/services/api';
 import styles from './QualificationUpload.module.scss';
 
 interface Evidence {
@@ -41,20 +42,24 @@ export const TeachingEvidenceUpload: React.FC<TeachingEvidenceUploadProps> = ({
     async (type: string, file: File) => {
       setUploading(type);
 
-      // Simulate upload delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const newEvidence: Evidence = {
-        id: `${type}-${Date.now()}`,
-        type,
-        name: file.name,
-        value: URL.createObjectURL(file),
-      };
-
-      onUpload(newEvidence);
-      setUploading(null);
+      try {
+        const response = await uploadApi.uploadQualification(file, type);
+        if (response.success && response.data?.url) {
+          const newEvidence: Evidence = {
+            id: `${type}-${Date.now()}`,
+            type,
+            name: file.name,
+            value: response.data.url,
+          };
+          onUpload(newEvidence);
+        }
+      } catch {
+        message.error(t('error'));
+      } finally {
+        setUploading(null);
+      }
     },
-    [onUpload]
+    [onUpload, t]
   );
 
   const handleLinkSubmit = useCallback(

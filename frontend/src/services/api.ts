@@ -190,7 +190,10 @@ export const reviewApi = {
     courseId?: string;
     page?: number;
     pageSize?: number;
-  }): Promise<{ data: Review[]; pagination: { page: number; pageSize: number; total: number; totalPages: number } }> {
+  }): Promise<{
+    data: Review[];
+    pagination: { page: number; pageSize: number; total: number; totalPages: number };
+  }> {
     return request({
       method: 'GET',
       url: '/reviews',
@@ -555,7 +558,9 @@ export const userCenterApi = {
   },
 
   // Update user profile
-  async updateProfile(data: Partial<UserProfile>): Promise<{ success: boolean; data: UserProfile; message?: string }> {
+  async updateProfile(
+    data: Partial<UserProfile>
+  ): Promise<{ success: boolean; data: UserProfile; message?: string }> {
     return request({
       method: 'PUT',
       url: '/user/profile',
@@ -564,7 +569,10 @@ export const userCenterApi = {
   },
 
   // Change password
-  async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+  async changePassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<{ success: boolean; message: string }> {
     return request({
       method: 'PUT',
       url: '/user/password',
@@ -581,7 +589,9 @@ export const userCenterApi = {
   },
 
   // Upload avatar
-  async uploadAvatar(file: File): Promise<{ success: boolean; data: { url: string }; message: string }> {
+  async uploadAvatar(
+    file: File
+  ): Promise<{ success: boolean; data: { url: string }; message: string }> {
     const formData = new FormData();
     formData.append('avatar', file);
     return request({
@@ -600,7 +610,9 @@ export const userCenterApi = {
     });
   },
 
-  async addChild(data: Omit<Child, 'id'>): Promise<{ success: boolean; data: Child; message: string }> {
+  async addChild(
+    data: Omit<Child, 'id'>
+  ): Promise<{ success: boolean; data: Child; message: string }> {
     return request({
       method: 'POST',
       url: '/user/children',
@@ -608,7 +620,10 @@ export const userCenterApi = {
     });
   },
 
-  async updateChild(id: string, data: Partial<Child>): Promise<{ success: boolean; data: Child; message: string }> {
+  async updateChild(
+    id: string,
+    data: Partial<Child>
+  ): Promise<{ success: boolean; data: Child; message: string }> {
     return request({
       method: 'PUT',
       url: `/user/children/${id}`,
@@ -639,7 +654,11 @@ export const userCenterApi = {
   },
 
   // Notifications
-  async getNotifications(): Promise<{ success: boolean; data: NotificationItem[]; unreadCount: number }> {
+  async getNotifications(): Promise<{
+    success: boolean;
+    data: NotificationItem[];
+    unreadCount: number;
+  }> {
     return request({
       method: 'GET',
       url: '/user/notifications',
@@ -684,6 +703,41 @@ export const userCenterApi = {
 };
 
 // ============================================
+// Upload API
+// ============================================
+
+export const uploadApi = {
+  // Upload avatar
+  async uploadAvatar(
+    file: File
+  ): Promise<{ success: boolean; data: { url: string }; message: string }> {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return request({
+      method: 'POST',
+      url: '/upload/avatar',
+      data: formData,
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
+  // Upload qualification
+  async uploadQualification(
+    file: File,
+    type: string
+  ): Promise<{ success: boolean; data: { url: string; type: string }; message: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return request({
+      method: 'POST',
+      url: `/upload/qualification/${type}`,
+      data: formData,
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+};
+
+// ============================================
 // 默认导出
 // ============================================
 
@@ -693,4 +747,5 @@ export default {
   search: searchApi,
   auth: authApi,
   userCenter: userCenterApi,
+  upload: uploadApi,
 };
