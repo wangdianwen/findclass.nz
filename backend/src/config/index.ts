@@ -22,11 +22,14 @@ const config: AppConfig = {
     accessKeyId: raw.AWS_ACCESS_KEY_ID,
     secretAccessKey: raw.AWS_SECRET_ACCESS_KEY,
   },
-  dynamodb: {
-    endpoint: raw.DYNAMODB_ENDPOINT,
-    tableName: raw.DYNAMODB_TABLE_NAME,
-    port: raw.DYNAMODB_PORT,
+  database: {
+    url: raw.DATABASE_URL,
   },
+  dynamodb: raw.DYNAMODB_ENDPOINT ? {
+    endpoint: raw.DYNAMODB_ENDPOINT,
+    tableName: raw.DYNAMODB_TABLE_NAME || 'FindClass-MainTable',
+    port: raw.DYNAMODB_PORT || 8000,
+  } : null,
   smtp: {
     host: raw.SMTP_HOST,
     port: raw.SMTP_PORT,

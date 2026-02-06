@@ -27,10 +27,13 @@ export const envSchema = z.object({
   AWS_ACCESS_KEY_ID: z.string().default('local'),
   AWS_SECRET_ACCESS_KEY: z.string().min(1).default('local'),
 
-  // DynamoDB 配置
-  DYNAMODB_ENDPOINT: z.string().default('http://localhost:4566'),
-  DYNAMODB_TABLE_NAME: z.string().default('FindClass-MainTable'),
-  DYNAMODB_PORT: z.coerce.number().default(8000),
+  // PostgreSQL Configuration (primary database)
+  DATABASE_URL: z.string().url().startsWith('postgresql://'),
+
+  // DynamoDB Configuration (deprecated, for migration only)
+  DYNAMODB_ENDPOINT: z.string().optional(),
+  DYNAMODB_TABLE_NAME: z.string().optional(),
+  DYNAMODB_PORT: z.coerce.number().optional(),
 
   // S3 配置
   S3_ENDPOINT: z.string().default('http://localhost:4566'),
@@ -115,12 +118,17 @@ export interface AppConfig {
   frontendUrl: string;
   auth: AuthConfig;
   aws: AWSConfig;
-  dynamodb: DynamoDBConfig;
+  database: DatabaseConfig;
+  dynamodb: DynamoDBConfig | null;
   smtp: SMTPConfig;
   jwt: JWTConfig;
   cors: CorsConfig;
   rateLimit: RateLimitConfig;
   logging: LoggingConfig;
+}
+
+export interface DatabaseConfig {
+  url: string;
 }
 
 export interface AuthConfig {

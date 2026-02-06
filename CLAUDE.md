@@ -28,14 +28,26 @@ npm run lint:fix
 # Formatting
 npm run format:fix
 
-# Unit tests (346 tests)
+# Full check (lint + format + typecheck)
+npm run check
+
+# Unit tests
 npm run test:unit
 
 # Integration tests (requires Docker for DynamoDB Local)
-npm run test:interation
+npm run test:integration
+
+# Tests with coverage
+npm run test:coverage
 
 # Build
 npm run build
+
+# Build Lambda bundle
+npm run lambda:build
+
+# Start production server
+npm run start
 
 # OpenAPI docs generation
 ts-node scripts/generate-openapi.ts
@@ -44,7 +56,7 @@ ts-node scripts/generate-openapi.ts
 ### Frontend (run from `frontend/` directory)
 
 ```bash
-# Development (port 5173)
+# Development (port 3000)
 npm run dev
 
 # Type checking & build
@@ -53,8 +65,17 @@ npm run build
 # Unit tests
 npm run test:unit
 
-# Storybook (port 6006)
+# Storybook component tests (port 6006)
+npm run test:stories
+
+# Storybook UI
 npm run storybook
+
+# Build Storybook
+npm run build-storybook
+
+# Playwright E2E tests
+npx playwright test
 
 # Linting
 npm run lint
