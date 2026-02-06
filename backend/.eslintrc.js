@@ -43,7 +43,7 @@ module.exports = {
     '@typescript-eslint/no-unnecessary-optional-chain': 'off',
     '@typescript-eslint/only-throw-error': 'off',
   },
-  ignorePatterns: [...baseIgnorePatterns, 'src/lambda/bundle.js'],
+  ignorePatterns: [...baseIgnorePatterns, 'src/lambda/bundle.js', 'vitest.config.ts'],
   overrides: [
     {
       files: ['tests/**/*.ts'],

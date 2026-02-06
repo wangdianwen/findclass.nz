@@ -16,7 +16,7 @@ const configDir = resolve(process.cwd(), 'src/config/env');
 config({ path: resolve(configDir, '.env.base') });
 config({ path: resolve(configDir, '.env.test') });
 
-import { GenericContainer, StartedTestContainer, Wait } from 'testcontainers';
+import { GenericContainer, type StartedTestContainer, Wait } from 'testcontainers';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { resetClient as resetMainDynamoDBClients, TABLE_NAME } from '@src/shared/db/dynamodb';
@@ -55,29 +55,29 @@ export const getDynamoDBDocClient = () =>
   containersStarted ? (testContext?.dynamodb.docClient ?? null) : null;
 
 async function startContainers() {
-  if (containersStarted) return testContext!;
+  if (containersStarted) return testContext;
 
-  const config = getConfig();
+  const cfg = getConfig();
   console.log('🚀 Starting test containers...');
 
   // MailHog
   console.log('📧 Starting MailHog...');
   const mailhog = await new GenericContainer(MAILHOG_IMAGE)
     .withExposedPorts(
-      { container: config.smtp.port, host: config.smtp.port },
-      { container: config.smtp.apiPort, host: config.smtp.apiPort }
+      { container: cfg.smtp.port, host: cfg.smtp.port },
+      { container: cfg.smtp.apiPort, host: cfg.smtp.apiPort }
     )
     .withWaitStrategy(Wait.forListeningPorts())
     .withStartupTimeout(60000)
     .start();
 
   const host = mailhog.getHost();
-  console.log(`✅ MailHog: ${host}:${config.smtp.port}`);
+  console.log(`✅ MailHog: ${host}:${cfg.smtp.port}`);
 
   // DynamoDB
   console.log('🗄️  Starting DynamoDB...');
   const dynamodb = await new GenericContainer(DYNAMODB_IMAGE)
-    .withExposedPorts({ container: 8000, host: config.dynamodb.port })
+    .withExposedPorts({ container: 8000, host: cfg.dynamodb.port })
     .withCommand(['-jar', 'DynamoDBLocal.jar', '-sharedDb'])
     .withWaitStrategy(Wait.forListeningPorts())
     .withStartupTimeout(20000)
@@ -91,10 +91,10 @@ async function startContainers() {
 
   const client = new DynamoDBClient({
     endpoint,
-    region: config.aws.region,
+    region: cfg.aws.region,
     credentials: {
-      accessKeyId: config.aws.accessKeyId,
-      secretAccessKey: config.aws.secretAccessKey,
+      accessKeyId: cfg.aws.accessKeyId,
+      secretAccessKey: cfg.aws.secretAccessKey,
     },
   });
 
@@ -133,8 +133,9 @@ async function startContainers() {
       })
     );
     console.log(`✅ Table ${TABLE_NAME} created`);
-  } catch (e: any) {
-    if (e.name !== 'ResourceInUseException') throw e;
+  } catch (e: unknown) {
+    const error = e as { name?: string };
+    if (error.name !== 'ResourceInUseException') throw e;
     console.log(`📋 Table ${TABLE_NAME} exists`);
   }
   await client.send(new DescribeTableCommand({ TableName: TABLE_NAME }));
@@ -149,7 +150,7 @@ async function startContainers() {
       host,
       port,
     },
-    mailhog: { container: mailhog, host, smtpPort: config.smtp.port, apiPort: config.smtp.apiPort },
+    mailhog: { container: mailhog, host, smtpPort: cfg.smtp.port, apiPort: cfg.smtp.apiPort },
   };
   containersStarted = true;
   console.log('✅ Containers ready');
@@ -160,8 +161,9 @@ async function stopContainers() {
   if (!containersStarted) return;
   console.log('🛑 Stopping containers...');
   try {
-    await testContext?.dynamodb.container.stop();
-    await testContext?.mailhog.container.stop();
+    const ctx = testContext;
+    if (ctx?.dynamodb.container) await ctx.dynamodb.container.stop();
+    if (ctx?.mailhog.container) await ctx.mailhog.container.stop();
   } catch (e) {
     console.warn('⚠️  Stop error:', e);
   }
@@ -193,16 +195,25 @@ async function clearTableData(docClient: DynamoDBDocumentClient) {
 beforeAll(async () => {
   await startContainers();
   _app = createApp();
-  await clearTableData(testContext!.dynamodb.docClient);
+  const ctx = testContext;
+  if (ctx) await clearTableData(ctx.dynamodb.docClient);
 }, 180000);
 
-afterAll(stopContainers);
+afterAll(async () => {
+  await stopContainers();
+});
 
 // Cleanup
-const cleanup = async () => {
+async function exitHandler() {
   await stopContainers();
   process.exit(0);
-};
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);
-process.on('beforeExit', stopContainers);
+}
+process.on('SIGINT', () => {
+  void exitHandler();
+});
+process.on('SIGTERM', () => {
+  void exitHandler();
+});
+process.on('beforeExit', () => {
+  void stopContainers();
+});

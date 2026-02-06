@@ -16,7 +16,7 @@
     "format": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:fix": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "check": "npm run lint && npm run format && npm run typecheck",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit --project tsconfig.build.json",
     "lambda:build": "esbuild src/lambda/index.ts --bundle --platform=node --outfile=dist/lambda/bundle.js --format=esm"
   },
   "dependencies": {
