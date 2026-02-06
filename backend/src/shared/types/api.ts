@@ -3,8 +3,8 @@
  * Standardized API response format following RFC 7807 Problem Details
  */
 
-import crypto from 'crypto';
 import { ErrorCode, ERROR_STATUS_MAP } from '../../core/errors';
+export { ErrorCode };
 
 export interface ApiResponse<T = unknown> {
   success: boolean;

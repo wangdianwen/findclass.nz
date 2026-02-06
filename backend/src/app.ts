@@ -3,7 +3,8 @@
  * Main Express app configuration
  */
 
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express from 'express';
+import type { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -13,7 +14,7 @@ import { getConfig } from './config';
 import { logger, logStream } from './core/logger';
 import { AppError, ErrorCode } from './core/errors';
 import { createErrorResponse } from './shared/types/api';
-import { AuthenticatedRequest } from './shared/middleware/auth';
+import type { AuthenticatedRequest } from './shared/middleware/auth';
 
 // Import routes
 import { authRoutes } from './modules/auth/routes';

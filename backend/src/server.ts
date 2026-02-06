@@ -119,24 +119,25 @@ async function startServer(): Promise<void> {
       logger.info('  GET  /api/v1/courses/:id');
 
       // Initial health check
-      performHealthCheck().then(health => {
+      void performHealthCheck().then(health => {
         logger.info('Initial health check', { status: health.status, services: health.services });
       });
     });
 
     // Periodic health check every 60 seconds
-    setInterval(async () => {
-      const health = await performHealthCheck();
-      if (health.status === 'unhealthy') {
-        logger.error('Health check failed', { services: health.services });
-      } else if (health.status === 'degraded') {
-        logger.warn('Health check degraded', { services: health.services });
-      }
+    setInterval(() => {
+      void performHealthCheck().then(health => {
+        if (health.status === 'unhealthy') {
+          logger.error('Health check failed', { services: health.services });
+        } else if (health.status === 'degraded') {
+          logger.warn('Health check degraded', { services: health.services });
+        }
+      });
     }, 60000);
 
     let isShuttingDown = false;
 
-    const shutdown = async (signal: string) => {
+    const shutdown = (signal: string) => {
       if (isShuttingDown) {
         return;
       }
@@ -144,7 +145,7 @@ async function startServer(): Promise<void> {
 
       logger.info(`Received ${signal}, shutting down gracefully...`);
 
-      server.close(async () => {
+      server.close(() => {
         logger.info('HTTP server closed');
         logger.info('Shutdown complete');
         process.exit(0);
@@ -156,12 +157,16 @@ async function startServer(): Promise<void> {
       }, 10000);
     };
 
-    process.on('SIGTERM', () => shutdown('SIGTERM'));
-    process.on('SIGINT', () => shutdown('SIGINT'));
+    process.on('SIGTERM', () => {
+      shutdown('SIGTERM');
+    });
+    process.on('SIGINT', () => {
+      shutdown('SIGINT');
+    });
   } catch (error) {
     logger.error('Failed to start server', { error });
     process.exit(1);
   }
 }
 
-startServer();
+void startServer();

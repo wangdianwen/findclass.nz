@@ -2,7 +2,7 @@
  * Courses Module - Controller
  */
 
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import {
   searchCourses,
   getCourseDetail,
@@ -10,7 +10,7 @@ import {
   getCourseTranslation,
 } from './courses.service';
 import { createSuccessResponse, createPaginatedResponse } from '@shared/types/api';
-import { SearchCoursesDto } from './courses.types';
+import type { SearchCoursesDto } from './courses.types';
 import { getRequestId, extractStringParam } from '@shared/utils/request';
 
 export const searchCoursesController = async (
@@ -144,7 +144,7 @@ export const toggleFavoriteController = async (
 ): Promise<void> => {
   try {
     const userId = req.user?.userId;
-    const { id } = req.params;
+    const id = req.params.id as string;
     if (!id || !userId) {
       res.status(400).json({
         error: {
@@ -159,7 +159,7 @@ export const toggleFavoriteController = async (
       return;
     }
 
-    const result = await toggleFavorite(userId as string, id as string);
+    const result = await toggleFavorite(userId, id);
 
     res.json(
       createSuccessResponse(

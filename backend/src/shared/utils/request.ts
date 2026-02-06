@@ -3,7 +3,7 @@
  * Helper functions for Express requests
  */
 
-import { Request } from 'express';
+import type { Request } from 'express';
 
 export function getRequestId(req: Request): string {
   return (req.headers['x-request-id'] as string) || '';

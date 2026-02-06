@@ -110,7 +110,7 @@ async function withRetry<T>(fn: () => Promise<T>, operation: string, key: string
     },
   });
 }
-
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export async function getFromCache<T>(key: string, cacheType: CacheType): Promise<T | null> {
   const client = getDocClient();
   const { PK, SK } = createSystemKey('CACHE', cacheType, key);
@@ -157,6 +157,7 @@ export async function getFromCache<T>(key: string, cacheType: CacheType): Promis
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export async function setCache<T>(
   key: string,
   cacheType: CacheType,
@@ -178,13 +179,10 @@ export async function setCache<T>(
             Item: {
               PK,
               SK,
-              entityType: 'SYSTEM_CACHE',
-              dataCategory: 'SYSTEM',
-              cacheType,
-              cacheKey: key,
-              cachedData: typeof value === 'string' ? value : JSON.stringify(value),
+              cachedData: JSON.stringify(value),
               expiresAt: now + ttl,
               createdAt: now,
+              __typename: 'SystemCache',
             },
           })
         ),
@@ -192,10 +190,7 @@ export async function setCache<T>(
       key
     );
   } catch (error) {
-    logger.warn('Cache set failed, continuing without cache', {
-      key,
-      error: (error as Error).message,
-    });
+    logger.error('Cache set failed', { key, error: (error as Error).message });
   }
 }
 

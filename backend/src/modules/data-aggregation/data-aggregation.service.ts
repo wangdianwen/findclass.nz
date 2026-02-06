@@ -3,14 +3,14 @@
  */
 
 import { logger } from '../../core/logger';
-import { FeedbackType } from './data-aggregation.types';
+import type { FeedbackType } from './data-aggregation.types';
 
 export async function aggregateDataFromSource(
   source: string
 ): Promise<{ count: number; success: boolean }> {
   logger.info('Aggregating data from source', { source });
   // Placeholder - implement data crawling
-  return { count: 0, success: true };
+  return Promise.resolve({ count: 0, success: true });
 }
 
 export async function assessDataQuality(dataId: string): Promise<{
@@ -23,13 +23,13 @@ export async function assessDataQuality(dataId: string): Promise<{
   logger.info('Assessing data quality', { dataId });
 
   // Placeholder - implement quality assessment
-  return {
+  return Promise.resolve({
     overallScore: 75,
     completeness: 80,
     accuracy: 70,
     freshness: 75,
     trustLevel: 'B',
-  };
+  });
 }
 
 export async function calculateTrustBadge(
@@ -44,7 +44,7 @@ export async function calculateTrustBadge(
   logger.info('Calculating trust badge', { entityType, entityId });
 
   // Placeholder - implement trust badge calculation
-  return {
+  return Promise.resolve({
     badgeType: 'HIGH_QUALITY',
     badgeLevel: 'B',
     score: 75,
@@ -52,7 +52,7 @@ export async function calculateTrustBadge(
       verificationDate: new Date().toISOString(),
       expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
     },
-  };
+  });
 }
 
 export async function desensitizeData(
@@ -76,7 +76,7 @@ export async function desensitizeData(
     desensitized.email = localPart.slice(0, 2) + '***@' + domain;
   }
 
-  return desensitized;
+  return Promise.resolve(desensitized);
 }
 
 export async function submitFeedback(
@@ -86,8 +86,8 @@ export async function submitFeedback(
   logger.info('Submitting feedback', { userId, data });
 
   // Placeholder - implement feedback submission
-  return {
+  return Promise.resolve({
     feedbackId: `fb_${Date.now()}`,
     status: 'SUBMITTED',
-  };
+  });
 }

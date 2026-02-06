@@ -5,10 +5,11 @@
 
 import crypto from 'crypto';
 import { logger } from '@core/logger';
-import { Course, Teacher } from '@shared/types';
+import type { Course, Teacher } from '@shared/types';
 import { queryItems, getItem, createEntityKey, batchGetItems } from '@shared/db/dynamodb';
 import { getFromCache, setCache, CacheKeys } from '@shared/db/cache';
-import { CourseSearchResult, SearchCoursesDto, SortBy } from './courses.types';
+import type { CourseSearchResult, SearchCoursesDto } from './courses.types';
+import { SortBy } from './courses.types';
 
 const CACHE_TTL = 300; // 5 minutes
 
@@ -286,7 +287,7 @@ export async function toggleFavorite(
 ): Promise<{ favorited: boolean }> {
   // Placeholder - implement favorite toggle
   logger.info('Toggling favorite', { userId, courseId });
-  return { favorited: true };
+  return Promise.resolve({ favorited: true });
 }
 
 export async function getCourseTranslation(

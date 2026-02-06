@@ -12,8 +12,8 @@ import {
   ListTablesCommand,
   CreateTableCommand,
   UpdateTimeToLiveCommand,
-  KeySchemaElement,
-  AttributeDefinition,
+  type KeySchemaElement,
+  type AttributeDefinition,
 } from '@aws-sdk/client-dynamodb';
 import {
   DynamoDBDocumentClient,
@@ -232,6 +232,7 @@ export async function deleteItem(
   logger.debug('DeleteItem', { tableName, key });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export async function queryItems<T>(params: {
   tableName?: string;
   indexName?: string;
@@ -273,6 +274,7 @@ export async function queryItems<T>(params: {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export async function scanItems<T>(params: {
   tableName?: string;
   filterExpression?: string;

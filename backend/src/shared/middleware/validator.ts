@@ -5,11 +5,13 @@
 
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { logger } from '../../core/logger';
 import { ValidationError } from '../../core/errors';
 import { createErrorResponse } from '../types/api';
 
+// Generic needed for runtime type transformation
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export function validateRequest<T extends object>(DtoClass: new () => T) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {

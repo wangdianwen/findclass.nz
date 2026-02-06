@@ -3,7 +3,7 @@
  */
 
 import { logger } from '@core/logger';
-import { Teacher } from '@shared/types';
+import type { Teacher } from '@shared/types';
 import { getItem, createEntityKey, queryItems } from '@shared/db/dynamodb';
 import { AppError, ErrorCode } from '@core/errors';
 
@@ -68,10 +68,8 @@ export async function submitTeacherOnboarding(
 ): Promise<{ teacherId: string; status: string; estimatedReviewTime: string }> {
   logger.info('Teacher onboarding submitted', { userId, data });
 
-  throw new AppError(
-    'Teacher onboarding feature not yet implemented',
-    ErrorCode.INTERNAL_ERROR,
-    501
+  return Promise.reject(
+    new AppError('Teacher onboarding feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501)
   );
 }
 
@@ -86,9 +84,7 @@ export async function uploadQualification(
 ): Promise<{ qualificationId: string; status: string }> {
   logger.info('Qualification uploaded', { teacherId, data });
 
-  throw new AppError(
-    'Qualification upload feature not yet implemented',
-    ErrorCode.INTERNAL_ERROR,
-    501
+  return Promise.reject(
+    new AppError('Qualification upload feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501)
   );
 }

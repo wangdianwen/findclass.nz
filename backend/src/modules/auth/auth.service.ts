@@ -4,14 +4,15 @@
  */
 
 import bcrypt from 'bcryptjs';
-import jwt, { Secret } from 'jsonwebtoken';
+import jwt, { type Secret } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { getConfig } from '../../config';
 import { logger } from '@core/logger';
 import { createAppError, ErrorCode } from '@core/errors';
-import { User, UserStatus, UserRole } from '@shared/types';
+import type { User } from '@shared/types';
+import { UserStatus, UserRole } from '@shared/types';
 import {
   getItem,
   createEntityKey,
@@ -29,12 +30,10 @@ import {
   CacheKeys,
 } from '@shared/db/cache';
 import { addTokenToBlacklist, isTokenBlacklisted } from '@shared/middleware/auth';
-import {
+import type {
   AuthResponse,
   RegisterDto,
   LoginDto,
-  AuthType,
-  RoleApplicationStatus,
   UserRoleInfo,
   RoleApplicationResponse,
   UserRolesResponse,
@@ -42,6 +41,7 @@ import {
   RoleApplicationHistory,
   RoleApplicationDetailResponse,
 } from './auth.types';
+import { AuthType, RoleApplicationStatus } from './auth.types';
 import {
   generateToken as generateAccessToken,
   generateRefreshToken,
@@ -240,7 +240,7 @@ export async function verifyToken(token: string): Promise<User | null> {
     }) as {
       userId: string;
     };
-    return getUserById(decoded.userId);
+    return await getUserById(decoded.userId);
   } catch {
     return null;
   }

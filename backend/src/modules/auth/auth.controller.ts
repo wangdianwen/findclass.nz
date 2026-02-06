@@ -3,7 +3,7 @@
  * HTTP request handlers for authentication
  */
 
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import {
   register,
   login,
@@ -27,7 +27,7 @@ import {
 import { createSuccessResponse } from '@shared/types/api';
 import { logger } from '@core/logger';
 import { createAppError, ErrorCode } from '@core/errors';
-import {
+import type {
   SendVerificationCodeDto,
   VerifyCodeDto,
   RefreshTokenDto,

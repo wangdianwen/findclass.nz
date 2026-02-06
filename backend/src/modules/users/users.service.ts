@@ -4,16 +4,15 @@
  */
 
 import { logger } from '@core/logger';
-import {
+import type {
   User,
   Child,
   LearningRecord,
   LearningProgress,
   LearningStatistics,
   LearningReport,
-  LearningRecordType,
-  ProgressStatus,
 } from '@shared/types';
+import { LearningRecordType, ProgressStatus } from '@shared/types';
 import { getItem, putItem, queryItems, createEntityKey } from '@shared/db/dynamodb';
 import { AppError, ErrorCode } from '@core/errors';
 import { v4 as uuidv4 } from 'uuid';
@@ -75,17 +74,23 @@ export async function addChild(
   }
 ): Promise<Child> {
   logger.info('Adding child', { userId, data });
-  throw new AppError('Child management feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501);
+  return Promise.reject(
+    new AppError('Child management feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501)
+  );
 }
 
 export async function recordParentalConsent(userId: string, childId: string): Promise<void> {
   logger.info('Recording parental consent', { userId, childId });
-  throw new AppError('Parental consent feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501);
+  return Promise.reject(
+    new AppError('Parental consent feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501)
+  );
 }
 
 export async function getFavorites(userId: string): Promise<unknown[]> {
   logger.info('Getting favorites', { userId });
-  throw new AppError('Favorites feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501);
+  return Promise.reject(
+    new AppError('Favorites feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501)
+  );
 }
 
 export async function recordLearning(
@@ -238,7 +243,7 @@ export async function getLearningStatistics(userId: string): Promise<LearningSta
   for (let i = 6; i >= 0; i--) {
     const date = new Date();
     date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0] as string;
+    const dateStr = date.toISOString().split('T')[0];
 
     const dayRecords = records.filter(r => r.createdAt.startsWith(dateStr));
     weeklyData.push({

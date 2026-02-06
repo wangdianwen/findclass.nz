@@ -2,7 +2,7 @@
  * Data Aggregation Module - Controller
  */
 
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import {
   aggregateDataFromSource,
   assessDataQuality,

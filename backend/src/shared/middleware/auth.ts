@@ -3,8 +3,8 @@
  * JWT-based authentication for protected routes
  */
 
-import { Request, Response, NextFunction } from 'express';
-import jwt, { SignOptions } from 'jsonwebtoken';
+import type { Request, Response, NextFunction } from 'express';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { getConfig } from '../../config';
 import { logger } from '../../core/logger';
@@ -77,8 +77,9 @@ export async function isTokenBlacklisted(jti: string): Promise<boolean> {
 /**
  * Revoke all tokens for a user
  */
-export async function revokeAllUserTokens(_userId: string): Promise<void> {
+export function revokeAllUserTokens(_userId: string): Promise<void> {
   logger.warn('All user tokens revoked - implement with user-specific token storage if needed');
+  return Promise.resolve();
 }
 
 /**
