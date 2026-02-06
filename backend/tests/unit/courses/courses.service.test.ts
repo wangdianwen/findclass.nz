@@ -2,11 +2,39 @@
  * Courses Service Unit Tests
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { queryItems, getItem, createEntityKey, batchGetItems } from '@src/shared/db/dynamodb';
 
 import { getFromCache, setCache } from '@src/shared/db/cache';
+
+vi.mock('@src/shared/db/dynamodb', () => ({
+  queryItems: vi.fn(),
+  getItem: vi.fn(),
+  createEntityKey: vi.fn(),
+  batchGetItems: vi.fn(),
+}));
+
+vi.mock('@src/shared/db/cache', () => ({
+  getFromCache: vi.fn(),
+  setCache: vi.fn(),
+  CacheKeys: {
+    search: vi.fn(),
+    facet: vi.fn(),
+    course: vi.fn(),
+    teacher: vi.fn(),
+    user: vi.fn(),
+    translation: vi.fn(),
+    csrf: vi.fn(),
+    captcha: vi.fn(),
+    verify: vi.fn(),
+    rateLimitEmail: vi.fn(),
+    rateLimitIP: vi.fn(),
+    rateLimitToken: vi.fn(),
+    session: vi.fn(),
+    roleApplication: vi.fn(),
+  },
+}));
 
 import {
   searchCourses,
@@ -27,7 +55,6 @@ import {
   CourseSourceType,
   CourseStatus,
 } from '@src/shared/types';
-import { resetLoggerMocks } from '../mocks/logger.mock';
 
 const mockTeacher: Teacher = {
   PK: 'TEACHER#t123',
@@ -83,7 +110,6 @@ const mockCourse: Course = {
 describe('CoursesService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    resetLoggerMocks();
   });
 
   afterEach(() => {
@@ -103,7 +129,7 @@ describe('CoursesService', () => {
           hasPrevPage: false,
         },
       };
-      (getFromCache as Mock).mockResolvedValue(cachedResult);
+      vi.mocked(getFromCache).mockResolvedValue(cachedResult);
 
       const result = await searchCourses({ keyword: 'math' });
 
@@ -112,10 +138,10 @@ describe('CoursesService', () => {
     });
 
     it('should search courses with no filters', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
-      (queryItems as Mock).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      (batchGetItems as Mock).mockResolvedValue([mockTeacher]);
+      vi.mocked(getFromCache).mockResolvedValue(null);
+      vi.mocked(queryItems).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
+      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
 
       const result = await searchCourses({});
 
@@ -125,10 +151,10 @@ describe('CoursesService', () => {
     });
 
     it('should filter courses by category', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
-      (queryItems as Mock).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      (batchGetItems as Mock).mockResolvedValue([mockTeacher]);
+      vi.mocked(getFromCache).mockResolvedValue(null);
+      vi.mocked(queryItems).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
+      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
 
       const result = await searchCourses({ category: CourseCategory.MATH });
 
@@ -137,10 +163,10 @@ describe('CoursesService', () => {
     });
 
     it('should filter courses by price range', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
-      (queryItems as Mock).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      (batchGetItems as Mock).mockResolvedValue([mockTeacher]);
+      vi.mocked(getFromCache).mockResolvedValue(null);
+      vi.mocked(queryItems).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
+      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
 
       const result = await searchCourses({ priceMin: 50, priceMax: 150 });
 
@@ -149,19 +175,19 @@ describe('CoursesService', () => {
     });
 
     it('should sort courses by newest', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
+      vi.mocked(getFromCache).mockResolvedValue(null);
       const olderCourse = { ...mockCourse, createdAt: new Date('2024-01-01').toISOString() };
       const newerCourse = {
         ...mockCourse,
         id: 'c456',
         createdAt: new Date('2024-06-01').toISOString(),
       };
-      (queryItems as Mock).mockResolvedValue({
+      vi.mocked(queryItems).mockResolvedValue({
         items: [olderCourse, newerCourse],
         lastKey: undefined,
       });
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      (batchGetItems as Mock).mockResolvedValue([mockTeacher]);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
+      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
 
       const result = await searchCourses({ sortBy: SortBy.NEWEST });
 
@@ -169,15 +195,15 @@ describe('CoursesService', () => {
     });
 
     it('should sort courses by price ascending', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
+      vi.mocked(getFromCache).mockResolvedValue(null);
       const expensiveCourse = { ...mockCourse, id: 'c1', price: 200 };
       const cheapCourse = { ...mockCourse, id: 'c2', price: 50 };
-      (queryItems as Mock).mockResolvedValue({
+      vi.mocked(queryItems).mockResolvedValue({
         items: [expensiveCourse, cheapCourse],
         lastKey: undefined,
       });
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      (batchGetItems as Mock).mockResolvedValue([mockTeacher]);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
+      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
 
       const result = await searchCourses({ sortBy: SortBy.PRICE_ASC });
 
@@ -186,15 +212,15 @@ describe('CoursesService', () => {
     });
 
     it('should sort courses by rating', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
+      vi.mocked(getFromCache).mockResolvedValue(null);
       const lowRated = { ...mockCourse, id: 'c1', averageRating: 3 };
       const highRated = { ...mockCourse, id: 'c2', averageRating: 5 };
-      (queryItems as Mock).mockResolvedValue({
+      vi.mocked(queryItems).mockResolvedValue({
         items: [lowRated, highRated],
         lastKey: undefined,
       });
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      (batchGetItems as Mock).mockResolvedValue([mockTeacher]);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
+      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
 
       const result = await searchCourses({ sortBy: SortBy.RATING });
 
@@ -202,11 +228,11 @@ describe('CoursesService', () => {
     });
 
     it('should paginate results correctly', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
+      vi.mocked(getFromCache).mockResolvedValue(null);
       const courses = Array.from({ length: 25 }, (_, i) => ({ ...mockCourse, id: `c${i}` }));
-      (queryItems as Mock).mockResolvedValue({ items: courses, lastKey: undefined });
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      (batchGetItems as Mock).mockResolvedValue([mockTeacher]);
+      vi.mocked(queryItems).mockResolvedValue({ items: courses, lastKey: undefined });
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
+      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
 
       const result = await searchCourses({ page: 1, limit: 10 });
 
@@ -218,8 +244,8 @@ describe('CoursesService', () => {
     });
 
     it('should handle empty results', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
-      (queryItems as Mock).mockResolvedValue({ items: [], lastKey: undefined });
+      vi.mocked(getFromCache).mockResolvedValue(null);
+      vi.mocked(queryItems).mockResolvedValue({ items: [], lastKey: undefined });
 
       const result = await searchCourses({ keyword: 'nonexistent' });
 
@@ -229,11 +255,11 @@ describe('CoursesService', () => {
     });
 
     it('should cache search results', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
-      (queryItems as Mock).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      (batchGetItems as Mock).mockResolvedValue([mockTeacher]);
-      (setCache as Mock).mockResolvedValue(undefined);
+      vi.mocked(getFromCache).mockResolvedValue(null);
+      vi.mocked(queryItems).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
+      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
+      vi.mocked(setCache).mockResolvedValue(undefined);
 
       await searchCourses({ keyword: 'math' });
 
@@ -243,7 +269,8 @@ describe('CoursesService', () => {
 
   describe('getCourseById', () => {
     it('should return course when found', async () => {
-      (getItem as Mock).mockResolvedValue(mockCourse);
+      vi.mocked(getItem).mockResolvedValue(mockCourse);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#c123', SK: 'METADATA' });
 
       const result = await getCourseById('c123');
 
@@ -252,7 +279,8 @@ describe('CoursesService', () => {
     });
 
     it('should return null when course not found', async () => {
-      (getItem as Mock).mockResolvedValue(null);
+      vi.mocked(getItem).mockResolvedValue(null);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#nonexistent', SK: 'METADATA' });
 
       const result = await getCourseById('nonexistent');
 
@@ -262,7 +290,8 @@ describe('CoursesService', () => {
 
   describe('getTeacherById', () => {
     it('should return teacher when found', async () => {
-      (getItem as Mock).mockResolvedValue(mockTeacher);
+      vi.mocked(getItem).mockResolvedValue(mockTeacher);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
 
       const result = await getTeacherById('t123');
 
@@ -270,7 +299,8 @@ describe('CoursesService', () => {
     });
 
     it('should return null when teacher not found', async () => {
-      (getItem as Mock).mockResolvedValue(null);
+      vi.mocked(getItem).mockResolvedValue(null);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#nonexistent', SK: 'METADATA' });
 
       const result = await getTeacherById('nonexistent');
 
@@ -280,7 +310,8 @@ describe('CoursesService', () => {
 
   describe('getCourseDetail', () => {
     it('should return null when course not found', async () => {
-      (getItem as Mock).mockResolvedValue(null);
+      vi.mocked(getItem).mockResolvedValue(null);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#nonexistent', SK: 'METADATA' });
 
       const result = await getCourseDetail('nonexistent');
 
@@ -288,7 +319,10 @@ describe('CoursesService', () => {
     });
 
     it('should return course detail with teacher', async () => {
-      (getItem as Mock).mockResolvedValueOnce(mockCourse).mockResolvedValueOnce(mockTeacher);
+      vi.mocked(getItem).mockResolvedValueOnce(mockCourse).mockResolvedValueOnce(mockTeacher);
+      vi.mocked(createEntityKey)
+        .mockReturnValueOnce({ PK: 'COURSE#c123', SK: 'METADATA' })
+        .mockReturnValueOnce({ PK: 'TEACHER#t123', SK: 'METADATA' });
 
       const result = await getCourseDetail('c123');
 
@@ -313,7 +347,7 @@ describe('CoursesService', () => {
         description: '完整的高中数学课程',
         translatedAt: new Date().toISOString(),
       };
-      (getFromCache as Mock).mockResolvedValue(cachedTranslation);
+      vi.mocked(getFromCache).mockResolvedValue(cachedTranslation);
 
       const result = await getCourseTranslation('c123', 'zh');
 
@@ -321,8 +355,9 @@ describe('CoursesService', () => {
     });
 
     it('should return English translation when target is en', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
-      (getItem as Mock).mockResolvedValue(mockCourse);
+      vi.mocked(getFromCache).mockResolvedValue(null);
+      vi.mocked(getItem).mockResolvedValue(mockCourse);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#c123', SK: 'METADATA' });
 
       const result = await getCourseTranslation('c123', 'en');
 
@@ -331,8 +366,9 @@ describe('CoursesService', () => {
     });
 
     it('should return null when course not found', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
-      (getItem as Mock).mockResolvedValue(null);
+      vi.mocked(getFromCache).mockResolvedValue(null);
+      vi.mocked(getItem).mockResolvedValue(null);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#nonexistent', SK: 'METADATA' });
 
       const result = await getCourseTranslation('nonexistent', 'zh');
 
@@ -340,9 +376,10 @@ describe('CoursesService', () => {
     });
 
     it('should cache translation', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
-      (getItem as Mock).mockResolvedValue(mockCourse);
-      (setCache as Mock).mockResolvedValue(undefined);
+      vi.mocked(getFromCache).mockResolvedValue(null);
+      vi.mocked(getItem).mockResolvedValue(mockCourse);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#c123', SK: 'METADATA' });
+      vi.mocked(setCache).mockResolvedValue(undefined);
 
       await getCourseTranslation('c123', 'zh');
 

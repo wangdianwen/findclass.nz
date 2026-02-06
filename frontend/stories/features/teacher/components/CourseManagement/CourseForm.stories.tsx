@@ -69,11 +69,9 @@ export const CreateNew: Story = {
   args: {
     course: null,
     onSubmit: values => {
-      // eslint-disable-next-line no-console
       console.log('Submit:', values);
     },
     onCancel: () => {
-      // eslint-disable-next-line no-console
       console.log('Cancel');
     },
     loading: false,
@@ -85,11 +83,9 @@ export const EditCourse: Story = {
   args: {
     course: defaultCourse,
     onSubmit: values => {
-      // eslint-disable-next-line no-console
       console.log('Submit:', values);
     },
     onCancel: () => {
-      // eslint-disable-next-line no-console
       console.log('Cancel');
     },
     loading: false,
@@ -101,11 +97,9 @@ export const EditWithAddressHidden: Story = {
   args: {
     course: { ...defaultCourse, showAddress: false },
     onSubmit: values => {
-      // eslint-disable-next-line no-console
       console.log('Submit:', values);
     },
     onCancel: () => {
-      // eslint-disable-next-line no-console
       console.log('Cancel');
     },
     loading: false,
@@ -124,11 +118,9 @@ export const WithDraftCourse: Story = {
       showAddress: false,
     },
     onSubmit: values => {
-      // eslint-disable-next-line no-console
       console.log('Submit:', values);
     },
     onCancel: () => {
-      // eslint-disable-next-line no-console
       console.log('Cancel');
     },
     loading: false,
@@ -140,11 +132,9 @@ export const Loading: Story = {
   args: {
     course: null,
     onSubmit: values => {
-      // eslint-disable-next-line no-console
       console.log('Submit:', values);
     },
     onCancel: () => {
-      // eslint-disable-next-line no-console
       console.log('Cancel');
     },
     loading: true,

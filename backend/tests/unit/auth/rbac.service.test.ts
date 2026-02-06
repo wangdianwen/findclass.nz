@@ -48,8 +48,6 @@ import { getItem, queryItems, scanItems } from '@src/shared/db/dynamodb';
 
 import { setCache, CacheKeys } from '@src/shared/db/cache';
 
-import { resetLoggerMocks } from '../mocks/logger.mock';
-
 import {
   getUserRoles,
   applyForRole,
@@ -76,7 +74,6 @@ import {
 describe('RBAC Service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    resetLoggerMocks();
   });
 
   afterEach(() => {
@@ -467,7 +464,6 @@ function createParentUser(overrides: Partial<ReturnType<typeof createMockUser>> 
 describe('Role Application History', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    resetLoggerMocks();
   });
 
   afterEach(() => {

@@ -3,7 +3,7 @@
  * Unified handler for all Lambda functions
  */
 
-import {
+import type {
   APIGatewayProxyHandler,
   APIGatewayProxyResult,
   Context,
@@ -33,15 +33,23 @@ export function createLambdaHandler(): APIGatewayProxyHandler {
 
       // Create mock request/response objects
       const requestId =
-        event.headers?.['x-request-id'] || event.requestContext?.requestId || `req_${Date.now()}`;
+        event.headers?.['x-request-id'] ?? event.requestContext.requestId ?? `req_${Date.now()}`;
 
-      const mockReq = {
+      const mockReq: {
+        method: string;
+        path: string;
+        query: Record<string, string>;
+        body: Record<string, unknown>;
+        headers: Record<string, string>;
+        get: (header: string) => string;
+        requestContext: APIGatewayProxyEvent['requestContext'];
+      } = {
         method: event.httpMethod,
         path: event.path,
-        query: event.queryStringParameters || {},
+        query: (event.queryStringParameters as Record<string, string>) ?? {},
         body: event.body ? JSON.parse(event.body) : {},
-        headers: event.headers || {},
-        get: (header: string) => event.headers?.[header],
+        headers: (event.headers ?? {}) as Record<string, string>,
+        get: (header: string) => event.headers?.[header] ?? '',
         requestContext: event.requestContext,
       };
 
@@ -102,7 +110,7 @@ export function createLambdaHandler(): APIGatewayProxyHandler {
             500,
             'Internal server error',
             undefined,
-            event.headers?.['x-request-id']
+            event.headers?.['x-request-id'] || ''
           )
         ),
       };

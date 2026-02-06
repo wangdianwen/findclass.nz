@@ -45,7 +45,7 @@ export async function retry<T>(fn: () => Promise<T>, maxRetries = 3, baseDelay =
     }
   }
 
-  throw lastError;
+  throw lastError ?? new Error('Retry failed');
 }
 
 /**

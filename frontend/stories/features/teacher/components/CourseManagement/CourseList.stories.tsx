@@ -146,27 +146,21 @@ export const Default: Story = {
   args: {
     courses: mockCourses,
     onCreateCourse: () => {
-      // eslint-disable-next-line no-console
       console.log('Create course');
     },
     onEditCourse: course => {
-      // eslint-disable-next-line no-console
       console.log('Edit:', course);
     },
     onPreviewCourse: course => {
-      // eslint-disable-next-line no-console
       console.log('Preview:', course);
     },
     onPublishCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Publish:', courseId);
     },
     onPauseCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Pause:', courseId);
     },
     onDeleteCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Delete:', courseId);
     },
   },
@@ -177,27 +171,21 @@ export const Empty: Story = {
   args: {
     courses: [],
     onCreateCourse: () => {
-      // eslint-disable-next-line no-console
       console.log('Create course');
     },
     onEditCourse: course => {
-      // eslint-disable-next-line no-console
       console.log('Edit:', course);
     },
     onPreviewCourse: course => {
-      // eslint-disable-next-line no-console
       console.log('Preview:', course);
     },
     onPublishCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Publish:', courseId);
     },
     onPauseCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Pause:', courseId);
     },
     onDeleteCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Delete:', courseId);
     },
   },
@@ -208,27 +196,21 @@ export const OnlyPublished: Story = {
   args: {
     courses: mockCourses.filter(c => c.status === 'published'),
     onCreateCourse: () => {
-      // eslint-disable-next-line no-console
       console.log('Create course');
     },
     onEditCourse: course => {
-      // eslint-disable-next-line no-console
       console.log('Edit:', course);
     },
     onPreviewCourse: course => {
-      // eslint-disable-next-line no-console
       console.log('Preview:', course);
     },
     onPublishCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Publish:', courseId);
     },
     onPauseCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Pause:', courseId);
     },
     onDeleteCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Delete:', courseId);
     },
   },
@@ -239,27 +221,21 @@ export const OnlyDrafts: Story = {
   args: {
     courses: mockCourses.filter(c => c.status === 'draft'),
     onCreateCourse: () => {
-      // eslint-disable-next-line no-console
       console.log('Create course');
     },
     onEditCourse: course => {
-      // eslint-disable-next-line no-console
       console.log('Edit:', course);
     },
     onPreviewCourse: course => {
-      // eslint-disable-next-line no-console
       console.log('Preview:', course);
     },
     onPublishCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Publish:', courseId);
     },
     onPauseCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Pause:', courseId);
     },
     onDeleteCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Delete:', courseId);
     },
   },
@@ -270,27 +246,21 @@ export const OnlyPaused: Story = {
   args: {
     courses: mockCourses.filter(c => c.status === 'paused'),
     onCreateCourse: () => {
-      // eslint-disable-next-line no-console
       console.log('Create course');
     },
     onEditCourse: course => {
-      // eslint-disable-next-line no-console
       console.log('Edit:', course);
     },
     onPreviewCourse: course => {
-      // eslint-disable-next-line no-console
       console.log('Preview:', course);
     },
     onPublishCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Publish:', courseId);
     },
     onPauseCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Pause:', courseId);
     },
     onDeleteCourse: courseId => {
-      // eslint-disable-next-line no-console
       console.log('Delete:', courseId);
     },
   },

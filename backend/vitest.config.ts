@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const backendSrc = path.resolve(__dirname, 'src');
 
 export default defineConfig({
   test: {
@@ -25,47 +24,16 @@ export default defineConfig({
       },
       reportsDirectory: 'coverage',
     },
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
-    projects: [
-      {
-        test: {
-          include: ['tests/unit/**/*.test.ts'],
-          setupFiles: ['tests/unit/setup.unit.ts'],
-        },
-        resolve: {
-          alias: {
-            '@src/': backendSrc,
-            '@core/': path.join(backendSrc, 'core'),
-            '@shared/': path.join(backendSrc, 'shared'),
-            '@modules/': path.join(backendSrc, 'modules'),
-            '@lambda/': path.join(backendSrc, 'lambda'),
-            '@config/': path.join(backendSrc, 'config'),
-          },
-        },
-        plugins: [tsconfigPaths()],
-      },
-      {
-        test: {
-          include: ['tests/integration/**/*.test.ts'],
-          setupFiles: ['tests/integration/setup.integration.ts'],
-        },
-        resolve: {
-          alias: {
-            '@src/': backendSrc,
-            '@core/': path.join(backendSrc, 'core'),
-            '@shared/': path.join(backendSrc, 'shared'),
-            '@modules/': path.join(backendSrc, 'modules'),
-            '@lambda/': path.join(backendSrc, 'lambda'),
-            '@config/': path.join(backendSrc, 'config'),
-          },
-        },
-        plugins: [tsconfigPaths()],
-      },
-    ],
   },
+  resolve: {
+    alias: {
+      '@src': path.resolve(__dirname, 'src'),
+      '@core': path.resolve(__dirname, 'src/core'),
+      '@shared': path.resolve(__dirname, 'src/shared'),
+      '@modules': path.resolve(__dirname, 'src/modules'),
+      '@lambda': path.resolve(__dirname, 'src/lambda'),
+      '@config': path.resolve(__dirname, 'src/config'),
+    },
+  },
+  plugins: [tsconfigPaths()],
 });

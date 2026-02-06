@@ -187,6 +187,7 @@ export interface LoggingConfig {
 export function validateEnv(): RawEnv {
   const result = envSchema.safeParse(process.env);
   if (!result.success) {
+    // eslint-disable-next-line no-console
     console.error('❌ Environment validation failed:', result.error.format());
     process.exit(1);
   }

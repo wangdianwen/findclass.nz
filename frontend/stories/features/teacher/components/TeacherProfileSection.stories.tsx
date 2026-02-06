@@ -43,7 +43,6 @@ export const ViewMode: Story = {
         <TeacherProfileSection
           teacher={teacherData}
           onSave={data => {
-            // eslint-disable-next-line no-console
             console.log('Save profile:', data);
             setTeacherData(prev => ({ ...prev, ...data }));
           }}
@@ -62,7 +61,6 @@ export const EditMode: Story = {
         <TeacherProfileSection
           teacher={teacherData}
           onSave={data => {
-            // eslint-disable-next-line no-console
             console.log('Save profile:', data);
             setTeacherData(prev => ({ ...prev, ...data }));
           }}
@@ -84,7 +82,6 @@ export const EmptyBio: Story = {
         <TeacherProfileSection
           teacher={teacherData}
           onSave={data => {
-            // eslint-disable-next-line no-console
             console.log('Save profile:', data);
             setTeacherData(prev => ({ ...prev, ...data }));
           }}
@@ -106,7 +103,6 @@ export const MultipleSubjects: Story = {
         <TeacherProfileSection
           teacher={teacherData}
           onSave={data => {
-            // eslint-disable-next-line no-console
             console.log('Save profile:', data);
             setTeacherData(prev => ({ ...prev, ...data }));
           }}

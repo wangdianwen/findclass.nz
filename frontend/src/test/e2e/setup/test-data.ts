@@ -4,8 +4,7 @@
  * Utilities for generating and managing test data for E2E tests.
  */
 
-import type { CourseData } from '../../data/courseData';
-import type { Review } from '../../types/review';
+import type { CourseData } from '../../../data/courseData';
 
 // Extended course data for pagination testing (courses 16-30)
 export const PAGINATION_TEST_COURSES: CourseData[] = [

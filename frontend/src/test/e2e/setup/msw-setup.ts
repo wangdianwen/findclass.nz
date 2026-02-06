@@ -17,13 +17,13 @@ export { test, expect };
 /**
  * Helper to set localStorage for authenticated user state
  */
-export async function setAuthState(page: Parameters<typeof page>[0], userData: {
+export async function setAuthState(page: any, userData: {
   id: string;
   name: string;
   email: string;
   token?: string;
 }) {
-  await page.addInitScript((data) => {
+  await page.addInitScript((data: any) => {
     localStorage.setItem('auth_token', data.token || 'test-token');
     localStorage.setItem('user', JSON.stringify(data));
   }, userData);
@@ -32,7 +32,7 @@ export async function setAuthState(page: Parameters<typeof page>[0], userData: {
 /**
  * Helper to clear auth state
  */
-export async function clearAuthState(page: Parameters<typeof page>[0]) {
+export async function clearAuthState(page: any) {
   await page.addInitScript(() => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
@@ -65,11 +65,11 @@ export const USER_STATES = {
  * Helper to intercept and modify API responses for error testing
  */
 export async function interceptWithError(
-  page: Parameters<typeof page>[0],
+  page: any,
   urlPattern: string,
   errorResponse: { status: number; body: Record<string, unknown> }
 ) {
-  await page.route(urlPattern, route => {
+  await page.route(urlPattern, (route: any) => {
     route.fulfill({
       status: errorResponse.status,
       body: JSON.stringify(errorResponse.body),

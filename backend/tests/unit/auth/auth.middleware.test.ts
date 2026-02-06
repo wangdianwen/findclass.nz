@@ -2,7 +2,7 @@
  * Auth Middleware Unit Tests
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Request, Response, NextFunction } from 'express';
 
 vi.mock('jsonwebtoken', () => ({
@@ -16,6 +16,27 @@ vi.mock('jsonwebtoken', () => ({
 
 vi.mock('@src/modules/auth/auth.service', () => ({
   getUserById: vi.fn(),
+}));
+
+vi.mock('@src/shared/db/cache', () => ({
+  getFromCache: vi.fn(),
+  setCache: vi.fn(),
+  CacheKeys: {
+    search: vi.fn((query: string) => `search:${query}`),
+    facet: vi.fn((query: string) => `facet:${query}`),
+    course: vi.fn((id: string) => `course:${id}`),
+    teacher: vi.fn((id: string) => `teacher:${id}`),
+    user: vi.fn((id: string) => `user:${id}`),
+    translation: vi.fn((text: string, targetLang: string) => `trans:${targetLang}:${text}`),
+    csrf: vi.fn((sessionId: string) => `csrf:${sessionId}`),
+    captcha: vi.fn((sessionId: string) => `captcha:${sessionId}`),
+    verify: vi.fn((email: string, type: string) => `verify:${type}:${email}`),
+    rateLimitEmail: vi.fn((email: string) => `rate:email:${email}`),
+    rateLimitIP: vi.fn((ip: string) => `rate:ip:${ip}`),
+    rateLimitToken: vi.fn((token: string) => `rate:token:${token}`),
+    session: vi.fn((sessionId: string) => `session:${sessionId}`),
+    roleApplication: vi.fn((userId: string) => `roleapp:${userId}`),
+  },
 }));
 
 import { getUserById } from '@src/modules/auth/auth.service';
@@ -34,12 +55,10 @@ import {
   addTokenToBlacklist,
   isTokenBlacklisted,
 } from '@src/shared/middleware/auth';
-import { resetLoggerMocks } from '../mocks/logger.mock';
 
 describe('Auth Middleware', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    resetLoggerMocks();
   });
 
   afterEach(() => {
@@ -59,12 +78,12 @@ describe('Auth Middleware', () => {
 
       const next = vi.fn() as NextFunction;
 
-      (jwt.verify as Mock).mockReturnValue({
+      vi.mocked(jwt.verify).mockReturnValue({
         userId: 'usr_123',
         email: 'test@example.com',
         role: 'PARENT',
       });
-      (getFromCache as Mock).mockResolvedValue(null);
+      vi.mocked(getFromCache).mockResolvedValue(null);
 
       await authenticate(req, res, next);
 
@@ -103,7 +122,7 @@ describe('Auth Middleware', () => {
 
       const next = vi.fn() as NextFunction;
 
-      (jwt.verify as Mock).mockImplementation(() => {
+      vi.mocked(jwt.verify).mockImplementation(() => {
         const error = new Error('Token expired') as Error & { name: string };
         error.name = 'TokenExpiredError';
         throw error;
@@ -127,11 +146,11 @@ describe('Auth Middleware', () => {
 
       const next = vi.fn() as NextFunction;
 
-      (jwt.verify as Mock).mockReturnValue({
+      vi.mocked(jwt.verify).mockReturnValue({
         userId: 'usr_123',
         jti: 'test-jti',
       });
-      (getFromCache as Mock).mockResolvedValue('revoked');
+      vi.mocked(getFromCache).mockResolvedValue('revoked');
 
       await authenticate(req, res, next);
 
@@ -149,12 +168,12 @@ describe('Auth Middleware', () => {
       const res = {} as Response;
       const next = vi.fn() as NextFunction;
 
-      (jwt.verify as Mock).mockReturnValue({
+      vi.mocked(jwt.verify).mockReturnValue({
         userId: 'usr_123',
         email: 'test@example.com',
         role: 'PARENT',
       });
-      (getFromCache as Mock).mockResolvedValue(null);
+      vi.mocked(getFromCache).mockResolvedValue(null);
 
       await optionalAuth(req, res, next);
 
@@ -184,7 +203,7 @@ describe('Auth Middleware', () => {
       const res = {} as Response;
       const next = vi.fn() as NextFunction;
 
-      (jwt.verify as Mock).mockImplementation(() => {
+      vi.mocked(jwt.verify).mockImplementation(() => {
         throw new Error('Invalid token');
       });
 
@@ -257,7 +276,7 @@ describe('Auth Middleware', () => {
 
   describe('generateToken', () => {
     it('should generate a valid JWT token', () => {
-      (jwt.sign as Mock).mockReturnValue('generated-token');
+      vi.mocked(jwt.sign).mockReturnValue('generated-token');
 
       const token = generateToken({
         userId: 'usr_123',
@@ -284,7 +303,7 @@ describe('Auth Middleware', () => {
 
   describe('generateRefreshToken', () => {
     it('should generate a refresh token', () => {
-      (jwt.sign as Mock).mockReturnValue('refresh-token');
+      vi.mocked(jwt.sign).mockReturnValue('refresh-token');
 
       const token = generateRefreshToken('usr_123');
 
@@ -304,7 +323,7 @@ describe('Auth Middleware', () => {
 
   describe('verifyRefreshToken', () => {
     it('should return userId and jti for valid refresh token', () => {
-      (jwt.verify as Mock).mockReturnValue({
+      vi.mocked(jwt.verify).mockReturnValue({
         userId: 'usr_123',
         type: 'refresh',
         jti: 'test-jti',
@@ -316,7 +335,7 @@ describe('Auth Middleware', () => {
     });
 
     it('should throw error for access token', () => {
-      (jwt.verify as Mock).mockReturnValue({
+      vi.mocked(jwt.verify).mockReturnValue({
         userId: 'usr_123',
         type: 'access',
         jti: 'test-jti',
@@ -326,7 +345,7 @@ describe('Auth Middleware', () => {
     });
 
     it('should throw error for expired token', () => {
-      (jwt.verify as Mock).mockImplementation(() => {
+      vi.mocked(jwt.verify).mockImplementation(() => {
         const error = new Error('Token expired') as Error & { name: string };
         error.name = 'TokenExpiredError';
         throw error;
@@ -338,14 +357,14 @@ describe('Auth Middleware', () => {
 
   describe('rotateRefreshToken', () => {
     it('should generate new tokens and blacklist old one', async () => {
-      (jwt.verify as Mock).mockReturnValue({
+      vi.mocked(jwt.verify).mockReturnValue({
         userId: 'usr_123',
         type: 'refresh',
         jti: 'old-jti',
       });
-      (jwt.sign as Mock).mockReturnValue('new-token');
-      (setCache as Mock).mockResolvedValue(undefined);
-      (getUserById as Mock).mockResolvedValue({
+      vi.mocked(jwt.sign).mockReturnValue('new-token');
+      vi.mocked(setCache).mockResolvedValue(undefined);
+      vi.mocked(getUserById).mockResolvedValue({
         id: 'usr_123',
         email: 'user@example.com',
         role: 'PARENT',
@@ -364,7 +383,7 @@ describe('Auth Middleware', () => {
 
   describe('Token Blacklist', () => {
     it('should add token to blacklist', async () => {
-      (setCache as Mock).mockResolvedValue(undefined);
+      vi.mocked(setCache).mockResolvedValue(undefined);
 
       await addTokenToBlacklist('test-jti');
 
@@ -372,7 +391,7 @@ describe('Auth Middleware', () => {
     });
 
     it('should check if token is blacklisted', async () => {
-      (getFromCache as Mock).mockResolvedValue('revoked');
+      vi.mocked(getFromCache).mockResolvedValue('revoked');
 
       const isBlacklisted = await isTokenBlacklisted('test-jti');
 
@@ -380,7 +399,7 @@ describe('Auth Middleware', () => {
     });
 
     it('should return false for non-blacklisted token', async () => {
-      (getFromCache as Mock).mockResolvedValue(null);
+      vi.mocked(getFromCache).mockResolvedValue(null);
 
       const isBlacklisted = await isTokenBlacklisted('valid-jti');
 

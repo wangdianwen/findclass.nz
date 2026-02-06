@@ -15,6 +15,7 @@ const configDir = resolve(process.cwd(), 'src/config/env');
 // Load base configuration first (for all test types)
 const baseResult = config({ path: resolve(configDir, '.env.base') });
 if (baseResult.error) {
+  // eslint-disable-next-line no-console
   console.warn(`⚠️  Could not load base config: ${baseResult.error.message}`);
 }
 

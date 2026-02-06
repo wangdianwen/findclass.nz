@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { NodeEnv } from './env-schema';
 
-const env = (process.env.NODE_ENV as NodeEnv) || NodeEnv.Development;
+const env = (process.env.NODE_ENV ?? NodeEnv.Development) as NodeEnv;
 const configDir = path.resolve(__dirname, 'env');
 
 // 环境文件加载顺序（后者覆盖前者）
@@ -18,7 +18,8 @@ export function loadEnvFiles(): void {
       dotenv.config({ path: file.path, override: file.override });
     } catch (error) {
       // 忽略不存在的文件
-      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      if (error instanceof Error && (error as NodeJS.ErrnoException).code !== 'ENOENT') {
+        // eslint-disable-next-line no-console
         console.warn(`⚠️ Failed to load ${file.name} env file:`, error);
       }
     }

@@ -23,7 +23,9 @@ const devFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
     const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '';
-    return `${timestamp} [${level}]: ${message} ${metaStr}`;
+    const cleanMessage = String(message);
+    const cleanMeta = metaStr ? ` ${metaStr}` : '';
+    return `${timestamp} [${level}]: ${cleanMessage}${cleanMeta}`;
   })
 );
 
@@ -74,7 +76,7 @@ export const logStream = {
 
 // Helper functions for different log levels
 export const logInfo = (message: string, meta?: Record<string, unknown>) => {
-  logger.info(message, meta);
+  logger.info(message, meta as Record<string, unknown>);
 };
 
 export const logError = (message: string, error?: Error | unknown) => {
@@ -83,8 +85,11 @@ export const logError = (message: string, error?: Error | unknown) => {
       error: error.message,
       stack: error.stack,
     });
+  } else if (error !== undefined) {
+    const errorMessage = typeof error === 'string' ? error : JSON.stringify(error);
+    logger.error(message, { error: errorMessage });
   } else {
-    logger.error(message, error);
+    logger.error(message);
   }
 };
 

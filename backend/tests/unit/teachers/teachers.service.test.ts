@@ -2,9 +2,15 @@
  * Teachers Service Unit Tests
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getItem, queryItems, createEntityKey } from '@src/shared/db/dynamodb';
+
+vi.mock('@src/shared/db/dynamodb', () => ({
+  getItem: vi.fn(),
+  queryItems: vi.fn(),
+  createEntityKey: vi.fn(),
+}));
 
 import {
   getTeacherById,
@@ -13,7 +19,6 @@ import {
   uploadQualification,
 } from '@src/modules/teachers/teachers.service';
 import { Teacher, TrustLevel, VerificationStatus } from '@src/shared/types';
-import { resetLoggerMocks } from '../mocks/logger.mock';
 
 const mockTeacher: Teacher = {
   PK: 'TEACHER#t123',
@@ -39,7 +44,6 @@ const mockTeacher: Teacher = {
 describe('TeachersService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    resetLoggerMocks();
   });
 
   afterEach(() => {
@@ -48,8 +52,8 @@ describe('TeachersService', () => {
 
   describe('getTeacherById', () => {
     it('should return teacher when found', async () => {
-      (getItem as Mock).mockResolvedValue(mockTeacher);
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
+      vi.mocked(getItem).mockResolvedValue(mockTeacher);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
 
       const result = await getTeacherById('t123');
 
@@ -58,8 +62,8 @@ describe('TeachersService', () => {
     });
 
     it('should return null when teacher not found', async () => {
-      (getItem as Mock).mockResolvedValue(null);
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#nonexistent', SK: 'METADATA' });
+      vi.mocked(getItem).mockResolvedValue(null);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#nonexistent', SK: 'METADATA' });
 
       const result = await getTeacherById('nonexistent');
 
@@ -69,8 +73,8 @@ describe('TeachersService', () => {
 
   describe('getTeacherProfile', () => {
     it('should return null when teacher not found', async () => {
-      (getItem as Mock).mockResolvedValue(null);
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#nonexistent', SK: 'METADATA' });
+      vi.mocked(getItem).mockResolvedValue(null);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#nonexistent', SK: 'METADATA' });
 
       const result = await getTeacherProfile('nonexistent');
 
@@ -88,9 +92,9 @@ describe('TeachersService', () => {
         category: 'MATH',
       };
 
-      (getItem as Mock).mockResolvedValueOnce(mockTeacher);
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      (queryItems as Mock).mockResolvedValue({ items: [mockCourse] });
+      vi.mocked(getItem).mockResolvedValueOnce(mockTeacher);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
+      vi.mocked(queryItems).mockResolvedValue({ items: [mockCourse] });
 
       const result = (await getTeacherProfile('t123')) as {
         id: string;
@@ -111,9 +115,9 @@ describe('TeachersService', () => {
     });
 
     it('should handle teacher with no courses', async () => {
-      (getItem as Mock).mockResolvedValueOnce(mockTeacher);
-      (createEntityKey as Mock).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      (queryItems as Mock).mockResolvedValue({ items: [] });
+      vi.mocked(getItem).mockResolvedValueOnce(mockTeacher);
+      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
+      vi.mocked(queryItems).mockResolvedValue({ items: [] });
 
       const result = (await getTeacherProfile('t123')) as { courses: unknown[] };
 

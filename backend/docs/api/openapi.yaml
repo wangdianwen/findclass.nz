@@ -277,3 +277,116 @@ paths:
                 $ref: '#/components/schemas/PasswordResetResponse'
         '400':
           description: Invalid or expired verification code
+  /auth/roles:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user's roles
+      description: >-
+        Returns the authenticated user's current role and role application
+        history
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User roles retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRolesResponse'
+        '401':
+          description: Unauthorized
+  /auth/roles/apply:
+    post:
+      tags:
+        - Authentication
+      summary: Apply for a new role
+      description: Submit a role application request
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplyRoleRequest'
+      responses:
+        '201':
+          description: Role application submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleApplicationResponse'
+        '400':
+          description: Bad request
+  /auth/roles/applications/{id}/approve:
+    post:
+      tags:
+        - Authentication
+      summary: Approve or reject a role application
+      description: Admin endpoint to process role applications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveRoleRequest'
+      responses:
+        '200':
+          description: Application processed
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required
+  /auth/roles/applications/{id}:
+    delete:
+      tags:
+        - Authentication
+      summary: Cancel a role application
+      description: Cancels a pending role application
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Application cancelled
+        '400':
+          description: Application cannot be cancelled
+        '403':
+          description: Forbidden - not your application
+        '404':
+          description: Application not found
+  /auth/roles/applications/pending:
+    get:
+      tags:
+        - Authentication
+      summary: Get pending role applications
+      description: Returns a list of pending role applications (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: number
+            default: 50
+      responses:
+        '200':
+          description: Pending applications list
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required

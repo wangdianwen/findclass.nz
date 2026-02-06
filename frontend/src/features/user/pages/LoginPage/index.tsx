@@ -4,7 +4,7 @@ import { Form, Input, Divider, message, Button } from 'antd';
 import { ArrowLeftOutlined, LockOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { AuthPageLayout } from '@/components/layout';
-import { EmailInput, SubmitButton, GoogleLoginButton, WeChatLoginButton } from '@/components/ui';
+import { EmailInput, GoogleLoginButton, WeChatLoginButton } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import styles from './LoginPage.module.scss';
 

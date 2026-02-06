@@ -36,6 +36,44 @@ vi.mock('@shared/smtp/email.service', () => ({
   sendPasswordResetEmail: vi.fn(),
 }));
 
+vi.mock('@src/shared/db/dynamodb', () => ({
+  putItem: vi.fn(),
+  getItem: vi.fn(),
+  updateItem: vi.fn(),
+  queryItems: vi.fn(),
+  createEntityKey: vi.fn((type, id) => ({ PK: `${type.toUpperCase()}#${id}`, SK: 'METADATA' })),
+  getTableName: vi.fn(() => 'test-table'),
+  transactWrite: vi.fn(),
+  batchWriteItems: vi.fn(),
+  getDynamoDBDocClient: vi.fn(),
+  createSystemKey: vi.fn(),
+  TABLE_NAME: 'test-table',
+  getEffectiveTableName: vi.fn(),
+}));
+
+vi.mock('@src/shared/db/cache', () => ({
+  getFromCache: vi.fn(),
+  setCache: vi.fn(),
+  deleteFromCache: vi.fn(),
+  incrementRateLimit: vi.fn(),
+  CacheKeys: {
+    search: vi.fn((query: string) => `search:${query}`),
+    facet: vi.fn((query: string) => `facet:${query}`),
+    course: vi.fn((id: string) => `course:${id}`),
+    teacher: vi.fn((id: string) => `teacher:${id}`),
+    user: vi.fn((id: string) => `user:${id}`),
+    translation: vi.fn((text: string, targetLang: string) => `trans:${targetLang}:${text}`),
+    csrf: vi.fn((sessionId: string) => `csrf:${sessionId}`),
+    captcha: vi.fn((sessionId: string) => `captcha:${sessionId}`),
+    verify: vi.fn((email: string, type: string) => `verify:${email}:${type}`),
+    rateLimitEmail: vi.fn((email: string) => `rate:email:${email}`),
+    rateLimitIP: vi.fn((ip: string) => `rate:ip:${ip}`),
+    rateLimitToken: vi.fn((token: string) => `rate:token:${token}`),
+    session: vi.fn((sessionId: string) => `session:${sessionId}`),
+    roleApplication: vi.fn((userId: string) => `roleapp:${userId}`),
+  },
+}));
+
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -57,8 +95,6 @@ import {
   incrementRateLimit,
   CacheKeys,
 } from '@src/shared/db/cache';
-
-import { resetLoggerMocks } from '../mocks/logger.mock';
 
 import {
   register,
@@ -90,8 +126,6 @@ import { sendVerificationEmail } from '@shared/smtp/email.service';
 describe('AuthService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    resetLoggerMocks();
-    (getTableName as Mock).mockReturnValue('test-table');
   });
 
   afterEach(() => {
