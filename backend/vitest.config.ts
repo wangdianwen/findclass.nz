@@ -21,7 +21,7 @@ export default defineConfig({
       : ['tests/unit/**/*.test.ts'],
     exclude: ['node_modules'],
     pool: 'forks',
-    poolOptions: { forks: { singleFork: true } },
+    singleFork: true,
     setupFiles: [
       isIntegration
         ? isPostgresIntegration
