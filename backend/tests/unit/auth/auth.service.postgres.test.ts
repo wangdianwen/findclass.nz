@@ -127,21 +127,60 @@ const mockRoleApplicationRepository = {
   hasPendingApplication: vi.fn(),
 };
 
-// Mock repository constructors
+// Mock repository constructors - use class syntax for Vitest 4 compatibility
 vi.mock('@modules/auth/user.repository', () => ({
-  UserRepository: vi.fn().mockImplementation(() => mockUserRepository),
+  UserRepository: class {
+    findById = mockUserRepository.findById;
+    findByEmail = mockUserRepository.findByEmail;
+    create = mockUserRepository.create;
+    update = mockUserRepository.update;
+    emailExists = mockUserRepository.emailExists;
+    delete = mockUserRepository.delete;
+    getProfile = mockUserRepository.getProfile;
+  },
 }));
 
 vi.mock('@modules/auth/session.repository', () => ({
-  SessionRepository: vi.fn().mockImplementation(() => mockSessionRepository),
+  SessionRepository: class {
+    create = mockSessionRepository.create;
+    addToBlacklist = mockSessionRepository.addToBlacklist;
+    isBlacklisted = mockSessionRepository.isBlacklisted;
+    findByJti = mockSessionRepository.findByJti;
+    revokeAllUserSessions = mockSessionRepository.revokeAllUserSessions;
+    cleanupExpired = mockSessionRepository.cleanupExpired;
+    getActiveSessions = mockSessionRepository.getActiveSessions;
+    revokeSession = mockSessionRepository.revokeSession;
+  },
 }));
 
 vi.mock('@modules/auth/verification.repository', () => ({
-  VerificationCodeRepository: vi.fn().mockImplementation(() => mockVerificationRepository),
+  VerificationCodeRepository: class {
+    create = mockVerificationRepository.create;
+    verifyAndMarkUsed = mockVerificationRepository.verifyAndMarkUsed;
+    getValidCode = mockVerificationRepository.getValidCode;
+    markAsUsed = mockVerificationRepository.markAsUsed;
+    deleteExpired = mockVerificationRepository.deleteExpired;
+    deleteAllForEmail = mockVerificationRepository.deleteAllForEmail;
+    hasRecentCode = mockVerificationRepository.hasRecentCode;
+    getLatest = mockVerificationRepository.getLatest;
+  },
 }));
 
 vi.mock('@modules/auth/role-application.repository', () => ({
-  RoleApplicationRepository: vi.fn().mockImplementation(() => mockRoleApplicationRepository),
+  RoleApplicationRepository: class {
+    create = mockRoleApplicationRepository.create;
+    findById = mockRoleApplicationRepository.findById;
+    findPendingByUserId = mockRoleApplicationRepository.findPendingByUserId;
+    findByUserId = mockRoleApplicationRepository.findByUserId;
+    findPending = mockRoleApplicationRepository.findPending;
+    findByStatus = mockRoleApplicationRepository.findByStatus;
+    updateStatus = mockRoleApplicationRepository.updateStatus;
+    cancel = mockRoleApplicationRepository.cancel;
+    createHistory = mockRoleApplicationRepository.createHistory;
+    getWithHistory = mockRoleApplicationRepository.getWithHistory;
+    delete = mockRoleApplicationRepository.delete;
+    hasPendingApplication = mockRoleApplicationRepository.hasPendingApplication;
+  },
 }));
 
 // Import after mocks are set up
