@@ -33,6 +33,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
   },
-  "include": ["src/**/*", "tests/**/*", "vitest.config.ts"],
+  "include": ["src/**/*", "vitest.config.ts"],
   "exclude": ["node_modules", "dist", "tests/**/*.test.ts"],
 }
