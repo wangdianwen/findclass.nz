@@ -6,16 +6,14 @@
 import { createApp } from './app';
 import { getConfig, validateConfig } from './config';
 import { logger } from './core/logger';
-import { checkCacheHealth, checkRateLimitsHealth } from './shared/db/cache';
-import { tableExists } from './shared/db/dynamodb';
+import { runMigrations } from './db/migrate';
+import { getPool } from './shared/db/postgres/client';
 
 interface HealthCheckResult {
   status: 'healthy' | 'degraded' | 'unhealthy';
   timestamp: string;
   services: {
-    cache: boolean;
-    rateLimits: boolean;
-    dynamodb: boolean;
+    postgres: boolean;
   };
   uptime: number;
 }
@@ -25,44 +23,24 @@ interface HealthCheckResult {
  */
 async function performHealthCheck(): Promise<HealthCheckResult> {
   const services = {
-    cache: false,
-    rateLimits: false,
-    dynamodb: false,
+    postgres: false,
   };
 
-  // Check Cache
+  // Check PostgreSQL
   try {
-    services.cache = await checkCacheHealth();
+    const pool = getPool();
+    const result = await pool.query('SELECT 1');
+    services.postgres = result.rows.length > 0;
   } catch {
-    services.cache = false;
+    services.postgres = false;
   }
 
-  // Check Rate Limits
-  try {
-    services.rateLimits = await checkRateLimitsHealth();
-  } catch {
-    services.rateLimits = false;
-  }
-
-  // Check DynamoDB (optional - can be null when using PostgreSQL only)
-  try {
-    const config = getConfig();
-    if (config.dynamodb?.tableName) {
-      const exists = await tableExists(config.dynamodb.tableName);
-      services.dynamodb = exists;
-    } else {
-      services.dynamodb = true; // Consider healthy if DynamoDB is not configured
-    }
-  } catch {
-    services.dynamodb = false;
-  }
-
-  const allHealthy = services.cache && services.rateLimits && services.dynamodb;
+  const allHealthy = services.postgres;
 
   return {
     status: allHealthy
       ? 'healthy'
-      : Object.values(services).some(s => s)
+      : services.postgres
         ? 'degraded'
         : 'unhealthy',
     timestamp: new Date().toISOString(),
@@ -78,26 +56,18 @@ async function startServer(): Promise<void> {
 
     const config = getConfig();
 
-    // DynamoDB is optional (can be null when using PostgreSQL only)
-    if (config.dynamodb?.tableName) {
-      try {
-        const tableName = await tableExists(config.dynamodb.tableName);
-        if (tableName) {
-          logger.info('DynamoDB connection verified', {
-            tableName: '[REDACTED]',
-          });
-        } else {
-          logger.error('DynamoDB table not found', {
-            tableName: '[REDACTED]',
-          });
-          process.exit(1);
-        }
-      } catch (error) {
-        logger.error('DynamoDB connection failed', { error: (error as Error).message });
-        // Don't exit - DynamoDB is optional now
-      }
-    } else {
-      logger.info('DynamoDB not configured (using PostgreSQL only)');
+    // Run database migrations on startup
+    logger.info('Running database migrations...');
+    try {
+      const pool = getPool();
+      const { executed, skipped } = await runMigrations(pool);
+      logger.info('Database migrations completed', {
+        executed: executed.length,
+        skipped: skipped.length,
+      });
+    } catch (error) {
+      logger.error('Database migration failed', { error: (error as Error).message });
+      process.exit(1);
     }
 
     const app = createApp();
