@@ -1,8 +1,6 @@
 /**
  * Integration Test Setup
- * Starts Docker containers ONCE before all tests, stops after all tests
- *
- * This file is loaded via setupFiles in vitest.integration.config.ts
+ * Starts Docker containers (DynamoDB + MailHog)
  */
 
 import { resolve } from 'path';
@@ -15,10 +13,7 @@ import 'reflect-metadata';
 import { config } from 'dotenv';
 
 const configDir = resolve(process.cwd(), 'src/config/env');
-
-// Load base configuration
 config({ path: resolve(configDir, '.env.base') });
-// Load test-specific configuration
 config({ path: resolve(configDir, '.env.test') });
 
 import { GenericContainer, StartedTestContainer, Wait } from 'testcontainers';
@@ -28,7 +23,7 @@ import { resetClient as resetMainDynamoDBClients, TABLE_NAME } from '@src/shared
 import { getConfig } from '@src/config';
 import { beforeAll, afterAll } from 'vitest';
 import { createApp } from '@src/app';
-import { DynamoDBDocumentClient as DocClientType, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 
 const DYNAMODB_IMAGE = 'amazon/dynamodb-local:2.0.0';
 const MAILHOG_IMAGE = 'mailhog/mailhog:latest';
@@ -55,53 +50,47 @@ let testContext: {
 
 let _app: ReturnType<typeof createApp> | null = null;
 
-// Export for tests
 export const getApp = () => _app;
 export const getDynamoDBDocClient = () =>
   containersStarted ? (testContext?.dynamodb.docClient ?? null) : null;
 
-async function startTestContainers() {
+async function startContainers() {
   if (containersStarted) return testContext!;
 
   const config = getConfig();
+  console.log('🚀 Starting test containers...');
 
-  console.log('🚀 Starting integration test containers...');
-
-  // Start MailHog
-  const STARTUP_TIMEOUT = 60000;
+  // MailHog
   console.log('📧 Starting MailHog...');
-
-  const mailhogContainer = await new GenericContainer(MAILHOG_IMAGE)
+  const mailhog = await new GenericContainer(MAILHOG_IMAGE)
     .withExposedPorts(
       { container: config.smtp.port, host: config.smtp.port },
       { container: config.smtp.apiPort, host: config.smtp.apiPort }
     )
     .withWaitStrategy(Wait.forListeningPorts())
-    .withStartupTimeout(STARTUP_TIMEOUT)
+    .withStartupTimeout(60000)
     .start();
 
-  const mailhogHost = mailhogContainer.getHost();
-  console.log(`✅ MailHog started: ${mailhogHost}:${config.smtp.port}`);
+  const host = mailhog.getHost();
+  console.log(`✅ MailHog: ${host}:${config.smtp.port}`);
 
-  // Start DynamoDB
-  console.log('🗄️  Starting DynamoDB Local...');
-
-  const dynamodbContainer = await new GenericContainer(DYNAMODB_IMAGE)
+  // DynamoDB
+  console.log('🗄️  Starting DynamoDB...');
+  const dynamodb = await new GenericContainer(DYNAMODB_IMAGE)
     .withExposedPorts({ container: 8000, host: config.dynamodb.port })
     .withCommand(['-jar', 'DynamoDBLocal.jar', '-sharedDb'])
     .withWaitStrategy(Wait.forListeningPorts())
     .withStartupTimeout(20000)
     .start();
 
-  const dynamodbPort = dynamodbContainer.getMappedPort(8000);
-  const dynamodbEndpoint = `http://${mailhogHost}:${dynamodbPort}`;
-  console.log(`✅ DynamoDB Local started: ${dynamodbEndpoint}`);
+  const port = dynamodb.getMappedPort(8000);
+  const endpoint = `http://${host}:${port}`;
+  console.log(`✅ DynamoDB: ${endpoint}`);
 
-  // Reset and create DynamoDB client
   resetMainDynamoDBClients();
 
-  const dynamoDBClient = new DynamoDBClient({
-    endpoint: dynamodbEndpoint,
+  const client = new DynamoDBClient({
+    endpoint,
     region: config.aws.region,
     credentials: {
       accessKeyId: config.aws.accessKeyId,
@@ -109,20 +98,14 @@ async function startTestContainers() {
     },
   });
 
-  const docClient = DynamoDBDocumentClient.from(dynamoDBClient, {
-    marshallOptions: {
-      removeUndefinedValues: true,
-      convertClassInstanceToMap: true,
-    },
+  const docClient = DynamoDBDocumentClient.from(client, {
+    marshallOptions: { removeUndefinedValues: true, convertClassInstanceToMap: true },
   });
 
-  // Create the test table
-  console.log('📋 Creating DynamoDB table...');
-
+  // Create table
   const { CreateTableCommand, DescribeTableCommand } = await import('@aws-sdk/client-dynamodb');
-
   try {
-    await dynamoDBClient.send(
+    await client.send(
       new CreateTableCommand({
         TableName: TABLE_NAME,
         KeySchema: [
@@ -143,129 +126,83 @@ async function startTestContainers() {
               { AttributeName: 'GSI1SK', KeyType: 'RANGE' },
             ],
             Projection: { ProjectionType: 'ALL' },
-            ProvisionedThroughput: {
-              ReadCapacityUnits: 5,
-              WriteCapacityUnits: 5,
-            },
+            ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
           },
         ],
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
+        ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
       })
     );
     console.log(`✅ Table ${TABLE_NAME} created`);
   } catch (e: any) {
-    if (e.name === 'ResourceInUseException') {
-      console.log(`📋 Table ${TABLE_NAME} already exists`);
-    } else {
-      throw e;
-    }
+    if (e.name !== 'ResourceInUseException') throw e;
+    console.log(`📋 Table ${TABLE_NAME} exists`);
   }
-
-  // Wait for table to be active
-  await dynamoDBClient.send(new DescribeTableCommand({ TableName: TABLE_NAME }));
+  await client.send(new DescribeTableCommand({ TableName: TABLE_NAME }));
 
   testContext = {
     dynamodb: {
-      container: dynamodbContainer,
-      client: dynamoDBClient,
+      container: dynamodb,
+      client,
       docClient,
       tableName: TABLE_NAME,
-      endpoint: dynamodbEndpoint,
-      host: mailhogHost,
-      port: dynamodbPort,
+      endpoint,
+      host,
+      port,
     },
-    mailhog: {
-      container: mailhogContainer,
-      host: mailhogHost,
-      smtpPort: config.smtp.port,
-      apiPort: config.smtp.apiPort,
-    },
+    mailhog: { container: mailhog, host, smtpPort: config.smtp.port, apiPort: config.smtp.apiPort },
   };
-
   containersStarted = true;
-  console.log('✅ All containers started successfully');
-
+  console.log('✅ Containers ready');
   return testContext;
 }
 
-async function stopTestContainers() {
+async function stopContainers() {
   if (!containersStarted) return;
-
-  console.log('🛑 Stopping test containers...');
-
+  console.log('🛑 Stopping containers...');
   try {
-    if (testContext?.dynamodb.container) {
-      await testContext.dynamodb.container.stop();
-      console.log('   DynamoDB stopped');
-    }
-    if (testContext?.mailhog.container) {
-      await testContext.mailhog.container.stop();
-      console.log('   MailHog stopped');
-    }
+    await testContext?.dynamodb.container.stop();
+    await testContext?.mailhog.container.stop();
   } catch (e) {
-    console.warn('⚠️  Error stopping containers:', e);
+    console.warn('⚠️  Stop error:', e);
   }
-
   containersStarted = false;
   testContext = null;
-  console.log('✅ All containers stopped');
 }
 
 async function clearTableData(docClient: DynamoDBDocumentClient) {
-  let lastEvaluatedKey: Record<string, string> | undefined;
-
+  let lastKey: Record<string, string> | undefined;
   do {
     const { Items, LastEvaluatedKey } = await docClient.send(
-      new ScanCommand({
-        TableName: TABLE_NAME,
-        ExclusiveStartKey: lastEvaluatedKey,
-      })
+      new ScanCommand({ TableName: TABLE_NAME, ExclusiveStartKey: lastKey })
     );
-
-    if (Items && Items.length > 0) {
+    if (Items?.length) {
       const { DeleteCommand } = await import('@aws-sdk/lib-dynamodb');
-
       for (const item of Items) {
         if (item.PK && item.SK) {
           await docClient.send(
-            new DeleteCommand({
-              TableName: TABLE_NAME,
-              Key: {
-                PK: item.PK,
-                SK: item.SK,
-              },
-            })
+            new DeleteCommand({ TableName: TABLE_NAME, Key: { PK: item.PK, SK: item.SK } })
           );
         }
       }
     }
-
-    lastEvaluatedKey = LastEvaluatedKey as Record<string, string> | undefined;
-  } while (lastEvaluatedKey);
+    lastKey = LastEvaluatedKey as Record<string, string> | undefined;
+  } while (lastKey);
 }
 
-// Vitest hooks
+// Integration test hooks
 beforeAll(async () => {
-  await startTestContainers();
+  await startContainers();
   _app = createApp();
   await clearTableData(testContext!.dynamodb.docClient);
 }, 180000);
 
-afterAll(async () => {
-  await stopTestContainers();
-});
+afterAll(stopContainers);
 
-// Handle process termination
+// Cleanup
 const cleanup = async () => {
-  await stopTestContainers();
+  await stopContainers();
   process.exit(0);
 };
-
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);
-process.on('beforeExit', async () => {
-  await stopTestContainers();
-});
+process.on('beforeExit', stopContainers);

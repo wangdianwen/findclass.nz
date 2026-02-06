@@ -6,37 +6,26 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const isIntegration = process.env.VITEST_INTEGRATION === 'true';
+const isIntegration = process.env.INTEGRATION_TESTS === 'true';
 
 export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
     root: __dirname,
-    // Integration tests: only run integration tests
-    // Unit tests: run all tests except integration
-    include: isIntegration
-      ? ['tests/integration/**/*.test.ts']
-      : ['tests/unit/**/*.test.ts', 'tests/**/*.test.ts'],
-    exclude: isIntegration ? ['node_modules'] : ['node_modules', 'tests/integration'],
-    ...(isIntegration && {
-      pool: 'forks',
-      poolOptions: {
-        forks: {
-          singleFork: true,
-        },
-      },
-      setupFiles: [path.resolve(__dirname, 'tests/integration/setup.integration.ts')],
-    }),
+    include: isIntegration ? ['tests/integration/**/*.test.ts'] : ['tests/unit/**/*.test.ts'],
+    exclude: ['node_modules'],
+    pool: 'forks',
+    poolOptions: { forks: { singleFork: true } },
+    setupFiles: [
+      isIntegration
+        ? path.resolve(__dirname, 'tests/integration/setup.integration.ts')
+        : path.resolve(__dirname, 'tests/unit/setup.unit.ts'),
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'html'],
-      thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 80,
-        statements: 80,
-      },
+      thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 },
       reportsDirectory: 'coverage',
     },
   },

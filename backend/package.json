@@ -9,7 +9,7 @@
     "start": "node dist/server.js",
     "test": "vitest run",
     "test:unit": "vitest run",
-    "test:integration": "VITEST_INTEGRATION=true vitest run",
+    "test:integration": "INTEGRATION_TESTS=true vitest run",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src/**/*.ts tests/**/*.ts",
     "lint:fix": "eslint src/**/*.ts tests/**/*.ts --fix",
