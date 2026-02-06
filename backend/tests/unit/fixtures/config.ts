@@ -73,6 +73,38 @@ export function createProdEnv(): NodeJS.ProcessEnv {
     CORS_ORIGIN: 'https://findclass.nz',
     CORS_METHODS: 'GET,POST,PUT,DELETE,PATCH,OPTIONS',
     CORS_CREDENTIALS: 'true',
+    // SMTP configuration (required for prod)
+    SMTP_HOST: 'smtp.sendpulse.com',
+    SMTP_PORT: '587',
+    SMTP_API_PORT: '8205',
+    SMTP_SECURE: 'false',
+    SMTP_USER: '',
+    SMTP_PASS: '',
+    FROM_EMAIL: 'no-reply@findclass.nz',
+    FROM_NAME: 'FindClass NZ',
+    // S3/SQS (required)
+    S3_ENDPOINT: 'https://s3.ap-southeast-2.amazonaws.com',
+    S3_BUCKET_UPLOADS: 'findclass-uploads',
+    S3_BUCKET_STATIC: 'findclass-static',
+    SQS_ENDPOINT: 'https://sqs.ap-southeast-2.amazonaws.com',
+    SQS_QUEUE_NOTIFICATIONS: 'findclass-notifications',
+    SQS_QUEUE_ANALYTICS: 'findclass-analytics',
+    // LocalStack (optional)
+    LOCALSTACK_ENDPOINT: 'https://localhost:4566',
+    SEED_SAMPLE_DATA: 'false',
+    // Rate limits (optional with defaults)
+    RATE_LIMIT_WINDOW_MS: '60000',
+    RATE_LIMIT_MAX_REQUESTS: '100',
+    RATE_LIMIT_MAX_REQUESTS_AUTHENTICATED: '1000',
+    RATE_LIMIT_EMAIL_WINDOW: '60',
+    RATE_LIMIT_EMAIL_MAX: '1',
+    RATE_LIMIT_IP_WINDOW: '3600',
+    RATE_LIMIT_IP_MAX: '100',
+    RATE_LIMIT_LOCKOUT_SECONDS: '900',
+    RATE_LIMIT_MAX_ATTEMPTS: '5',
+    // Upload (optional)
+    MAX_FILE_SIZE: '5242880',
+    UPLOAD_DIR: './uploads',
   };
 }
 

@@ -3,25 +3,34 @@
  *
  * User Story:
  * As a visitor
- * I want to register an account with email
- * So that I can start using the platform services
+ * I want to register with email verification
+ * So that I can create an account
  *
- * Test Type: Integration Test
+ * Test Type: Integration Test (PostgreSQL)
  * Path: tests/integration/auth/us1-registration.test.ts
  */
 
 import 'reflect-metadata';
 import request from 'supertest';
-import { getApp } from '../setup.integration';
-import { createTestUser, cleanupTestUser } from '../fixtures/test-users';
-import { describe, expect, it, beforeAll, afterAll } from 'vitest';
+import { getApp, getTestPool } from '../setup.integration';
+import { cleanupTestUser } from '../fixtures/test-users.postgres';
+import { describe, expect, it, beforeAll, afterAll, beforeEach } from 'vitest';
+import { Pool } from 'pg';
 
-describe('US1: User Registration', () => {
-  const testEmail = 'us1-test@example.com';
+describe('US1: User Registration (PostgreSQL)', () => {
+  let pool: Pool;
 
-  afterAll(async () => {
-    // Clean up test user
-    await cleanupTestUser(testEmail);
+  beforeAll(() => {
+    pool = getTestPool();
+  });
+
+  beforeEach(async () => {
+    // Clean up before each test
+    await pool.query('DELETE FROM role_application_history');
+    await pool.query('DELETE FROM role_applications');
+    await pool.query('DELETE FROM sessions');
+    await pool.query('DELETE FROM verification_codes');
+    await pool.query('DELETE FROM users');
   });
 
   // ==================== Happy Path ====================
@@ -30,7 +39,7 @@ describe('US1: User Registration', () => {
     it('US1-HP-03: should complete full registration flow', async () => {
       const uniqueEmail = `us1-hp-03-${Date.now()}@example.com`;
 
-      // Step 1: 发送验证码
+      // Step 1: Send verification code
       const sendCodeResponse = await request(getApp())
         .post('/api/v1/auth/send-verification-code')
         .send({ email: uniqueEmail, type: 'REGISTER' })
@@ -39,7 +48,7 @@ describe('US1: User Registration', () => {
       expect(sendCodeResponse.body.success).toBe(true);
       expect(sendCodeResponse.body.data.expiresIn).toBe(300);
 
-      // Step 2: 注册用户 (简化: 跳过验证码验证直接注册)
+      // Step 2: Register user
       const registerResponse = await request(getApp())
         .post('/api/v1/auth/register')
         .send({
@@ -51,12 +60,12 @@ describe('US1: User Registration', () => {
         .expect(201);
 
       expect(registerResponse.body.success).toBe(true);
-      expect(registerResponse.body.data.user.email).toBe(uniqueEmail);
+      expect(registerResponse.body.data.user.email).toBe(uniqueEmail.toLowerCase());
       expect(registerResponse.body.data.user.name).toBe('Test User');
       expect(registerResponse.body.data.user.role).toBe('PARENT');
       expect(registerResponse.body.data.token).toBeDefined();
 
-      // Step 3: 验证用户可以登录
+      // Step 3: Verify user can login
       const loginResponse = await request(getApp())
         .post('/api/v1/auth/login')
         .send({ email: uniqueEmail, password: 'SecurePass123!' })
@@ -64,18 +73,22 @@ describe('US1: User Registration', () => {
 
       expect(loginResponse.body.success).toBe(true);
       expect(loginResponse.body.data.token).toBeDefined();
-      expect(loginResponse.body.data.user.email).toBe(uniqueEmail);
+      expect(loginResponse.body.data.user.email).toBe(uniqueEmail.toLowerCase());
 
-      // Step 4: 获取用户信息
+      // Step 4: Get user info
       const profileResponse = await request(getApp())
         .get('/api/v1/auth/me')
         .set('Authorization', `Bearer ${loginResponse.body.data.token}`)
         .expect(200);
 
       expect(profileResponse.body.success).toBe(true);
-      expect(profileResponse.body.data.user.email).toBe(uniqueEmail);
+      expect(profileResponse.body.data.user.email).toBe(uniqueEmail.toLowerCase());
 
-      // 清理
+      // Verify in database
+      const dbResult = await pool.query('SELECT * FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      expect(dbResult.rows.length).toBe(1);
+      expect(dbResult.rows[0].name).toBe('Test User');
+
       await cleanupTestUser(uniqueEmail);
     });
 
@@ -91,13 +104,21 @@ describe('US1: User Registration', () => {
       expect(response.body.data.expiresIn).toBe(300);
       expect(response.body.message).toBe('Verification code sent successfully');
 
+      // Verify code was stored in database
+      const dbResult = await pool.query(
+        'SELECT * FROM verification_codes WHERE email = $1 AND type = $2',
+        [uniqueEmail.toLowerCase(), 'REGISTER']
+      );
+      expect(dbResult.rows.length).toBe(1);
+      expect(dbResult.rows[0].used).toBe(false);
+
       await cleanupTestUser(uniqueEmail);
     });
 
     it('US1-HP-02: should update user profile after registration', async () => {
       const uniqueEmail = `us1-hp-02-${Date.now()}@example.com`;
 
-      // 注册用户
+      // Register user
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password: 'SecurePass123!',
@@ -105,13 +126,13 @@ describe('US1: User Registration', () => {
         role: 'PARENT',
       });
 
-      // 登录
+      // Login
       const loginResponse = await request(getApp())
         .post('/api/v1/auth/login')
         .send({ email: uniqueEmail, password: 'SecurePass123!' })
         .expect(200);
 
-      // 更新个人信息
+      // Update profile
       const updateResponse = await request(getApp())
         .put('/api/v1/auth/me')
         .set('Authorization', `Bearer ${loginResponse.body.data.token}`)
@@ -120,6 +141,10 @@ describe('US1: User Registration', () => {
 
       expect(updateResponse.body.success).toBe(true);
       expect(updateResponse.body.data.user.name).toBe('Updated Name');
+
+      // Verify in database
+      const dbResult = await pool.query('SELECT name FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      expect(dbResult.rows[0].name).toBe('Updated Name');
 
       await cleanupTestUser(uniqueEmail);
     });
@@ -131,7 +156,7 @@ describe('US1: User Registration', () => {
     it('US1-FC-01: should reject duplicate email registration', async () => {
       const uniqueEmail = `us1-fc-01-${Date.now()}@example.com`;
 
-      // 第一次注册成功
+      // First registration succeeds
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password: 'SecurePass123!',
@@ -139,7 +164,7 @@ describe('US1: User Registration', () => {
         role: 'PARENT',
       });
 
-      // 第二次注册失败
+      // Second registration fails
       const duplicateResponse = await request(getApp())
         .post('/api/v1/auth/register')
         .send({
@@ -161,7 +186,7 @@ describe('US1: User Registration', () => {
         .post('/api/v1/auth/register')
         .send({
           email: 'test@example.com',
-          // 缺少 password, name, role
+          // missing password, name, role
         })
         .expect(400);
 
@@ -235,13 +260,17 @@ describe('US1: User Registration', () => {
 
       expect(response.body.success).toBe(true);
 
-      // 尝试用小写邮箱登录
+      // Login with lowercase email
       const loginResponse = await request(getApp())
         .post('/api/v1/auth/login')
         .send({ email: uniqueEmail.toLowerCase(), password: 'SecurePass123!' })
         .expect(200);
 
       expect(loginResponse.body.success).toBe(true);
+
+      // Verify in database
+      const dbResult = await pool.query('SELECT email FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      expect(dbResult.rows[0].email).toBe(uniqueEmail.toLowerCase());
 
       await cleanupTestUser(uniqueEmail);
     });
@@ -268,7 +297,7 @@ describe('US1: User Registration', () => {
     it('US1-EC-03: should handle concurrent registration with same email', async () => {
       const uniqueEmail = `us1-ec-03-${Date.now()}@example.com`;
 
-      // 并发注册
+      // Concurrent registrations
       const promises = Array(3)
         .fill(null)
         .map(() =>
@@ -282,12 +311,16 @@ describe('US1: User Registration', () => {
 
       const results = await Promise.all(promises);
 
-      // 只有一个成功(201)，其他失败(409)
+      // Only one succeeds (201), others fail (409)
       const successCount = results.filter(r => r.status === 201).length;
       const conflictCount = results.filter(r => r.status === 409).length;
 
       expect(successCount).toBe(1);
       expect(conflictCount).toBe(2);
+
+      // Verify only one user in database
+      const dbResult = await pool.query('SELECT COUNT(*) FROM users WHERE email = $1', [uniqueEmail.toLowerCase()]);
+      expect(parseInt(dbResult.rows[0].count)).toBe(1);
 
       await cleanupTestUser(uniqueEmail);
     });

@@ -3,7 +3,7 @@
  * Handles token blacklist (sessions table)
  */
 
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
 import crypto from 'crypto';
 import { logger } from '@core/logger';
 
@@ -113,10 +113,9 @@ export class SessionRepository {
    * Find session by JTI
    */
   async findByJti(jti: string): Promise<Session | null> {
-    const result = await this.pool.query<Session>(
-      'SELECT * FROM sessions WHERE token_jti = $1',
-      [jti]
-    );
+    const result = await this.pool.query<Session>('SELECT * FROM sessions WHERE token_jti = $1', [
+      jti,
+    ]);
     return result.rows[0] || null;
   }
 
@@ -139,9 +138,7 @@ export class SessionRepository {
    * Clean up expired sessions
    */
   async cleanupExpired(): Promise<number> {
-    const result = await this.pool.query(
-      'DELETE FROM sessions WHERE expires_at < NOW()'
-    );
+    const result = await this.pool.query('DELETE FROM sessions WHERE expires_at < NOW()');
 
     logger.info('Cleaned up expired sessions', { count: result.rowCount });
     return result.rowCount ?? 0;

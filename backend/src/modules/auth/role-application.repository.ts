@@ -3,10 +3,10 @@
  * Handles role change applications
  */
 
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '@core/logger';
-import { UserRole } from '@shared/types';
+import type { UserRole } from '@shared/types';
 
 export type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
 export type HistoryAction = 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
@@ -60,7 +60,11 @@ export class RoleApplicationRepository {
     // Create history record
     await this.createHistory(id, 'SUBMITTED', undefined, data.user_id);
 
-    logger.info('Role application created', { applicationId: id, userId: data.user_id, role: data.role });
+    logger.info('Role application created', {
+      applicationId: id,
+      userId: data.user_id,
+      role: data.role,
+    });
     return result.rows[0];
   }
 
@@ -141,8 +145,8 @@ export class RoleApplicationRepository {
     const now = new Date();
 
     // Cast status to HistoryAction for the history action
-    const historyAction: HistoryAction = status === 'APPROVED' ? 'APPROVED' :
-                                          status === 'REJECTED' ? 'REJECTED' : 'CANCELLED';
+    const historyAction: HistoryAction =
+      status === 'APPROVED' ? 'APPROVED' : status === 'REJECTED' ? 'REJECTED' : 'CANCELLED';
 
     const result = await this.pool.query<RoleApplication>(
       `UPDATE role_applications
@@ -209,7 +213,9 @@ export class RoleApplicationRepository {
   /**
    * Get application with history
    */
-  async getWithHistory(id: string): Promise<(RoleApplication & { history: RoleApplicationHistory[] }) | null> {
+  async getWithHistory(
+    id: string
+  ): Promise<(RoleApplication & { history: RoleApplicationHistory[] }) | null> {
     const application = await this.findById(id);
 
     if (!application) {
@@ -227,10 +233,7 @@ export class RoleApplicationRepository {
    * Delete an application
    */
   async delete(id: string): Promise<boolean> {
-    const result = await this.pool.query(
-      'DELETE FROM role_applications WHERE id = $1',
-      [id]
-    );
+    const result = await this.pool.query('DELETE FROM role_applications WHERE id = $1', [id]);
     return (result.rowCount ?? 0) > 0;
   }
 

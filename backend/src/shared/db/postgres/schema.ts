@@ -324,11 +324,17 @@ async function createIndexes(): Promise<void> {
 
   // Learning records indexes
   await query(`CREATE INDEX IF NOT EXISTS idx_learning_records_user ON learning_records(user_id)`);
-  await query(`CREATE INDEX IF NOT EXISTS idx_learning_records_course ON learning_records(course_id)`);
+  await query(
+    `CREATE INDEX IF NOT EXISTS idx_learning_records_course ON learning_records(course_id)`
+  );
 
   // Role applications indexes
-  await query(`CREATE INDEX IF NOT EXISTS idx_role_applications_user ON role_applications(user_id)`);
-  await query(`CREATE INDEX IF NOT EXISTS idx_role_applications_status ON role_applications(status)`);
+  await query(
+    `CREATE INDEX IF NOT EXISTS idx_role_applications_user ON role_applications(user_id)`
+  );
+  await query(
+    `CREATE INDEX IF NOT EXISTS idx_role_applications_status ON role_applications(status)`
+  );
 
   // Sessions indexes
   await query(`CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`);
@@ -336,8 +342,12 @@ async function createIndexes(): Promise<void> {
   await query(`CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at)`);
 
   // Verification codes indexes
-  await query(`CREATE INDEX IF NOT EXISTS idx_verification_codes_email ON verification_codes(email)`);
-  await query(`CREATE INDEX IF NOT EXISTS idx_verification_codes_expires ON verification_codes(expires_at)`);
+  await query(
+    `CREATE INDEX IF NOT EXISTS idx_verification_codes_email ON verification_codes(email)`
+  );
+  await query(
+    `CREATE INDEX IF NOT EXISTS idx_verification_codes_expires ON verification_codes(expires_at)`
+  );
 
   // Rate limits indexes
   await query(`CREATE INDEX IF NOT EXISTS idx_rate_limits_reset ON rate_limits(reset_at)`);

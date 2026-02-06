@@ -17,17 +17,9 @@ import {
   type CreateUserDTO,
   type UpdateUserDTO,
 } from './user.repository';
-import {
-  SessionRepository,
-  hashToken,
-} from './session.repository';
-import {
-  VerificationCodeRepository,
-} from './verification.repository';
-import {
-  RoleApplicationRepository,
-  type ApplicationStatus,
-} from './role-application.repository';
+import { SessionRepository, hashToken } from './session.repository';
+import { VerificationCodeRepository } from './verification.repository';
+import { RoleApplicationRepository, type ApplicationStatus } from './role-application.repository';
 import type {
   AuthResponse,
   RegisterDto,
@@ -188,10 +180,10 @@ export async function updateUserPassword(userId: string, newPasswordHash: string
 
   // Actually update the password directly
   const pool = getPool();
-  await pool.query(
-    'UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2',
-    [newPasswordHash, userId]
-  );
+  await pool.query('UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2', [
+    newPasswordHash,
+    userId,
+  ]);
 }
 
 /**
@@ -322,7 +314,12 @@ export async function rotateRefreshToken(oldRefreshToken: string): Promise<{
   }
 
   // Add old token to blacklist
-  await sessionRepository.addToBlacklist(decoded.jti, user.id, hashToken(oldRefreshToken), new Date());
+  await sessionRepository.addToBlacklist(
+    decoded.jti,
+    user.id,
+    hashToken(oldRefreshToken),
+    new Date()
+  );
 
   // Generate new tokens
   const newAccessToken = generateAccessToken({
@@ -362,7 +359,12 @@ export async function logout(
       const config = getConfig();
       const decoded = jwt.verify(accessToken, config.jwt.secret as Secret) as { jti?: string };
       if (decoded.jti) {
-        await sessionRepository.addToBlacklist(decoded.jti, userId, hashToken(accessToken), new Date());
+        await sessionRepository.addToBlacklist(
+          decoded.jti,
+          userId,
+          hashToken(accessToken),
+          new Date()
+        );
       }
     } catch {
       // Token might be invalid, ignore
@@ -374,7 +376,12 @@ export async function logout(
       const config = getConfig();
       const decoded = jwt.verify(refreshToken, config.jwt.secret as Secret) as { jti?: string };
       if (decoded.jti) {
-        await sessionRepository.addToBlacklist(decoded.jti, userId, hashToken(refreshToken), new Date());
+        await sessionRepository.addToBlacklist(
+          decoded.jti,
+          userId,
+          hashToken(refreshToken),
+          new Date()
+        );
       }
     } catch {
       // Token might be invalid, ignore
@@ -695,16 +702,16 @@ export async function getPendingRoleApplications(
 /**
  * Get application history
  */
-export async function getApplicationHistory(
-  applicationId: string
-): Promise<Array<{
-  id: string;
-  applicationId: string;
-  action: string;
-  performedBy?: string;
-  note?: string;
-  createdAt: string;
-}>> {
+export async function getApplicationHistory(applicationId: string): Promise<
+  Array<{
+    id: string;
+    applicationId: string;
+    action: string;
+    performedBy?: string;
+    note?: string;
+    createdAt: string;
+  }>
+> {
   logger.info('Getting application history', { applicationId });
 
   const { roleApplicationRepository } = getRepositories();
@@ -790,14 +797,15 @@ export async function getUserApplications(
       processedAt: app.reviewed_at?.toISOString(),
       processedBy: app.reviewed_by,
       comment: app.comment,
-      history: history?.history.map(h => ({
-        id: h.id,
-        applicationId: h.application_id,
-        action: h.action,
-        performedBy: h.performed_by || '',
-        note: h.comment || undefined,
-        createdAt: h.created_at.toISOString(),
-      })) || [],
+      history:
+        history?.history.map(h => ({
+          id: h.id,
+          applicationId: h.application_id,
+          action: h.action,
+          performedBy: h.performed_by || '',
+          note: h.comment || undefined,
+          createdAt: h.created_at.toISOString(),
+        })) || [],
     });
   }
 

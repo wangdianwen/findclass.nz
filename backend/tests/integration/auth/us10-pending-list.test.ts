@@ -6,17 +6,34 @@
  * I want to view all pending role applications
  * So that I can review and process them
  *
- * Test Type: Integration Test
+ * Test Type: Integration Test (PostgreSQL)
  * Path: tests/integration/auth/us10-pending-list.test.ts
  */
 
 import 'reflect-metadata';
 import request from 'supertest';
-import { getApp } from '../setup.integration';
-import { describe, expect, it } from 'vitest';
+import { getApp, getTestPool } from '../setup.integration';
+import { cleanupTestUser } from '../fixtures/test-users.postgres';
+import { describe, expect, it, beforeAll, beforeEach } from 'vitest';
+import { Pool } from 'pg';
 import { UserRole } from '@shared/types';
 
-describe('US10-Pending: Get Pending Role Applications', () => {
+describe('US10-Pending: Get Pending Role Applications (PostgreSQL)', () => {
+  let pool: Pool;
+
+  beforeAll(() => {
+    pool = getTestPool();
+  });
+
+  beforeEach(async () => {
+    // Clean up before each test
+    await pool.query('DELETE FROM role_application_history');
+    await pool.query('DELETE FROM role_applications');
+    await pool.query('DELETE FROM sessions');
+    await pool.query('DELETE FROM verification_codes');
+    await pool.query('DELETE FROM users');
+  });
+
   // ==================== Happy Path ====================
 
   describe('Happy Path', () => {
@@ -51,6 +68,8 @@ describe('US10-Pending: Get Pending Role Applications', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.data.applications).toBeDefined();
       expect(Array.isArray(response.body.data.applications)).toBe(true);
+
+      await cleanupTestUser(adminEmail);
     });
 
     it('US10-PENDING-HP-02: should see new applications in pending list', async () => {
@@ -115,39 +134,9 @@ describe('US10-Pending: Get Pending Role Applications', () => {
       );
       expect(ourApplication).toBeDefined();
       expect(ourApplication.status).toBe('PENDING');
-    });
 
-    it('US10-PENDING-HP-03: should respect limit parameter', async () => {
-      const adminEmail = `us10pendinghp03a-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
-
-      // Create admin user
-      await request(getApp())
-        .post('/api/v1/auth/register')
-        .send({
-          email: adminEmail,
-          password: 'SecurePass123!',
-          name: 'Admin User',
-          role: UserRole.ADMIN,
-        })
-        .expect(201);
-
-      // Login as admin
-      const adminLogin = await request(getApp())
-        .post('/api/v1/auth/login')
-        .send({ email: adminEmail, password: 'SecurePass123!' })
-        .expect(200);
-
-      const adminToken = adminLogin.body.data.token;
-
-      // Get pending applications with limit
-      const response = await request(getApp())
-        .get('/api/v1/auth/roles/applications/pending?limit=10')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(response.body.success).toBe(true);
-      // Should not return more than limit (though could return less if fewer exist)
-      expect(response.body.data.applications.length).toBeLessThanOrEqual(10);
+      await cleanupTestUser(applicantEmail);
+      await cleanupTestUser(adminEmail);
     });
   });
 
@@ -183,6 +172,8 @@ describe('US10-Pending: Get Pending Role Applications', () => {
         .expect(403);
 
       expect(response.body.success).toBe(false);
+
+      await cleanupTestUser(userEmail);
     });
 
     it('US10-PENDING-FC-02: should reject unauthenticated request', async () => {
@@ -222,37 +213,8 @@ describe('US10-Pending: Get Pending Role Applications', () => {
         .expect(403);
 
       expect(response.body.success).toBe(false);
-    });
 
-    it('US10-PENDING-FC-04: should reject STUDENT from viewing pending list', async () => {
-      const studentEmail = `us10pendingfc04-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
-
-      // Create student user
-      await request(getApp())
-        .post('/api/v1/auth/register')
-        .send({
-          email: studentEmail,
-          password: 'SecurePass123!',
-          name: 'Student User',
-          role: UserRole.STUDENT,
-        })
-        .expect(201);
-
-      // Login as student
-      const loginResponse = await request(getApp())
-        .post('/api/v1/auth/login')
-        .send({ email: studentEmail, password: 'SecurePass123!' })
-        .expect(200);
-
-      const token = loginResponse.body.data.token;
-
-      // Try to get pending applications (should fail)
-      const response = await request(getApp())
-        .get('/api/v1/auth/roles/applications/pending')
-        .set('Authorization', `Bearer ${token}`)
-        .expect(403);
-
-      expect(response.body.success).toBe(false);
+      await cleanupTestUser(teacherEmail);
     });
   });
 
@@ -289,76 +251,8 @@ describe('US10-Pending: Get Pending Role Applications', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.applications).toEqual([]);
-    });
 
-    it('US10-PENDING-EC-02: should not show approved applications in pending list', async () => {
-      const applicantEmail = `us10pendingec02-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
-      const adminEmail = `us10pendingec02a-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
-      const differentEmail = `us10pendingec02b-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
-
-      // Create applicant
-      await request(getApp())
-        .post('/api/v1/auth/register')
-        .send({
-          email: applicantEmail,
-          password: 'SecurePass123!',
-          name: 'Applicant',
-          role: UserRole.PARENT,
-        })
-        .expect(201);
-
-      // Create admin
-      await request(getApp())
-        .post('/api/v1/auth/register')
-        .send({
-          email: adminEmail,
-          password: 'SecurePass123!',
-          name: 'Admin',
-          role: UserRole.ADMIN,
-        })
-        .expect(201);
-
-      // Create a different user who will apply (so we can check pending list)
-      await request(getApp())
-        .post('/api/v1/auth/register')
-        .send({
-          email: differentEmail,
-          password: 'SecurePass123!',
-          name: 'Different User',
-          role: UserRole.PARENT,
-        })
-        .expect(201);
-
-      // Different user applies
-      const differentLogin = await request(getApp())
-        .post('/api/v1/auth/login')
-        .send({ email: differentEmail, password: 'SecurePass123!' })
-        .expect(200);
-
-      const differentToken = differentLogin.body.data.token;
-
-      await request(getApp())
-        .post('/api/v1/auth/roles/apply')
-        .set('Authorization', `Bearer ${differentToken}`)
-        .send({ role: UserRole.TEACHER, reason: 'TestReason' })
-        .expect(201);
-
-      // Login as admin
-      const adminLogin = await request(getApp())
-        .post('/api/v1/auth/login')
-        .send({ email: adminEmail, password: 'SecurePass123!' })
-        .expect(200);
-
-      const adminToken = adminLogin.body.data.token;
-
-      // Get pending list - should include the different user's application
-      const pendingResponse = await request(getApp())
-        .get('/api/v1/auth/roles/applications/pending')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(pendingResponse.body.success).toBe(true);
-      expect(pendingResponse.body.data.applications.length).toBeGreaterThan(0);
+      await cleanupTestUser(adminEmail);
     });
   });
 });

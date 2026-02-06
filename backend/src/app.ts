@@ -39,7 +39,7 @@ async function initializeDatabase(): Promise<void> {
 
 // Initialize on module load (will run before app starts accepting requests)
 // Note: In production, consider running migrations separately
-initializeDatabase().catch((err) => {
+initializeDatabase().catch(err => {
   logger.error('Database initialization failed', { error: err.message });
   // Don't exit in test environment
   if (process.env.NODE_ENV !== 'test') {

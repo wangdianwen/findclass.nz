@@ -1,113 +1,36 @@
 /**
- * Courses Service Unit Tests
+ * Courses Service Unit Tests - PostgreSQL Version
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { Pool } from 'pg';
 
-import { queryItems, getItem, createEntityKey, batchGetItems } from '@src/shared/db/dynamodb';
+// Mock PostgreSQL pool
+const mockPool = {
+  query: vi.fn(),
+  connect: vi.fn(),
+};
 
-import { getFromCache, setCache } from '@src/shared/db/cache';
-
-vi.mock('@src/shared/db/dynamodb', () => ({
-  queryItems: vi.fn(),
-  getItem: vi.fn(),
-  createEntityKey: vi.fn(),
-  batchGetItems: vi.fn(),
+vi.mock('@shared/db/postgres/client', () => ({
+  getPool: vi.fn(() => mockPool),
 }));
 
-vi.mock('@src/shared/db/cache', () => ({
-  getFromCache: vi.fn(),
-  setCache: vi.fn(),
-  CacheKeys: {
-    search: vi.fn(),
-    facet: vi.fn(),
-    course: vi.fn(),
-    teacher: vi.fn(),
-    user: vi.fn(),
-    translation: vi.fn(),
-    csrf: vi.fn(),
-    captcha: vi.fn(),
-    verify: vi.fn(),
-    rateLimitEmail: vi.fn(),
-    rateLimitIP: vi.fn(),
-    rateLimitToken: vi.fn(),
-    session: vi.fn(),
-    roleApplication: vi.fn(),
+// Mock logger
+vi.mock('@core/logger', () => ({
+  logger: {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
   },
 }));
 
-import {
-  searchCourses,
-  getCourseById,
-  getTeacherById,
-  getCourseDetail,
-  toggleFavorite,
-  getCourseTranslation,
-} from '@src/modules/courses/courses.service';
-import { SortBy } from '@src/modules/courses/courses.types';
-import {
-  Teacher,
-  Course,
-  TrustLevel,
-  VerificationStatus,
-  CourseCategory,
-  PriceType,
-  CourseSourceType,
-  CourseStatus,
-} from '@src/shared/types';
+// Import after mocks are set up
+import { createCoursesService } from '@modules/courses/courses.service';
+import { CourseCategory, CourseSourceType, CourseStatus, PriceType, TrustLevel, VerificationStatus } from '@shared/types';
+import { SortBy } from '@modules/courses/courses.types';
 
-const mockTeacher: Teacher = {
-  PK: 'TEACHER#t123',
-  SK: 'METADATA',
-  entityType: 'TEACHER',
-  dataCategory: 'TEACHER',
-  id: 't123',
-  userId: 'usr_t123',
-  displayName: 'John Teacher',
-  bio: 'Experienced math teacher',
-  teachingSubjects: ['Mathematics', 'Calculus'],
-  teachingModes: ['ONLINE', 'BOTH'],
-  locations: ['Auckland', 'Wellington'],
-  trustLevel: TrustLevel.A,
-  verificationStatus: VerificationStatus.APPROVED,
-  averageRating: 4.8,
-  totalReviews: 150,
-  totalStudents: 50,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
-
-const mockCourse: Course = {
-  PK: 'COURSE#c123',
-  SK: 'METADATA',
-  entityType: 'COURSE',
-  dataCategory: 'COURSE',
-  id: 'c123',
-  teacherId: 't123',
-  title: 'High School Mathematics',
-  titleEn: 'High School Mathematics',
-  description: 'Complete math course for high school students',
-  descriptionEn: 'Complete math course for high school students',
-  price: 99.99,
-  priceType: PriceType.PER_SESSION,
-  category: CourseCategory.MATH,
-  teachingModes: ['ONLINE', 'BOTH'],
-  locations: ['Auckland', 'Wellington'],
-  targetAgeGroups: ['14-18'],
-  maxClassSize: 20,
-  currentEnrollment: 10,
-  sourceType: CourseSourceType.REGISTERED,
-  qualityScore: 85,
-  trustLevel: TrustLevel.A,
-  averageRating: 4.5,
-  totalReviews: 30,
-  publishedAt: new Date().toISOString(),
-  status: CourseStatus.ACTIVE,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
-
-describe('CoursesService', () => {
+describe('Courses Service (PostgreSQL)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -116,274 +39,910 @@ describe('CoursesService', () => {
     vi.restoreAllMocks();
   });
 
-  describe('searchCourses', () => {
-    it('should return cached results if available', async () => {
-      const cachedResult = {
-        items: [],
-        pagination: {
-          page: 1,
-          limit: 20,
-          total: 0,
-          totalPages: 0,
-          hasNextPage: false,
-          hasPrevPage: false,
-        },
-      };
-      vi.mocked(getFromCache).mockResolvedValue(cachedResult);
+  // ==================== Mock Data ====================
 
-      const result = await searchCourses({ keyword: 'math' });
+  const mockTeacher = {
+    id: 'teacher_123',
+    user_id: 'user_123',
+    display_name: 'Test Teacher',
+    bio: 'Experienced teacher',
+    teaching_subjects: ['MATH'],
+    teaching_modes: ['ONLINE', 'OFFLINE'],
+    locations: ['Auckland'],
+    trust_level: TrustLevel.A,
+    verification_status: VerificationStatus.APPROVED,
+    average_rating: 4.8,
+    total_reviews: 50,
+    total_students: 200,
+    created_at: new Date(),
+    updated_at: new Date(),
+  };
 
-      expect(result).toEqual(cachedResult);
-      expect(queryItems).not.toHaveBeenCalled();
-    });
+  const mockCourse = {
+    id: 'course_123',
+    teacher_id: 'teacher_123',
+    title: 'Math Course',
+    title_en: 'Math Course EN',
+    description: 'A comprehensive math course',
+    description_en: 'A comprehensive math course in English',
+    category: CourseCategory.MATH,
+    subcategory: 'Algebra',
+    price: 50,
+    price_type: PriceType.PER_HOUR,
+    teaching_modes: ['ONLINE'],
+    locations: ['Auckland'],
+    target_age_groups: ['10-15'],
+    max_class_size: 20,
+    current_enrollment: 5,
+    source_type: CourseSourceType.REGISTERED,
+    source_url: undefined,
+    quality_score: 85,
+    trust_level: TrustLevel.A,
+    average_rating: 4.5,
+    total_reviews: 10,
+    published_at: new Date(),
+    expires_at: undefined,
+    status: CourseStatus.ACTIVE,
+    created_at: new Date(),
+    updated_at: new Date(),
+  };
 
-    it('should search courses with no filters', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      vi.mocked(queryItems).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
-
-      const result = await searchCourses({});
-
-      expect(result).toBeDefined();
-      expect(result.items).toHaveLength(1);
-      expect(result.items[0]?.teacher).toBeDefined();
-    });
-
-    it('should filter courses by category', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      vi.mocked(queryItems).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
-
-      const result = await searchCourses({ category: CourseCategory.MATH });
-
-      expect(queryItems).toHaveBeenCalled();
-      expect(result).toBeDefined();
-    });
-
-    it('should filter courses by price range', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      vi.mocked(queryItems).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
-
-      const result = await searchCourses({ priceMin: 50, priceMax: 150 });
-
-      expect(result).toBeDefined();
-      expect(result.items[0]?.price).toBeGreaterThanOrEqual(50);
-    });
-
-    it('should sort courses by newest', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      const olderCourse = { ...mockCourse, createdAt: new Date('2024-01-01').toISOString() };
-      const newerCourse = {
-        ...mockCourse,
-        id: 'c456',
-        createdAt: new Date('2024-06-01').toISOString(),
-      };
-      vi.mocked(queryItems).mockResolvedValue({
-        items: [olderCourse, newerCourse],
-        lastKey: undefined,
-      });
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
-
-      const result = await searchCourses({ sortBy: SortBy.NEWEST });
-
-      expect(result.items[0]?.id).toBe('c456');
-    });
-
-    it('should sort courses by price ascending', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      const expensiveCourse = { ...mockCourse, id: 'c1', price: 200 };
-      const cheapCourse = { ...mockCourse, id: 'c2', price: 50 };
-      vi.mocked(queryItems).mockResolvedValue({
-        items: [expensiveCourse, cheapCourse],
-        lastKey: undefined,
-      });
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
-
-      const result = await searchCourses({ sortBy: SortBy.PRICE_ASC });
-
-      expect(result.items[0]?.price).toBe(50);
-      expect(result.items[1]?.price).toBe(200);
-    });
-
-    it('should sort courses by rating', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      const lowRated = { ...mockCourse, id: 'c1', averageRating: 3 };
-      const highRated = { ...mockCourse, id: 'c2', averageRating: 5 };
-      vi.mocked(queryItems).mockResolvedValue({
-        items: [lowRated, highRated],
-        lastKey: undefined,
-      });
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
-
-      const result = await searchCourses({ sortBy: SortBy.RATING });
-
-      expect(result.items[0]?.averageRating).toBe(5);
-    });
-
-    it('should paginate results correctly', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      const courses = Array.from({ length: 25 }, (_, i) => ({ ...mockCourse, id: `c${i}` }));
-      vi.mocked(queryItems).mockResolvedValue({ items: courses, lastKey: undefined });
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
-
-      const result = await searchCourses({ page: 1, limit: 10 });
-
-      expect(result.items).toHaveLength(10);
-      expect(result.pagination.page).toBe(1);
-      expect(result.pagination.total).toBe(25);
-      expect(result.pagination.totalPages).toBe(3);
-      expect(result.pagination.hasNextPage).toBe(true);
-    });
-
-    it('should handle empty results', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      vi.mocked(queryItems).mockResolvedValue({ items: [], lastKey: undefined });
-
-      const result = await searchCourses({ keyword: 'nonexistent' });
-
-      expect(result.items).toHaveLength(0);
-      expect(result.pagination.total).toBe(0);
-      expect(result.pagination.hasNextPage).toBe(false);
-    });
-
-    it('should cache search results', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      vi.mocked(queryItems).mockResolvedValue({ items: [mockCourse], lastKey: undefined });
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-      vi.mocked(batchGetItems).mockResolvedValue([mockTeacher]);
-      vi.mocked(setCache).mockResolvedValue(undefined);
-
-      await searchCourses({ keyword: 'math' });
-
-      expect(setCache).toHaveBeenCalled();
-    });
-  });
+  // ==================== getCourseById ====================
 
   describe('getCourseById', () => {
-    it('should return course when found', async () => {
-      vi.mocked(getItem).mockResolvedValue(mockCourse);
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#c123', SK: 'METADATA' });
+    it('should return course when course exists', async () => {
+      mockPool.query.mockResolvedValue({ rows: [mockCourse] });
 
-      const result = await getCourseById('c123');
+      const { getCourseById } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCourseById('course_123');
 
       expect(result).toEqual(mockCourse);
-      expect(getItem).toHaveBeenCalled();
+      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('SELECT * FROM courses WHERE id = $1'),
+        ['course_123']
+      );
     });
 
     it('should return null when course not found', async () => {
-      vi.mocked(getItem).mockResolvedValue(null);
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#nonexistent', SK: 'METADATA' });
+      mockPool.query.mockResolvedValue({ rows: [] });
 
+      const { getCourseById } = createCoursesService(mockPool as unknown as Pool);
       const result = await getCourseById('nonexistent');
 
       expect(result).toBeNull();
     });
   });
 
-  describe('getTeacherById', () => {
-    it('should return teacher when found', async () => {
-      vi.mocked(getItem).mockResolvedValue(mockTeacher);
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#t123', SK: 'METADATA' });
-
-      const result = await getTeacherById('t123');
-
-      expect(result).toEqual(mockTeacher);
-    });
-
-    it('should return null when teacher not found', async () => {
-      vi.mocked(getItem).mockResolvedValue(null);
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'TEACHER#nonexistent', SK: 'METADATA' });
-
-      const result = await getTeacherById('nonexistent');
-
-      expect(result).toBeNull();
-    });
-  });
+  // ==================== getCourseDetail ====================
 
   describe('getCourseDetail', () => {
-    it('should return null when course not found', async () => {
-      vi.mocked(getItem).mockResolvedValue(null);
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#nonexistent', SK: 'METADATA' });
+    it('should return course with teacher details when course exists', async () => {
+      mockPool.query.mockImplementation((query: string) => {
+        if (query.includes('SELECT * FROM courses WHERE id = $1')) {
+          return Promise.resolve({ rows: [mockCourse] });
+        }
+        if (query.includes('SELECT * FROM teachers WHERE id = $1')) {
+          return Promise.resolve({ rows: [mockTeacher] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
 
+      const { getCourseDetail } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCourseDetail('course_123');
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe('course_123');
+      expect(result?.teacher).toBeDefined();
+      expect(result?.teacher?.id).toBe('teacher_123');
+      expect(result?.teacher?.displayName).toBe('Test Teacher');
+      expect(result?.timeSlots).toEqual([]);
+      expect(result?.reviews).toBeDefined();
+    });
+
+    it('should return null when course not found', async () => {
+      mockPool.query.mockResolvedValue({ rows: [] });
+
+      const { getCourseDetail } = createCoursesService(mockPool as unknown as Pool);
       const result = await getCourseDetail('nonexistent');
 
       expect(result).toBeNull();
     });
 
-    it('should return course detail with teacher', async () => {
-      vi.mocked(getItem).mockResolvedValueOnce(mockCourse).mockResolvedValueOnce(mockTeacher);
-      vi.mocked(createEntityKey)
-        .mockReturnValueOnce({ PK: 'COURSE#c123', SK: 'METADATA' })
-        .mockReturnValueOnce({ PK: 'TEACHER#t123', SK: 'METADATA' });
+    it('should return teacher as null when teacher not found', async () => {
+      mockPool.query.mockImplementation((query: string) => {
+        if (query.includes('SELECT * FROM courses WHERE id = $1')) {
+          return Promise.resolve({ rows: [mockCourse] });
+        }
+        if (query.includes('SELECT * FROM teachers WHERE id = $1')) {
+          return Promise.resolve({ rows: [] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
 
-      const result = await getCourseDetail('c123');
+      const { getCourseDetail } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCourseDetail('course_123');
 
       expect(result).toBeDefined();
-      expect((result as { teacher: { id: string } }).teacher.id).toBe('t123');
+      expect(result?.teacher).toBeNull();
     });
   });
 
-  describe('toggleFavorite', () => {
-    it('should toggle favorite status', async () => {
-      const result = await toggleFavorite('usr_123', 'c123');
+  // ==================== createCourse ====================
 
-      expect(result).toBeDefined();
-      expect(result.favorited).toBe(true);
-    });
-  });
-
-  describe('getCourseTranslation', () => {
-    it('should return cached translation if available', async () => {
-      const cachedTranslation = {
-        title: '数学',
-        description: '完整的高中数学课程',
-        translatedAt: new Date().toISOString(),
+  describe('createCourse', () => {
+    it('should create course successfully', async () => {
+      const createInput = {
+        teacherId: 'teacher_123',
+        title: 'New Math Course',
+        titleEn: 'New Math Course EN',
+        description: 'A new math course',
+        descriptionEn: 'A new math course in English',
+        category: CourseCategory.MATH as CourseCategory,
+        subcategory: 'Calculus',
+        price: 75,
+        priceType: PriceType.PER_HOUR as PriceType,
+        teachingModes: ['ONLINE', 'OFFLINE'] as ('ONLINE' | 'OFFLINE' | 'BOTH')[],
+        locations: ['Wellington'],
+        targetAgeGroups: ['15-18'],
+        maxClassSize: 15,
+        sourceType: CourseSourceType.REGISTERED,
+        sourceUrl: undefined,
       };
-      vi.mocked(getFromCache).mockResolvedValue(cachedTranslation);
 
-      const result = await getCourseTranslation('c123', 'zh');
+      const createdCourse = {
+        ...mockCourse,
+        id: 'course_new_123',
+        title: createInput.title,
+        description: createInput.description,
+        price: createInput.price,
+      };
 
-      expect(result).toEqual(cachedTranslation);
-    });
+      const teacherCourseLink = {
+        id: 'tc_123',
+        teacher_id: 'teacher_123',
+        course_id: 'course_new_123',
+        course_title: createInput.title,
+        course_category: CourseCategory.MATH,
+        course_price: createInput.price,
+        created_at: new Date(),
+      };
 
-    it('should return English translation when target is en', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      vi.mocked(getItem).mockResolvedValue(mockCourse);
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#c123', SK: 'METADATA' });
+      // Mock teacher check
+      mockPool.query.mockResolvedValueOnce({ rows: [mockTeacher] });
+      // Mock course creation - INSERT query returns the created course
+      mockPool.query.mockResolvedValueOnce({ rows: [createdCourse] });
+      // Mock addCourse - must return rows with proper structure
+      mockPool.query.mockResolvedValueOnce({ rows: [teacherCourseLink] });
 
-      const result = await getCourseTranslation('c123', 'en');
+      const { createCourse } = createCoursesService(mockPool as unknown as Pool);
+      const result = await createCourse(createInput);
 
       expect(result).toBeDefined();
-      expect(result?.title).toBe(mockCourse.titleEn || mockCourse.title);
+      expect(result.title).toBe('New Math Course');
+      expect(result.price).toBe(75);
+    });
+
+    it('should throw error when teacher not found', async () => {
+      mockPool.query.mockResolvedValue({ rows: [] });
+
+      const { createCourse } = createCoursesService(mockPool as unknown as Pool);
+
+      await expect(
+        createCourse({
+          teacherId: 'nonexistent',
+          title: 'Test Course',
+          description: 'Test description',
+          category: CourseCategory.MATH,
+          price: 50,
+          priceType: PriceType.PER_HOUR,
+          teachingModes: ['ONLINE'],
+          locations: ['Auckland'],
+          targetAgeGroups: ['10-15'],
+          maxClassSize: 20,
+        })
+      ).rejects.toThrow('Teacher not found');
+    });
+  });
+
+  // ==================== updateCourse ====================
+
+  describe('updateCourse', () => {
+    it('should update course successfully', async () => {
+      const updatedCourse = {
+        ...mockCourse,
+        title: 'Updated Math Course',
+        price: 60,
+      };
+
+      // The update method in repository calls findById internally, so we need 3 mocks:
+      // 1. Service findById for existence check
+      // 2. Repository update's findById call
+      // 3. Repository UPDATE query
+      mockPool.query
+        .mockResolvedValueOnce({ rows: [mockCourse] }) // Service: findById
+        .mockResolvedValueOnce({ rows: [mockCourse] }) // Repository: findById in update
+        .mockResolvedValueOnce({ rows: [updatedCourse] }); // Repository: UPDATE
+
+      const { updateCourse } = createCoursesService(mockPool as unknown as Pool);
+      const result = await updateCourse('course_123', {
+        title: 'Updated Math Course',
+        price: 60,
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.title).toBe('Updated Math Course');
+      expect(result?.price).toBe(60);
+    });
+
+    it('should throw error when course not found', async () => {
+      mockPool.query.mockResolvedValue({ rows: [] });
+
+      const { updateCourse } = createCoursesService(mockPool as unknown as Pool);
+
+      await expect(
+        updateCourse('nonexistent', { title: 'New Title' })
+      ).rejects.toThrow('Course not found');
+    });
+
+    it('should update multiple fields', async () => {
+      const updatedCourse = {
+        ...mockCourse,
+        title: 'New Title',
+        description: 'New description',
+        price: 100,
+        status: CourseStatus.INACTIVE,
+      };
+
+      // 3 mocks: Service findById, Repository findById, Repository UPDATE
+      mockPool.query
+        .mockResolvedValueOnce({ rows: [mockCourse] }) // Service: findById
+        .mockResolvedValueOnce({ rows: [mockCourse] }) // Repository: findById in update
+        .mockResolvedValueOnce({ rows: [updatedCourse] }); // Repository: UPDATE
+
+      const { updateCourse } = createCoursesService(mockPool as unknown as Pool);
+      const result = await updateCourse('course_123', {
+        title: 'New Title',
+        description: 'New description',
+        price: 100,
+        status: CourseStatus.INACTIVE,
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.title).toBe('New Title');
+      expect(result?.description).toBe('New description');
+      expect(result?.price).toBe(100);
+      expect(result?.status).toBe(CourseStatus.INACTIVE);
+    });
+  });
+
+  // ==================== deleteCourse ====================
+
+  describe('deleteCourse', () => {
+    it('should return true when course deleted successfully', async () => {
+      // Mock findById for existence check
+      mockPool.query.mockResolvedValueOnce({ rows: [mockCourse] });
+      // Mock removeCourse
+      mockPool.query.mockResolvedValueOnce({ rows: [] });
+      // Mock delete
+      mockPool.query.mockResolvedValueOnce({ rowCount: 1 });
+
+      const { deleteCourse } = createCoursesService(mockPool as unknown as Pool);
+      const result = await deleteCourse('course_123');
+
+      expect(result).toBe(true);
+    });
+
+    it('should throw error when course not found', async () => {
+      mockPool.query.mockResolvedValue({ rows: [] });
+
+      const { deleteCourse } = createCoursesService(mockPool as unknown as Pool);
+
+      await expect(deleteCourse('nonexistent')).rejects.toThrow('Course not found');
+    });
+  });
+
+  // ==================== getCoursesByTeacher ====================
+
+  describe('getCoursesByTeacher', () => {
+    it('should return courses for teacher', async () => {
+      const mockCourses = [
+        mockCourse,
+        { ...mockCourse, id: 'course_456', title: 'Physics Course' },
+      ];
+
+      mockPool.query.mockResolvedValue({ rows: mockCourses });
+
+      const { getCoursesByTeacher } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCoursesByTeacher('teacher_123');
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('course_123');
+      expect(result[1].id).toBe('course_456');
+      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('SELECT * FROM courses WHERE teacher_id = $1'),
+        ['teacher_123']
+      );
+    });
+
+    it('should return empty array when teacher has no courses', async () => {
+      mockPool.query.mockResolvedValue({ rows: [] });
+
+      const { getCoursesByTeacher } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCoursesByTeacher('teacher_no_courses');
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  // ==================== searchCourses ====================
+
+  describe('searchCourses', () => {
+    it('should search courses with keyword', async () => {
+      const mockCourses = [mockCourse];
+
+      // Mock search query
+      mockPool.query.mockImplementation((query: string) => {
+        if (query.includes('COUNT(*) as count')) {
+          return Promise.resolve({ rows: [{ count: '1' }] });
+        }
+        if (query.includes('SELECT *') && query.includes('FROM courses')) {
+          return Promise.resolve({ rows: mockCourses });
+        }
+        if (query.includes('FROM teachers')) {
+          return Promise.resolve({ rows: [mockTeacher] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { searchCourses } = createCoursesService(mockPool as unknown as Pool);
+      const result = await searchCourses({
+        keyword: 'math',
+        category: CourseCategory.MATH,
+        page: 1,
+        limit: 20,
+      });
+
+      expect(result.items).toHaveLength(1);
+      expect(result.pagination.total).toBe(1);
+      expect(result.pagination.page).toBe(1);
+      expect(result.pagination.limit).toBe(20);
+    });
+
+    it('should search courses with filters', async () => {
+      const mockCourses = [mockCourse];
+
+      mockPool.query.mockImplementation((query: string) => {
+        if (query.includes('COUNT(*) as count')) {
+          return Promise.resolve({ rows: [{ count: '1' }] });
+        }
+        if (query.includes('SELECT *') && query.includes('FROM courses')) {
+          return Promise.resolve({ rows: mockCourses });
+        }
+        if (query.includes('FROM teachers')) {
+          return Promise.resolve({ rows: [mockTeacher] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { searchCourses } = createCoursesService(mockPool as unknown as Pool);
+      const result = await searchCourses({
+        keyword: 'math',
+        category: CourseCategory.MATH,
+        city: 'Auckland',
+        priceMin: 0,
+        priceMax: 100,
+        ratingMin: 4.0,
+        trustLevel: TrustLevel.A,
+        teachingMode: 'ONLINE',
+        sortBy: SortBy.RATING,
+        page: 1,
+        limit: 10,
+      });
+
+      expect(result.items).toHaveLength(1);
+      expect(result.pagination.totalPages).toBe(1);
+      expect(result.pagination.hasNextPage).toBe(false);
+    });
+
+    it('should return empty results when no courses match', async () => {
+      mockPool.query.mockImplementation((query: string) => {
+        if (query.includes('COUNT(*) as count')) {
+          return Promise.resolve({ rows: [{ count: '0' }] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { searchCourses } = createCoursesService(mockPool as unknown as Pool);
+      const result = await searchCourses({
+        keyword: 'nonexistent',
+        category: CourseCategory.MUSIC,
+      });
+
+      expect(result.items).toEqual([]);
+      expect(result.pagination.total).toBe(0);
+    });
+
+    it('should handle pagination correctly', async () => {
+      const mockCourses = Array.from({ length: 20 }, (_, i) => ({
+        ...mockCourse,
+        id: `course_${i}`,
+      }));
+
+      mockPool.query.mockImplementation((query: string) => {
+        if (query.includes('COUNT(*) as count')) {
+          return Promise.resolve({ rows: [{ count: '50' }] });
+        }
+        if (query.includes('SELECT *') && query.includes('FROM courses')) {
+          return Promise.resolve({ rows: mockCourses });
+        }
+        if (query.includes('FROM teachers')) {
+          return Promise.resolve({ rows: [mockTeacher] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { searchCourses } = createCoursesService(mockPool as unknown as Pool);
+      const result = await searchCourses({
+        page: 2,
+        limit: 20,
+      });
+
+      expect(result.items).toHaveLength(20);
+      expect(result.pagination.page).toBe(2);
+      expect(result.pagination.total).toBe(50);
+      expect(result.pagination.totalPages).toBe(3);
+      expect(result.pagination.hasNextPage).toBe(true);
+      expect(result.pagination.hasPrevPage).toBe(true);
+    });
+
+    it('should include teacher info in search results', async () => {
+      const mockCourses = [mockCourse];
+
+      mockPool.query.mockImplementation((query: string) => {
+        if (query.includes('COUNT(*) as count')) {
+          return Promise.resolve({ rows: [{ count: '1' }] });
+        }
+        if (query.includes('SELECT *') && query.includes('FROM courses')) {
+          return Promise.resolve({ rows: mockCourses });
+        }
+        if (query.includes('FROM teachers')) {
+          return Promise.resolve({ rows: [mockTeacher] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { searchCourses } = createCoursesService(mockPool as unknown as Pool);
+      const result = await searchCourses({});
+
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].teacher).toBeDefined();
+      expect(result.items[0].teacher?.id).toBe('teacher_123');
+      expect(result.items[0].teacher?.displayName).toBe('Test Teacher');
+    });
+  });
+
+  // ==================== getCourseStatistics ====================
+
+  describe('getCourseStatistics', () => {
+    it('should return statistics for all courses', async () => {
+      let queryCallCount = 0;
+
+      mockPool.query.mockImplementation((query: string) => {
+        queryCallCount++;
+        // First query is the stats aggregation query
+        if (queryCallCount === 1) {
+          return Promise.resolve({
+            rows: [
+              {
+                total_courses: '10',
+                active_courses: '8',
+                avg_rating: '4.5',
+                total_reviews: '100',
+                avg_price: '60',
+              },
+            ],
+          });
+        }
+        // Second query is the category distribution query
+        if (query.includes('GROUP BY category')) {
+          return Promise.resolve({
+            rows: [
+              { category: 'MATH', count: '5' },
+              { category: 'MUSIC', count: '3' },
+              { category: 'ART', count: '2' },
+            ],
+          });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { getCourseStatistics } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCourseStatistics();
+
+      expect(result.totalCourses).toBe(10);
+      expect(result.activeCourses).toBe(8);
+      expect(result.averageRating).toBe(4.5);
+      expect(result.totalReviews).toBe(100);
+      expect(result.averagePrice).toBe(60);
+      expect(result.categoryDistribution).toHaveLength(3);
+    });
+
+    it('should return statistics for specific teacher', async () => {
+      let queryCallCount = 0;
+
+      mockPool.query.mockImplementation((query: string) => {
+        queryCallCount++;
+        // First query is the stats aggregation query with teacher filter
+        if (queryCallCount === 1) {
+          return Promise.resolve({
+            rows: [
+              {
+                total_courses: '5',
+                active_courses: '4',
+                avg_rating: '4.8',
+                total_reviews: '50',
+                avg_price: '75',
+              },
+            ],
+          });
+        }
+        // Second query is the category distribution query with teacher filter
+        if (query.includes('GROUP BY category')) {
+          return Promise.resolve({
+            rows: [
+              { category: 'MATH', count: '3' },
+              { category: 'PHYSICS', count: '2' },
+            ],
+          });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { getCourseStatistics } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCourseStatistics('teacher_123');
+
+      expect(result.totalCourses).toBe(5);
+      expect(result.activeCourses).toBe(4);
+      expect(result.categoryDistribution).toHaveLength(2);
+    });
+
+    it('should return zeros when no courses exist', async () => {
+      let queryCallCount = 0;
+
+      mockPool.query.mockImplementation((query: string) => {
+        queryCallCount++;
+        // First query is the stats aggregation query
+        if (queryCallCount === 1) {
+          return Promise.resolve({
+            rows: [
+              {
+                total_courses: '0',
+                active_courses: '0',
+                avg_rating: null,
+                total_reviews: '0',
+                avg_price: null,
+              },
+            ],
+          });
+        }
+        // Second query is the category distribution query
+        if (query.includes('GROUP BY category')) {
+          return Promise.resolve({ rows: [] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { getCourseStatistics } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCourseStatistics();
+
+      expect(result.totalCourses).toBe(0);
+      expect(result.activeCourses).toBe(0);
+      expect(result.averageRating).toBe(0);
+      expect(result.totalReviews).toBe(0);
+      expect(result.averagePrice).toBe(0);
+      expect(result.categoryDistribution).toEqual([]);
+    });
+  });
+
+  // ==================== getFeaturedCourses ====================
+
+  describe('getFeaturedCourses', () => {
+    it('should return featured courses', async () => {
+      const mockCourses = [
+        { ...mockCourse, id: 'course_1', average_rating: 4.9 },
+        { ...mockCourse, id: 'course_2', average_rating: 4.8 },
+      ];
+
+      mockPool.query.mockImplementation((query: string) => {
+        if (query.includes('COUNT(*) as count')) {
+          return Promise.resolve({ rows: [{ count: '2' }] });
+        }
+        if (query.includes('SELECT *') && query.includes('FROM courses')) {
+          return Promise.resolve({ rows: mockCourses });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { getFeaturedCourses } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getFeaturedCourses(10);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('course_1');
+    });
+
+    it('should use default limit', async () => {
+      mockPool.query.mockImplementation((query: string) => {
+        if (query.includes('COUNT(*) as count')) {
+          return Promise.resolve({ rows: [{ count: '0' }] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { getFeaturedCourses } = createCoursesService(mockPool as unknown as Pool);
+      await getFeaturedCourses();
+
+      // Verify the query was called with default limit
+      expect(mockPool.query).toHaveBeenCalled();
+    });
+  });
+
+  // ==================== getRecentCourses ====================
+
+  describe('getRecentCourses', () => {
+    it('should return recent courses', async () => {
+      const mockCourses = [
+        { ...mockCourse, id: 'course_new' },
+        { ...mockCourse, id: 'course_new2' },
+      ];
+
+      mockPool.query.mockImplementation((query: string) => {
+        if (query.includes('COUNT(*) as count')) {
+          return Promise.resolve({ rows: [{ count: '2' }] });
+        }
+        if (query.includes('SELECT *') && query.includes('FROM courses')) {
+          return Promise.resolve({ rows: mockCourses });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { getRecentCourses } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getRecentCourses(10);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('course_new');
+    });
+
+    it('should return empty array when no recent courses', async () => {
+      mockPool.query.mockImplementation((query: string) => {
+        if (query.includes('COUNT(*) as count')) {
+          return Promise.resolve({ rows: [{ count: '0' }] });
+        }
+        return Promise.resolve({ rows: [] });
+      });
+
+      const { getRecentCourses } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getRecentCourses(10);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  // ==================== incrementEnrollment ====================
+
+  describe('incrementEnrollment', () => {
+    it('should increment enrollment successfully', async () => {
+      const updatedCourse = {
+        ...mockCourse,
+        current_enrollment: 6,
+      };
+
+      mockPool.query.mockResolvedValue({ rows: [updatedCourse] });
+
+      const { incrementEnrollment } = createCoursesService(mockPool as unknown as Pool);
+      const result = await incrementEnrollment('course_123');
+
+      expect(result).toBeDefined();
+      expect(result?.current_enrollment).toBe(6);
+      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('current_enrollment = current_enrollment + 1'),
+        ['course_123']
+      );
     });
 
     it('should return null when course not found', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      vi.mocked(getItem).mockResolvedValue(null);
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#nonexistent', SK: 'METADATA' });
+      mockPool.query.mockResolvedValue({ rows: [] });
 
-      const result = await getCourseTranslation('nonexistent', 'zh');
+      const { incrementEnrollment } = createCoursesService(mockPool as unknown as Pool);
+      const result = await incrementEnrollment('nonexistent');
 
       expect(result).toBeNull();
     });
 
-    it('should cache translation', async () => {
-      vi.mocked(getFromCache).mockResolvedValue(null);
-      vi.mocked(getItem).mockResolvedValue(mockCourse);
-      vi.mocked(createEntityKey).mockReturnValue({ PK: 'COURSE#c123', SK: 'METADATA' });
-      vi.mocked(setCache).mockResolvedValue(undefined);
+    it('should return null when class is full (enrollment equals max class size)', async () => {
+      // When class is full, the query condition `current_enrollment < max_class_size` fails
+      // so no rows are returned
+      mockPool.query.mockResolvedValue({ rows: [] });
 
-      await getCourseTranslation('c123', 'zh');
+      const { incrementEnrollment } = createCoursesService(mockPool as unknown as Pool);
+      const result = await incrementEnrollment('course_full');
 
-      expect(setCache).toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+  });
+
+  // ==================== decrementEnrollment ====================
+
+  describe('decrementEnrollment', () => {
+    it('should decrement enrollment successfully', async () => {
+      const updatedCourse = {
+        ...mockCourse,
+        current_enrollment: 4,
+      };
+
+      mockPool.query.mockResolvedValue({ rows: [updatedCourse] });
+
+      const { decrementEnrollment } = createCoursesService(mockPool as unknown as Pool);
+      const result = await decrementEnrollment('course_123');
+
+      expect(result).toBeDefined();
+      expect(result?.current_enrollment).toBe(4);
+    });
+
+    it('should not go below zero', async () => {
+      const emptyCourse = { ...mockCourse, current_enrollment: 0 };
+      mockPool.query.mockResolvedValue({ rows: [emptyCourse] });
+
+      const { decrementEnrollment } = createCoursesService(mockPool as unknown as Pool);
+      const result = await decrementEnrollment('course_empty');
+
+      expect(result).toBeDefined();
+      expect(result?.current_enrollment).toBe(0);
+    });
+
+    it('should return null when course not found', async () => {
+      mockPool.query.mockResolvedValue({ rows: [] });
+
+      const { decrementEnrollment } = createCoursesService(mockPool as unknown as Pool);
+      const result = await decrementEnrollment('nonexistent');
+
+      expect(result).toBeNull();
+    });
+  });
+
+  // ==================== updateCourseRating ====================
+
+  describe('updateCourseRating', () => {
+    it('should update course rating successfully', async () => {
+      const updatedCourse = {
+        ...mockCourse,
+        average_rating: 4.8,
+        total_reviews: 15,
+      };
+
+      mockPool.query.mockResolvedValue({ rows: [updatedCourse] });
+
+      const { updateCourseRating } = createCoursesService(mockPool as unknown as Pool);
+      const result = await updateCourseRating('course_123', 4.8, 15);
+
+      expect(result).toBeDefined();
+      expect(result?.average_rating).toBe(4.8);
+      expect(result?.total_reviews).toBe(15);
+      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('UPDATE courses'),
+        [4.8, 15, 'course_123']
+      );
+    });
+
+    it('should return null when course not found', async () => {
+      mockPool.query.mockResolvedValue({ rows: [] });
+
+      const { updateCourseRating } = createCoursesService(mockPool as unknown as Pool);
+      const result = await updateCourseRating('nonexistent', 4.5, 10);
+
+      expect(result).toBeNull();
+    });
+  });
+
+  // ==================== toggleFavorite ====================
+
+  describe('toggleFavorite', () => {
+    it('should return favorited status', async () => {
+      const { toggleFavorite } = createCoursesService(mockPool as unknown as Pool);
+      const result = await toggleFavorite('user_123', 'course_123');
+
+      expect(result).toEqual({ favorited: true });
+    });
+  });
+
+  // ==================== getCourseTranslation ====================
+
+  describe('getCourseTranslation', () => {
+    it('should return Chinese translation', async () => {
+      mockPool.query.mockResolvedValue({ rows: [mockCourse] });
+
+      const { getCourseTranslation } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCourseTranslation('course_123', 'zh');
+
+      expect(result).toBeDefined();
+      expect(result?.title).toBe('Math Course');
+      expect(result?.description).toBe('A comprehensive math course');
+      expect(result?.translatedAt).toBeDefined();
+    });
+
+    it('should return English translation when available', async () => {
+      mockPool.query.mockResolvedValue({ rows: [mockCourse] });
+
+      const { getCourseTranslation } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCourseTranslation('course_123', 'en');
+
+      expect(result).toBeDefined();
+      expect(result?.title).toBe('Math Course EN');
+      expect(result?.description).toBe('A comprehensive math course in English');
+    });
+
+    it('should fallback to Chinese when English not available', async () => {
+      const courseWithoutEn = { ...mockCourse, title_en: undefined, description_en: undefined };
+      mockPool.query.mockResolvedValue({ rows: [courseWithoutEn] });
+
+      const { getCourseTranslation } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCourseTranslation('course_123', 'en');
+
+      expect(result).toBeDefined();
+      expect(result?.title).toBe('Math Course');
+      expect(result?.description).toBe('A comprehensive math course');
+    });
+
+    it('should return null when course not found', async () => {
+      mockPool.query.mockResolvedValue({ rows: [] });
+
+      const { getCourseTranslation } = createCoursesService(mockPool as unknown as Pool);
+      const result = await getCourseTranslation('nonexistent', 'zh');
+
+      expect(result).toBeNull();
+    });
+  });
+
+  // ==================== Error Cases ====================
+
+  describe('Error Handling', () => {
+    it('should throw error for invalid course ID format', async () => {
+      mockPool.query.mockRejectedValue(new Error('invalid input syntax for uuid'));
+
+      const { getCourseById } = createCoursesService(mockPool as unknown as Pool);
+
+      await expect(getCourseById('invalid-id')).rejects.toThrow();
+    });
+
+    it('should handle database connection errors', async () => {
+      mockPool.query.mockRejectedValue(new Error('Connection refused'));
+
+      const { getCourseById } = createCoursesService(mockPool as unknown as Pool);
+
+      await expect(getCourseById('course_123')).rejects.toThrow('Connection refused');
+    });
+
+    it('should handle transaction errors gracefully', async () => {
+      // Mock teacher check passes
+      mockPool.query.mockResolvedValueOnce({ rows: [mockTeacher] });
+      // Mock create fails
+      mockPool.query.mockRejectedValueOnce(new Error('Duplicate key'));
+
+      const { createCourse } = createCoursesService(mockPool as unknown as Pool);
+
+      await expect(
+        createCourse({
+          teacherId: 'teacher_123',
+          title: 'Duplicate Course',
+          description: 'Test',
+          category: CourseCategory.MATH,
+          price: 50,
+          priceType: PriceType.PER_HOUR,
+          teachingModes: ['ONLINE'],
+          locations: ['Auckland'],
+          targetAgeGroups: ['10-15'],
+          maxClassSize: 20,
+        })
+      ).rejects.toThrow('Duplicate key');
     });
   });
 });

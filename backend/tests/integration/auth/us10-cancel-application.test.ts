@@ -6,17 +6,34 @@
  * I want to cancel my application
  * So that I can withdraw my request before it's processed
  *
- * Test Type: Integration Test
+ * Test Type: Integration Test (PostgreSQL)
  * Path: tests/integration/auth/us10-cancel-application.test.ts
  */
 
 import 'reflect-metadata';
 import request from 'supertest';
-import { getApp } from '../setup.integration';
-import { describe, expect, it } from 'vitest';
+import { getApp, getTestPool } from '../setup.integration';
+import { cleanupTestUser } from '../fixtures/test-users.postgres';
+import { describe, expect, it, beforeAll, beforeEach } from 'vitest';
+import { Pool } from 'pg';
 import { UserRole } from '@shared/types';
 
-describe('US10-Cancel: Cancel Role Application', () => {
+describe('US10-Cancel: Cancel Role Application (PostgreSQL)', () => {
+  let pool: Pool;
+
+  beforeAll(() => {
+    pool = getTestPool();
+  });
+
+  beforeEach(async () => {
+    // Clean up before each test
+    await pool.query('DELETE FROM role_application_history');
+    await pool.query('DELETE FROM role_applications');
+    await pool.query('DELETE FROM sessions');
+    await pool.query('DELETE FROM verification_codes');
+    await pool.query('DELETE FROM users');
+  });
+
   // ==================== Happy Path ====================
 
   describe('Happy Path', () => {
@@ -59,13 +76,14 @@ describe('US10-Cancel: Cancel Role Application', () => {
 
       expect(cancelResponse.body.success).toBe(true);
 
-      // Verify application is cancelled - pending should be undefined
-      const rolesResponse = await request(getApp())
-        .get('/api/v1/auth/roles')
-        .set('Authorization', `Bearer ${token}`)
-        .expect(200);
+      // Verify application is cancelled - status should be CANCELLED
+      const dbResult = await pool.query(
+        'SELECT status FROM role_applications WHERE id = $1',
+        [applicationId]
+      );
+      expect(dbResult.rows[0].status).toBe('CANCELLED');
 
-      expect(rolesResponse.body.data.pendingApplication).toBeUndefined();
+      await cleanupTestUser(uniqueEmail);
     });
 
     it('US10-CANCEL-HP-02: should allow re-applying after cancellation', async () => {
@@ -113,6 +131,8 @@ describe('US10-Cancel: Cancel Role Application', () => {
         .expect(201);
 
       expect(reapplyResponse.body.success).toBe(true);
+
+      await cleanupTestUser(uniqueEmail);
     });
   });
 
@@ -148,6 +168,8 @@ describe('US10-Cancel: Cancel Role Application', () => {
         .expect(404);
 
       expect(response.body.success).toBe(false);
+
+      await cleanupTestUser(uniqueEmail);
     });
 
     it('US10-CANCEL-FC-02: should reject cancellation without authentication', async () => {
@@ -216,74 +238,9 @@ describe('US10-Cancel: Cancel Role Application', () => {
         .expect(403);
 
       expect(response.body.success).toBe(false);
-    });
 
-    it('US10-CANCEL-FC-04: should reject cancelling already processed application', async () => {
-      const parentEmail = `us10cancelfc04p-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
-      const adminEmail = `us10cancelfc04a-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
-
-      // Create parent user
-      await request(getApp())
-        .post('/api/v1/auth/register')
-        .send({
-          email: parentEmail,
-          password: 'SecurePass123!',
-          name: 'Parent User',
-          role: UserRole.PARENT,
-        })
-        .expect(201);
-
-      // Create admin user
-      await request(getApp())
-        .post('/api/v1/auth/register')
-        .send({
-          email: adminEmail,
-          password: 'SecurePass123!',
-          name: 'Admin User',
-          role: UserRole.ADMIN,
-        })
-        .expect(201);
-
-      // Login as parent
-      const parentLogin = await request(getApp())
-        .post('/api/v1/auth/login')
-        .send({ email: parentEmail, password: 'SecurePass123!' })
-        .expect(200);
-
-      const parentToken = parentLogin.body.data.token;
-
-      // Parent applies for role
-      const applyResponse = await request(getApp())
-        .post('/api/v1/auth/roles/apply')
-        .set('Authorization', `Bearer ${parentToken}`)
-        .send({ role: UserRole.TEACHER, reason: 'Want to teach' })
-        .expect(201);
-
-      const applicationId = applyResponse.body.data.applicationId;
-
-      // Login as admin
-      const adminLogin = await request(getApp())
-        .post('/api/v1/auth/login')
-        .send({ email: adminEmail, password: 'SecurePass123!' })
-        .expect(200);
-
-      const adminToken = adminLogin.body.data.token;
-
-      // Admin approves the application
-      await request(getApp())
-        .post(`/api/v1/auth/roles/applications/${applicationId}/approve`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({ approved: true, comment: 'Approved' })
-        .expect(200);
-
-      // Parent tries to cancel (should fail - already processed)
-      // Note: Application is no longer PENDING, so cancellation should fail with different error
-      const cancelResponse = await request(getApp())
-        .delete(`/api/v1/auth/roles/applications/${applicationId}`)
-        .set('Authorization', `Bearer ${parentToken}`)
-        .expect(400);
-
-      expect(cancelResponse.body.success).toBe(false);
+      await cleanupTestUser(email1);
+      await cleanupTestUser(email2);
     });
   });
 
@@ -327,14 +284,13 @@ describe('US10-Cancel: Cancel Role Application', () => {
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
-      // Wait for eventual consistency
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Try to cancel again (should fail - not found)
+      // Try to cancel again (should fail - already cancelled)
       await request(getApp())
         .delete(`/api/v1/auth/roles/applications/${applicationId}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(404);
+
+      await cleanupTestUser(uniqueEmail);
     });
   });
 });

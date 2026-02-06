@@ -2,10 +2,11 @@
  * User Repository for PostgreSQL
  */
 
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '@core/logger';
-import { UserStatus, UserRole } from '@shared/types';
+import type { UserRole } from '@shared/types';
+import { UserStatus } from '@shared/types';
 
 export interface User {
   id: string;
@@ -45,10 +46,7 @@ export class UserRepository {
    * Find user by ID
    */
   async findById(id: string): Promise<User | null> {
-    const result = await this.pool.query<User>(
-      'SELECT * FROM users WHERE id = $1',
-      [id]
-    );
+    const result = await this.pool.query<User>('SELECT * FROM users WHERE id = $1', [id]);
     return result.rows[0] || null;
   }
 
@@ -56,10 +54,9 @@ export class UserRepository {
    * Find user by email
    */
   async findByEmail(email: string): Promise<User | null> {
-    const result = await this.pool.query<User>(
-      'SELECT * FROM users WHERE email = $1',
-      [email.toLowerCase()]
-    );
+    const result = await this.pool.query<User>('SELECT * FROM users WHERE email = $1', [
+      email.toLowerCase(),
+    ]);
     return result.rows[0] || null;
   }
 
@@ -149,10 +146,9 @@ export class UserRepository {
    * Check if email exists
    */
   async emailExists(email: string): Promise<boolean> {
-    const result = await this.pool.query(
-      'SELECT 1 FROM users WHERE email = $1 LIMIT 1',
-      [email.toLowerCase()]
-    );
+    const result = await this.pool.query('SELECT 1 FROM users WHERE email = $1 LIMIT 1', [
+      email.toLowerCase(),
+    ]);
     return result.rows.length > 0;
   }
 
@@ -160,10 +156,7 @@ export class UserRepository {
    * Delete user by ID
    */
   async delete(id: string): Promise<boolean> {
-    const result = await this.pool.query(
-      'DELETE FROM users WHERE id = $1',
-      [id]
-    );
+    const result = await this.pool.query('DELETE FROM users WHERE id = $1', [id]);
     return (result.rowCount ?? 0) > 0;
   }
 

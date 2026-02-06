@@ -1,6 +1,7 @@
 /**
  * Integration Test Setup
- * Starts Docker containers (DynamoDB + MailHog)
+ * Starts Docker containers (PostgreSQL + MailHog)
+ * Uses testcontainers for PostgreSQL container management
  */
 
 import { resolve } from 'path';
@@ -16,32 +17,32 @@ const configDir = resolve(process.cwd(), 'src/config/env');
 config({ path: resolve(configDir, '.env.base') });
 config({ path: resolve(configDir, '.env.test') });
 
-import { GenericContainer, type StartedTestContainer, Wait } from 'testcontainers';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { resetClient as resetMainDynamoDBClients, TABLE_NAME } from '@src/shared/db/dynamodb';
-import { getConfig } from '@src/config';
+import { GenericContainer, type StartedGenericContainer, Wait } from 'testcontainers';
+import { Pool } from 'pg';
 import { beforeAll, afterAll } from 'vitest';
 import { createApp } from '@src/app';
-import { ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { initializeSchema, truncateAllTables } from '@src/shared/db/postgres/schema';
+import { getPool, resetPool } from '@src/shared/db/postgres/client';
 
-const DYNAMODB_IMAGE = 'amazon/dynamodb-local:2.0.0';
+const POSTGRES_IMAGE = 'postgres:15-alpine';
 const MAILHOG_IMAGE = 'mailhog/mailhog:latest';
+
+const POSTGRES_USER = 'test_user';
+const POSTGRES_PASSWORD = 'test_password';
+const POSTGRES_DB = 'findclass_test';
 
 // Global state
 let containersStarted = false;
 let testContext: {
-  dynamodb: {
-    container: StartedTestContainer;
-    client: DynamoDBClient;
-    docClient: DynamoDBDocumentClient;
-    tableName: string;
-    endpoint: string;
+  postgres: {
+    container: StartedGenericContainer;
+    pool: Pool;
     host: string;
     port: number;
+    connectionString: string;
   };
   mailhog: {
-    container: StartedTestContainer;
+    container: StartedGenericContainer;
     host: string;
     smtpPort: number;
     apiPort: number;
@@ -51,106 +52,77 @@ let testContext: {
 let _app: ReturnType<typeof createApp> | null = null;
 
 export const getApp = () => _app;
-export const getDynamoDBDocClient = () =>
-  containersStarted ? (testContext?.dynamodb.docClient ?? null) : null;
+export const getTestPool = (): Pool => {
+  if (!testContext?.postgres.pool) {
+    throw new Error('PostgreSQL pool not initialized');
+  }
+  return testContext!.postgres.pool;
+};
+
+export const getTestContext = () => testContext;
+export const isContainersStarted = () => containersStarted;
 
 async function startContainers() {
-  if (containersStarted) return testContext;
+  if (containersStarted && testContext) return testContext;
 
-  const cfg = getConfig();
-  console.log('🚀 Starting test containers...');
+  console.log('🚀 Starting integration test containers...');
 
   // MailHog
   console.log('📧 Starting MailHog...');
   const mailhog = await new GenericContainer(MAILHOG_IMAGE)
-    .withExposedPorts(
-      { container: cfg.smtp.port, host: cfg.smtp.port },
-      { container: cfg.smtp.apiPort, host: cfg.smtp.apiPort }
-    )
+    .withExposedPorts({ container: 1025, host: 1025 }, { container: 8025, host: 8025 })
     .withWaitStrategy(Wait.forListeningPorts())
     .withStartupTimeout(60000)
     .start();
 
   const host = mailhog.getHost();
-  console.log(`✅ MailHog: ${host}:${cfg.smtp.port}`);
+  console.log(`✅ MailHog started: ${host}:1025 (SMTP), ${host}:8025 (API)`);
 
-  // DynamoDB
-  console.log('🗄️  Starting DynamoDB...');
-  const dynamodb = await new GenericContainer(DYNAMODB_IMAGE)
-    .withExposedPorts({ container: 8000, host: cfg.dynamodb.port })
-    .withCommand(['-jar', 'DynamoDBLocal.jar', '-sharedDb'])
+  // PostgreSQL
+  console.log('🗄️  Starting PostgreSQL...');
+  const postgres = await new GenericContainer(POSTGRES_IMAGE)
+    .withExposedPorts({ container: 5432, host: 5432 })
+    .withEnvironment({
+      POSTGRES_USER,
+      POSTGRES_PASSWORD,
+      POSTGRES_DB,
+    })
     .withWaitStrategy(Wait.forListeningPorts())
-    .withStartupTimeout(20000)
+    .withStartupTimeout(120000)
     .start();
 
-  const port = dynamodb.getMappedPort(8000);
-  const endpoint = `http://${host}:${port}`;
-  console.log(`✅ DynamoDB: ${endpoint}`);
+  const postgresPort = postgres.getMappedPort(5432);
+  const connectionUri = `postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${host}:${postgresPort}/${POSTGRES_DB}`;
+  console.log(`✅ PostgreSQL started: ${connectionUri}`);
 
-  resetMainDynamoDBClients();
+  // Reset the pool to ensure new connection
+  resetPool();
 
-  const client = new DynamoDBClient({
-    endpoint,
-    region: cfg.aws.region,
-    credentials: {
-      accessKeyId: cfg.aws.accessKeyId,
-      secretAccessKey: cfg.aws.secretAccessKey,
-    },
-  });
+  // Set DATABASE_URL for the app
+  process.env.DATABASE_URL = connectionUri;
 
-  const docClient = DynamoDBDocumentClient.from(client, {
-    marshallOptions: { removeUndefinedValues: true, convertClassInstanceToMap: true },
-  });
+  // Create pool for tests
+  const pool = new Pool({ connectionString: connectionUri });
 
-  // Create table
-  const { CreateTableCommand, DescribeTableCommand } = await import('@aws-sdk/client-dynamodb');
-  try {
-    await client.send(
-      new CreateTableCommand({
-        TableName: TABLE_NAME,
-        KeySchema: [
-          { AttributeName: 'PK', KeyType: 'HASH' },
-          { AttributeName: 'SK', KeyType: 'RANGE' },
-        ],
-        AttributeDefinitions: [
-          { AttributeName: 'PK', AttributeType: 'S' },
-          { AttributeName: 'SK', AttributeType: 'S' },
-          { AttributeName: 'GSI1PK', AttributeType: 'S' },
-          { AttributeName: 'GSI1SK', AttributeType: 'S' },
-        ],
-        GlobalSecondaryIndexes: [
-          {
-            IndexName: 'GSI1',
-            KeySchema: [
-              { AttributeName: 'GSI1PK', KeyType: 'HASH' },
-              { AttributeName: 'GSI1SK', KeyType: 'RANGE' },
-            ],
-            Projection: { ProjectionType: 'ALL' },
-            ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
-          },
-        ],
-        ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
-      })
-    );
-    console.log(`✅ Table ${TABLE_NAME} created`);
-  } catch (e: unknown) {
-    const error = e as { name?: string };
-    if (error.name !== 'ResourceInUseException') throw e;
-    console.log(`📋 Table ${TABLE_NAME} exists`);
-  }
-  await client.send(new DescribeTableCommand({ TableName: TABLE_NAME }));
+  // Initialize schema
+  console.log('📦 Initializing database schema...');
+  await initializeSchema();
+  console.log('✅ Schema initialized');
 
   testContext = {
-    dynamodb: {
-      container: dynamodb,
-      client,
-      docClient,
-      tableName: TABLE_NAME,
-      endpoint,
+    postgres: {
+      container: postgres,
+      pool,
       host,
-      port,
+      port: postgresPort,
+      connectionString: connectionUri,
     },
-    mailhog: { container: mailhog, host, smtpPort: cfg.smtp.port, apiPort: cfg.smtp.apiPort },
+    mailhog: {
+      container: mailhog,
+      host,
+      smtpPort: 1025,
+      apiPort: 8025,
+    },
   };
   containersStarted = true;
   console.log('✅ Containers ready');
@@ -160,60 +132,60 @@ async function startContainers() {
 async function stopContainers() {
   if (!containersStarted) return;
   console.log('🛑 Stopping containers...');
+
   try {
     const ctx = testContext;
-    if (ctx?.dynamodb.container) await ctx.dynamodb.container.stop();
-    if (ctx?.mailhog.container) await ctx.mailhog.container.stop();
+    if (ctx?.postgres.pool) {
+      await ctx.postgres.pool.end();
+    }
+    if (ctx?.postgres.container) {
+      await ctx.postgres.container.stop();
+    }
+    if (ctx?.mailhog.container) {
+      await ctx.mailhog.container.stop();
+    }
+    console.log('✅ Containers stopped');
   } catch (e) {
     console.warn('⚠️  Stop error:', e);
   }
+
   containersStarted = false;
   testContext = null;
+  resetPool();
 }
 
-async function clearTableData(docClient: DynamoDBDocumentClient) {
-  let lastKey: Record<string, string> | undefined;
-  do {
-    const { Items, LastEvaluatedKey } = await docClient.send(
-      new ScanCommand({ TableName: TABLE_NAME, ExclusiveStartKey: lastKey })
-    );
-    if (Items?.length) {
-      const { DeleteCommand } = await import('@aws-sdk/lib-dynamodb');
-      for (const item of Items) {
-        if (item.PK && item.SK) {
-          await docClient.send(
-            new DeleteCommand({ TableName: TABLE_NAME, Key: { PK: item.PK, SK: item.SK } })
-          );
-        }
-      }
-    }
-    lastKey = LastEvaluatedKey as Record<string, string> | undefined;
-  } while (lastKey);
+async function clearTableData(pool: Pool) {
+  await truncateAllTables();
 }
 
 // Integration test hooks
 beforeAll(async () => {
   await startContainers();
-  _app = createApp();
   const ctx = testContext;
-  if (ctx) await clearTableData(ctx.dynamodb.docClient);
+  if (ctx) {
+    await clearTableData(ctx.postgres.pool);
+  }
+  _app = createApp();
 }, 180000);
 
 afterAll(async () => {
   await stopContainers();
 });
 
-// Cleanup
+// Cleanup on process exit
 async function exitHandler() {
   await stopContainers();
   process.exit(0);
 }
+
 process.on('SIGINT', () => {
   void exitHandler();
 });
+
 process.on('SIGTERM', () => {
   void exitHandler();
 });
+
 process.on('beforeExit', () => {
   void stopContainers();
 });

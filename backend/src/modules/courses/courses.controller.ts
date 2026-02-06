@@ -10,7 +10,8 @@ import {
   getCourseTranslation,
 } from './courses.service';
 import { createSuccessResponse, createPaginatedResponse } from '@shared/types/api';
-import type { SearchCoursesDto } from './courses.types';
+import { SortBy } from './courses.types';
+import type { CourseCategory, TrustLevel } from '@shared/types';
 import { getRequestId, extractStringParam } from '@shared/utils/request';
 
 export const searchCoursesController = async (
@@ -19,29 +20,32 @@ export const searchCoursesController = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const language = (extractStringParam(req.query.language as string | string[] | undefined) ||
+      req.headers['accept-language'] ||
+      'zh') as 'zh' | 'en';
+
     const queryParams = {
-      ...req.query,
-      keyword: req.query.keyword as string,
-      category: req.query.category as string,
+      keyword: req.query.keyword as string | undefined,
+      category: req.query.category as CourseCategory | undefined,
+      city: req.query.city as string | undefined,
       priceMin: req.query.priceMin ? parseFloat(req.query.priceMin as string) : undefined,
       priceMax: req.query.priceMax ? parseFloat(req.query.priceMax as string) : undefined,
-      teachingMode: req.query.teachingMode as string,
-      location: req.query.location as string,
-      trustLevel: req.query.trustLevel as string,
-      language: req.query.language as string,
-      sortBy: req.query.sortBy as string,
+      ratingMin: req.query.ratingMin ? parseFloat(req.query.ratingMin as string) : undefined,
+      trustLevel: req.query.trustLevel as TrustLevel | undefined,
+      teachingMode: req.query.teachingMode as 'ONLINE' | 'OFFLINE' | 'BOTH' | undefined,
+      sortBy: (req.query.sortBy as SortBy) || SortBy.RELEVANCE,
       page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
       limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 20,
     };
 
-    const result = await searchCourses(queryParams as SearchCoursesDto);
+    const result = await searchCourses(queryParams);
 
     res.json(
       createPaginatedResponse(
         result.items,
         result.pagination,
         'Courses retrieved',
-        queryParams.language as 'zh' | 'en' | undefined,
+        language,
         getRequestId(req)
       )
     );

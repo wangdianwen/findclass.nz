@@ -3,7 +3,7 @@
  * Handles email verification codes with TTL
  */
 
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
 import crypto from 'crypto';
 import { logger } from '@core/logger';
 
@@ -74,10 +74,9 @@ export class VerificationCodeRepository {
     }
 
     // Mark as used
-    await this.pool.query(
-      'UPDATE verification_codes SET used = true WHERE id = $1',
-      [verification.id]
-    );
+    await this.pool.query('UPDATE verification_codes SET used = true WHERE id = $1', [
+      verification.id,
+    ]);
 
     logger.info('Verification code validated', { email: normalizedEmail, type });
     return { valid: true };
@@ -104,10 +103,7 @@ export class VerificationCodeRepository {
    * Mark a code as used
    */
   async markAsUsed(id: string): Promise<void> {
-    await this.pool.query(
-      'UPDATE verification_codes SET used = true WHERE id = $1',
-      [id]
-    );
+    await this.pool.query('UPDATE verification_codes SET used = true WHERE id = $1', [id]);
   }
 
   /**
@@ -131,10 +127,9 @@ export class VerificationCodeRepository {
   async deleteAllForEmail(email: string): Promise<number> {
     const normalizedEmail = email.toLowerCase();
 
-    const result = await this.pool.query(
-      'DELETE FROM verification_codes WHERE email = $1',
-      [normalizedEmail]
-    );
+    const result = await this.pool.query('DELETE FROM verification_codes WHERE email = $1', [
+      normalizedEmail,
+    ]);
 
     return result.rowCount ?? 0;
   }

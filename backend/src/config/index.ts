@@ -25,11 +25,13 @@ const config: AppConfig = {
   database: {
     url: raw.DATABASE_URL,
   },
-  dynamodb: raw.DYNAMODB_ENDPOINT ? {
-    endpoint: raw.DYNAMODB_ENDPOINT,
-    tableName: raw.DYNAMODB_TABLE_NAME || 'FindClass-MainTable',
-    port: raw.DYNAMODB_PORT || 8000,
-  } : null,
+  dynamodb: raw.DYNAMODB_ENDPOINT
+    ? {
+        endpoint: raw.DYNAMODB_ENDPOINT,
+        tableName: raw.DYNAMODB_TABLE_NAME || 'FindClass-MainTable',
+        port: raw.DYNAMODB_PORT || 8000,
+      }
+    : null,
   smtp: {
     host: raw.SMTP_HOST,
     port: raw.SMTP_PORT,

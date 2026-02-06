@@ -4,16 +4,6 @@
  */
 
 export { Pool, type PoolClient, type QueryResult } from 'pg';
-export {
-  getPool,
-  query,
-  checkHealth,
-  closePool,
-  resetPool,
-} from './postgres/client';
+export { getPool, query, checkHealth, closePool, resetPool } from './postgres/client';
 
-export {
-  initializeSchema,
-  dropAllTables,
-  truncateAllTables,
-} from './postgres/schema';
+export { initializeSchema, dropAllTables, truncateAllTables } from './postgres/schema';

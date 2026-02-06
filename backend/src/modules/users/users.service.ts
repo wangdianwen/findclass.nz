@@ -1,6 +1,6 @@
 /**
  * Users Module - Service
- * User management business logic
+ * User management business logic with PostgreSQL
  */
 
 import { logger } from '@core/logger';
@@ -11,311 +11,236 @@ import type {
   LearningProgress,
   LearningStatistics,
   LearningReport,
+  LearningRecordType,
 } from '@shared/types';
-import { LearningRecordType, ProgressStatus } from '@shared/types';
-import { getItem, putItem, queryItems, createEntityKey } from '@shared/db/dynamodb';
+import { ProgressStatus } from '@shared/types';
 import { AppError, ErrorCode } from '@core/errors';
-import { v4 as uuidv4 } from 'uuid';
+import { ChildRepository } from './child.repository';
+import type { CreateLearningRecordDTO } from './learning-record.repository';
+import { LearningRecordRepository } from './learning-record.repository';
+import { UserRepository } from './user.repository';
+import type { Pool } from 'pg';
 
-export async function getUserProfile(userId: string): Promise<User | null> {
-  const { PK, SK } = createEntityKey('USER', userId);
-  return getItem<User>({ PK, SK });
-}
+// Factory function to create service with dependencies
+export function createUsersService(pool: Pool) {
+  const userRepository = new UserRepository(pool);
+  const childRepository = new ChildRepository(pool);
+  const learningRecordRepository = new LearningRecordRepository(pool);
 
-export async function updateUserProfile(
-  userId: string,
-  data: { name?: string; phone?: string; language?: string; avatarUrl?: string }
-): Promise<User> {
-  logger.info('Updating user profile', { userId, data });
-
-  const { PK, SK } = createEntityKey('USER', userId);
-  const user = await getItem<User>({ PK, SK });
-
-  if (!user) {
-    throw new AppError('User not found', ErrorCode.USER_NOT_FOUND, 404);
+  async function getUserProfile(userId: string): Promise<User | null> {
+    logger.info('Getting user profile', { userId });
+    return userRepository.findById(userId);
   }
 
-  const updatedUser: User = {
-    ...user,
-    ...data,
-    language: (data.language as 'zh' | 'en') || user.language,
-    updatedAt: new Date().toISOString(),
-  };
+  async function updateUserProfile(
+    userId: string,
+    data: { name?: string; phone?: string; language?: string; avatarUrl?: string }
+  ): Promise<User> {
+    logger.info('Updating user profile', { userId, data });
 
-  await putItem(updatedUser as unknown as Record<string, unknown>);
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new AppError('User not found', ErrorCode.USER_NOT_FOUND, 404);
+    }
 
-  return updatedUser;
-}
+    const updatedUser = await userRepository.update(userId, {
+      name: data.name,
+      phone: data.phone,
+      avatar_url: data.avatarUrl,
+      language: data.language as 'zh' | 'en',
+    });
 
-export async function getChildren(userId: string): Promise<Child[]> {
-  const { PK } = createEntityKey('USER', userId);
+    if (!updatedUser) {
+      throw new AppError('Failed to update user', ErrorCode.INTERNAL_ERROR, 500);
+    }
 
-  const result = await queryItems<Child>({
-    keyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':pk': PK,
-      ':sk': 'CHILD#',
-    },
-  });
-
-  return result.items;
-}
-
-export async function addChild(
-  userId: string,
-  data: {
-    name: string;
-    dateOfBirth: string;
-    gender: 'MALE' | 'FEMALE';
-    school?: string;
-    grade?: string;
-    subjects?: string[];
-    learningGoals?: string[];
-  }
-): Promise<Child> {
-  logger.info('Adding child', { userId, data });
-  return Promise.reject(
-    new AppError('Child management feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501)
-  );
-}
-
-export async function recordParentalConsent(userId: string, childId: string): Promise<void> {
-  logger.info('Recording parental consent', { userId, childId });
-  return Promise.reject(
-    new AppError('Parental consent feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501)
-  );
-}
-
-export async function getFavorites(userId: string): Promise<unknown[]> {
-  logger.info('Getting favorites', { userId });
-  return Promise.reject(
-    new AppError('Favorites feature not yet implemented', ErrorCode.INTERNAL_ERROR, 501)
-  );
-}
-
-export async function recordLearning(
-  userId: string,
-  data: {
-    courseId: string;
-    lessonId?: string;
-    type: LearningRecordType;
-    duration: number;
-    progress: number;
-    metadata?: LearningRecord['metadata'];
-  }
-): Promise<LearningRecord> {
-  logger.info('Recording learning activity', { userId, data });
-
-  const { PK, SK } = createEntityKey('USER', userId);
-  const user = await getItem<User>({ PK, SK });
-
-  if (!user) {
-    throw new AppError('User not found', ErrorCode.USER_NOT_FOUND, 404);
+    return updatedUser;
   }
 
-  const recordId = `LRN#${uuidv4()}`;
-  const { PK: recordPK, SK: recordSK } = createEntityKey('USER', userId, recordId);
-
-  const record: LearningRecord = {
-    PK: recordPK,
-    SK: recordSK,
-    entityType: 'LEARNING_RECORD',
-    dataCategory: 'USER',
-    id: recordId,
-    userId,
-    courseId: data.courseId,
-    lessonId: data.lessonId,
-    type: data.type,
-    duration: data.duration,
-    progress: data.progress,
-    status: data.progress >= 100 ? ProgressStatus.COMPLETED : ProgressStatus.IN_PROGRESS,
-    metadata: data.metadata,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  await putItem(record as unknown as Record<string, unknown>);
-
-  return record;
-}
-
-export async function getLearningRecords(
-  userId: string,
-  params?: { courseId?: string; limit?: number }
-): Promise<LearningRecord[]> {
-  logger.info('Getting learning records', { userId, params });
-
-  const { PK } = createEntityKey('USER', userId);
-
-  let keyConditionExpression = 'PK = :pk AND begins_with(SK, :sk)';
-  const expressionAttributeValues: Record<string, unknown> = {
-    ':pk': PK,
-    ':sk': 'LRN#',
-  };
-
-  if (params?.courseId) {
-    keyConditionExpression = 'PK = :pk AND SK = :sk';
-    expressionAttributeValues[':sk'] = `LRN#${params.courseId}`;
+  async function getChildren(userId: string): Promise<Child[]> {
+    logger.info('Getting children', { userId });
+    return childRepository.findByUserId(userId);
   }
 
-  const result = await queryItems<LearningRecord>({
-    keyConditionExpression,
-    expressionAttributeValues,
-    limit: params?.limit || 50,
-    scanIndexForward: false,
-  });
+  async function addChild(
+    userId: string,
+    data: {
+      name: string;
+      dateOfBirth: string;
+      gender: 'MALE' | 'FEMALE';
+      school?: string;
+      grade?: string;
+      subjects?: string[];
+      learningGoals?: string[];
+    }
+  ): Promise<Child> {
+    logger.info('Adding child', { userId, data });
 
-  return result.items;
-}
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new AppError('User not found', ErrorCode.USER_NOT_FOUND, 404);
+    }
 
-export async function getCourseProgress(
-  userId: string,
-  courseId: string
-): Promise<LearningProgress | null> {
-  logger.info('Getting course progress', { userId, courseId });
-
-  const { PK } = createEntityKey('USER', userId);
-
-  const result = await queryItems<LearningRecord>({
-    keyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':pk': PK,
-      ':sk': `LRN#${courseId}`,
-    },
-  });
-
-  if (result.items.length === 0) {
-    return null;
-  }
-
-  const totalDuration = result.items.reduce((sum, item) => sum + item.duration, 0);
-  const completedLessons = result.items.filter(
-    item => item.type === LearningRecordType.LESSON_COMPLETE
-  ).length;
-  const lastActivity = result.items.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )[0];
-
-  const maxLessons = result.items.reduce((max, item) => Math.max(max, item.progress), 0);
-
-  return {
-    courseId,
-    userId,
-    totalDuration,
-    completedLessons,
-    totalLessons: Math.ceil(maxLessons / 10) || 0,
-    progressPercentage: Math.min(100, maxLessons),
-    status: maxLessons >= 100 ? ProgressStatus.COMPLETED : ProgressStatus.IN_PROGRESS,
-    lastActivityAt: lastActivity?.createdAt || new Date().toISOString(),
-    startedAt:
-      result.items.sort(
-        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      )[0]?.createdAt || new Date().toISOString(),
-    completedAt: maxLessons >= 100 ? new Date().toISOString() : undefined,
-  };
-}
-
-export async function getLearningStatistics(userId: string): Promise<LearningStatistics> {
-  logger.info('Getting learning statistics', { userId });
-
-  const { PK } = createEntityKey('USER', userId);
-
-  const result = await queryItems<LearningRecord>({
-    keyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':pk': PK,
-      ':sk': 'LRN#',
-    },
-  });
-
-  const records = result.items;
-
-  const totalLearningTime = records.reduce((sum, item) => sum + item.duration, 0);
-  const uniqueCourses = new Set(records.map(item => item.courseId)).size;
-  const completedCourses = new Set(
-    records.filter(item => item.progress >= 100).map(item => item.courseId)
-  ).size;
-  const completedLessons = records.filter(
-    item => item.type === LearningRecordType.LESSON_COMPLETE
-  ).length;
-
-  const weeklyData: LearningStatistics['weeklyData'] = [];
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
-
-    const dayRecords = records.filter(r => r.createdAt.startsWith(dateStr));
-    weeklyData.push({
-      date: dateStr,
-      duration: dayRecords.reduce((sum, item) => sum + item.duration, 0),
-      lessonsCompleted: dayRecords.filter(item => item.type === LearningRecordType.LESSON_COMPLETE)
-        .length,
+    return childRepository.create(userId, {
+      name: data.name,
+      dateOfBirth: data.dateOfBirth,
+      gender: data.gender,
+      school: data.school,
+      grade: data.grade,
+      subjects: data.subjects,
+      learningGoals: data.learningGoals,
     });
   }
 
-  const progressSum =
-    uniqueCourses > 0 ? records.reduce((sum, item) => sum + item.progress, 0) / uniqueCourses : 0;
-
-  const lastActivity = records.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )[0];
-
-  return {
-    userId,
-    totalLearningTime,
-    totalCourses: uniqueCourses,
-    completedCourses,
-    totalLessons: completedLessons,
-    completedLessons,
-    averageProgress: Math.min(100, progressSum),
-    lastActivityAt: lastActivity?.createdAt || new Date().toISOString(),
-    weeklyData,
-  };
-}
-
-export async function generateLearningReport(
-  userId: string,
-  period?: { start: string; end: string }
-): Promise<LearningReport> {
-  logger.info('Generating learning report', { userId, period });
-
-  const statistics = await getLearningStatistics(userId);
-
-  const { PK } = createEntityKey('USER', userId);
-
-  const result = await queryItems<LearningRecord>({
-    keyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    expressionAttributeValues: {
-      ':pk': PK,
-      ':sk': 'LRN#',
-    },
-  });
-
-  const courseProgressMap = new Map<string, LearningProgress>();
-
-  for (const record of result.items) {
-    const existing = courseProgressMap.get(record.courseId);
-    if (!existing) {
-      const progress = await getCourseProgress(userId, record.courseId);
-      if (progress) {
-        courseProgressMap.set(record.courseId, progress);
-      }
+  async function updateChild(
+    childId: string,
+    data: {
+      name?: string;
+      dateOfBirth?: string;
+      gender?: 'MALE' | 'FEMALE';
+      school?: string;
+      grade?: string;
+      subjects?: string[];
+      learningGoals?: string[];
     }
+  ): Promise<Child | null> {
+    logger.info('Updating child', { childId, data });
+    return childRepository.update(childId, data);
   }
 
-  const startDate = period?.start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const endDate = period?.end || new Date().toISOString();
+  async function deleteChild(childId: string): Promise<boolean> {
+    logger.info('Deleting child', { childId });
+    return childRepository.delete(childId);
+  }
+
+  async function recordParentalConsent(userId: string, childId: string): Promise<void> {
+    logger.info('Recording parental consent', { userId, childId });
+
+    const child = await childRepository.findById(childId);
+    if (!child) {
+      throw new AppError('Child not found', ErrorCode.USER_NOT_FOUND, 404);
+    }
+
+    if (child.user_id !== userId) {
+      throw new AppError('Unauthorized', ErrorCode.FORBIDDEN, 403);
+    }
+
+    await childRepository.update(childId, { learningGoals: ['PARENTAL_CONSENT_GIVEN'] });
+  }
+
+  async function getFavorites(userId: string): Promise<unknown[]> {
+    logger.info('Getting favorites', { userId });
+    // Favorites feature not yet implemented
+    return [];
+  }
+
+  async function recordLearning(
+    userId: string,
+    data: {
+      courseId: string;
+      lessonId?: string;
+      type: LearningRecordType;
+      duration: number;
+      progress: number;
+      metadata?: LearningRecord['metadata'];
+    }
+  ): Promise<LearningRecord> {
+    logger.info('Recording learning activity', { userId, data });
+
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new AppError('User not found', ErrorCode.USER_NOT_FOUND, 404);
+    }
+
+    const createData: CreateLearningRecordDTO = {
+      courseId: data.courseId,
+      lessonId: data.lessonId,
+      type: data.type,
+      duration: data.duration,
+      progress: data.progress,
+      metadata: data.metadata,
+    };
+
+    return learningRecordRepository.create(userId, createData);
+  }
+
+  async function getLearningRecords(
+    userId: string,
+    params?: { courseId?: string; limit?: number }
+  ): Promise<LearningRecord[]> {
+    logger.info('Getting learning records', { userId, params });
+    return learningRecordRepository.findByUserId(userId, {
+      courseId: params?.courseId,
+      limit: params?.limit,
+    });
+  }
+
+  async function getCourseProgress(
+    userId: string,
+    courseId: string
+  ): Promise<LearningProgress | null> {
+    logger.info('Getting course progress', { userId, courseId });
+    return learningRecordRepository.getProgress(userId, courseId);
+  }
+
+  async function getLearningStatistics(userId: string): Promise<LearningStatistics> {
+    logger.info('Getting learning statistics', { userId });
+    return learningRecordRepository.getStatistics(userId);
+  }
+
+  async function generateLearningReport(
+    userId: string,
+    period?: { start: string; end: string }
+  ): Promise<LearningReport> {
+    logger.info('Generating learning report', { userId, period });
+
+    const statistics = await getLearningStatistics(userId);
+
+    const records = await learningRecordRepository.findByUserId(userId);
+    const courseProgressMap = new Map<string, LearningProgress>();
+
+    for (const record of records) {
+      if (!courseProgressMap.has(record.course_id)) {
+        const progress = await getCourseProgress(userId, record.course_id);
+        if (progress) {
+          courseProgressMap.set(record.course_id, progress);
+        }
+      }
+    }
+
+    const startDate =
+      period?.start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const endDate = period?.end || new Date().toISOString();
+
+    return {
+      userId,
+      generatedAt: new Date().toISOString(),
+      period: {
+        start: startDate,
+        end: endDate,
+      },
+      statistics,
+      courseProgress: Array.from(courseProgressMap.values()),
+      achievements: [],
+    };
+  }
 
   return {
-    userId,
-    generatedAt: new Date().toISOString(),
-    period: {
-      start: startDate,
-      end: endDate,
-    },
-    statistics,
-    courseProgress: Array.from(courseProgressMap.values()),
-    achievements: [],
+    getUserProfile,
+    updateUserProfile,
+    getChildren,
+    addChild,
+    updateChild,
+    deleteChild,
+    recordParentalConsent,
+    getFavorites,
+    recordLearning,
+    getLearningRecords,
+    getCourseProgress,
+    getLearningStatistics,
+    generateLearningReport,
   };
 }
+
+// Re-export types for convenience
+export type UsersService = ReturnType<typeof createUsersService>;

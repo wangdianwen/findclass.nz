@@ -3,7 +3,8 @@
  * Uses connection pooling with pg library
  */
 
-import { Pool, QueryResult } from 'pg';
+import type { QueryResult } from 'pg';
+import { Pool } from 'pg';
 import { logger } from '../../../core/logger';
 
 let pool: Pool | null = null;

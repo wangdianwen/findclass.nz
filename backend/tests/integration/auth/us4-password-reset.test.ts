@@ -6,24 +6,40 @@
  * I want to manage and reset my password
  * So that I can keep my account secure
  *
- * Test Type: Integration Test
+ * Test Type: Integration Test (PostgreSQL)
  * Path: tests/integration/auth/us4-password-reset.test.ts
  */
 
 import 'reflect-metadata';
 import request from 'supertest';
-import { getApp } from '../setup.integration';
-import { createTestUser, cleanupTestUser } from '../fixtures/test-users';
-import { describe, expect, it } from 'vitest';
+import { getApp, getTestPool } from '../setup.integration';
+import { createTestUser, cleanupTestUser } from '../fixtures/test-users.postgres';
+import { describe, expect, it, beforeAll, beforeEach } from 'vitest';
+import { Pool } from 'pg';
 
-describe('US4: Password Management', () => {
+describe('US4: Password Management (PostgreSQL)', () => {
+  let pool: Pool;
+
+  beforeAll(() => {
+    pool = getTestPool();
+  });
+
+  beforeEach(async () => {
+    // Clean up before each test
+    await pool.query('DELETE FROM role_application_history');
+    await pool.query('DELETE FROM role_applications');
+    await pool.query('DELETE FROM sessions');
+    await pool.query('DELETE FROM verification_codes');
+    await pool.query('DELETE FROM users');
+  });
+
   // ==================== Happy Path ====================
 
   describe('Happy Path', () => {
     it('US4-HP-01: should send password reset code for existing user', async () => {
       const uniqueEmail = `us4-hp-01-${Date.now()}@example.com`;
 
-      // 先注册用户
+      // Register user
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password: 'TestPass123!',
@@ -31,7 +47,7 @@ describe('US4: Password Management', () => {
         role: 'PARENT',
       });
 
-      // 请求重置密码
+      // Request password reset
       const response = await request(getApp())
         .post('/api/v1/auth/password/reset-request')
         .send({ email: uniqueEmail })
@@ -48,7 +64,7 @@ describe('US4: Password Management', () => {
       const originalPassword = 'OriginalPass123!';
       const newPassword = 'NewSecurePass456!';
 
-      // Step 1: 注册用户
+      // Register user
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password: originalPassword,
@@ -56,22 +72,44 @@ describe('US4: Password Management', () => {
         role: 'PARENT',
       });
 
-      // Step 2: 请求重置密码
+      // Request password reset
       await request(getApp())
         .post('/api/v1/auth/password/reset-request')
         .send({ email: uniqueEmail })
         .expect(200);
 
-      // Step 3: 使用错误验证码尝试重置 (应该失败)
-      const failResponse = await request(getApp())
+      // Get the verification code from database
+      const codeResult = await pool.query(
+        'SELECT code FROM verification_codes WHERE email = $1 AND type = $2 ORDER BY created_at DESC LIMIT 1',
+        [uniqueEmail.toLowerCase(), 'PASSWORD_RESET']
+      );
+
+      expect(codeResult.rows.length).toBe(1);
+      const resetCode = codeResult.rows[0].code;
+
+      // Reset password with valid code
+      const resetResponse = await request(getApp())
         .post('/api/v1/auth/password/reset')
-        .send({ email: uniqueEmail, code: 'INVALID', newPassword })
-        .expect(400);
+        .send({ email: uniqueEmail, code: resetCode, newPassword })
+        .expect(200);
 
-      expect(failResponse.body.success).toBe(false);
+      expect(resetResponse.body.success).toBe(true);
 
-      // 注意: 完整的密码重置流程需要真实的验证码
-      // 这里测试失败场景来验证流程正确性
+      // Verify old password no longer works
+      const oldLogin = await request(getApp())
+        .post('/api/v1/auth/login')
+        .send({ email: uniqueEmail, password: originalPassword })
+        .expect(401);
+
+      expect(oldLogin.body.success).toBe(false);
+
+      // Verify new password works
+      const newLogin = await request(getApp())
+        .post('/api/v1/auth/login')
+        .send({ email: uniqueEmail, password: newPassword })
+        .expect(200);
+
+      expect(newLogin.body.success).toBe(true);
 
       await cleanupTestUser(uniqueEmail);
     });
@@ -94,7 +132,7 @@ describe('US4: Password Management', () => {
     it('US4-FC-02: should reject invalid verification code', async () => {
       const uniqueEmail = `us4-fc-02-${Date.now()}@example.com`;
 
-      // 注册用户
+      // Register user
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password: 'TestPass123!',
@@ -102,13 +140,13 @@ describe('US4: Password Management', () => {
         role: 'PARENT',
       });
 
-      // 请求重置密码
+      // Request password reset
       await request(getApp())
         .post('/api/v1/auth/password/reset-request')
         .send({ email: uniqueEmail })
         .expect(200);
 
-      // 使用无效验证码
+      // Use invalid verification code
       const response = await request(getApp())
         .post('/api/v1/auth/password/reset')
         .send({ email: uniqueEmail, code: 'INVALID', newPassword: 'NewPass123!' })
@@ -122,7 +160,7 @@ describe('US4: Password Management', () => {
     it('US4-FC-03: should reject short new password', async () => {
       const uniqueEmail = `us4-fc-03-${Date.now()}@example.com`;
 
-      // 注册用户
+      // Register user
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password: 'TestPass123!',
@@ -130,13 +168,13 @@ describe('US4: Password Management', () => {
         role: 'PARENT',
       });
 
-      // 请求重置密码
+      // Request password reset
       await request(getApp())
         .post('/api/v1/auth/password/reset-request')
         .send({ email: uniqueEmail })
         .expect(200);
 
-      // 使用过短的新密码
+      // Use short new password
       const response = await request(getApp())
         .post('/api/v1/auth/password/reset')
         .send({ email: uniqueEmail, code: '123456', newPassword: 'short' })
@@ -148,7 +186,6 @@ describe('US4: Password Management', () => {
     });
 
     it('US4-FC-04: should reject reset for non-existent user', async () => {
-      // 尝试为不存在的用户重置密码
       const response = await request(getApp())
         .post('/api/v1/auth/password/reset')
         .send({ email: 'nonexistent@example.com', code: '123456', newPassword: 'NewPass123!' })
@@ -169,7 +206,7 @@ describe('US4: Password Management', () => {
     it('US4-FC-06: should reject empty new password', async () => {
       const uniqueEmail = `us4-fc-06-${Date.now()}@example.com`;
 
-      // 注册用户
+      // Register user
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password: 'TestPass123!',
@@ -177,13 +214,13 @@ describe('US4: Password Management', () => {
         role: 'PARENT',
       });
 
-      // 请求重置密码
+      // Request password reset
       await request(getApp())
         .post('/api/v1/auth/password/reset-request')
         .send({ email: uniqueEmail })
         .expect(200);
 
-      // 使用空新密码
+      // Use empty new password
       const response = await request(getApp())
         .post('/api/v1/auth/password/reset')
         .send({ email: uniqueEmail, code: '123456', newPassword: '' })
@@ -201,7 +238,7 @@ describe('US4: Password Management', () => {
     it('US4-EC-01: should handle case-insensitive email for reset request', async () => {
       const uniqueEmail = `us4-ec-01-${Date.now()}@EXAMPLE.COM`;
 
-      // 注册用户 (使用大写邮箱)
+      // Register user (with uppercase email)
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password: 'TestPass123!',
@@ -209,7 +246,7 @@ describe('US4: Password Management', () => {
         role: 'PARENT',
       });
 
-      // 使用小写邮箱请求重置
+      // Request reset with lowercase email
       const response = await request(getApp())
         .post('/api/v1/auth/password/reset-request')
         .send({ email: uniqueEmail.toLowerCase() })
@@ -224,7 +261,7 @@ describe('US4: Password Management', () => {
       const uniqueEmail = `us4-ec-02-${Date.now()}@example.com`;
       const longPassword = 'A'.repeat(500);
 
-      // 注册用户
+      // Register user
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password: 'TestPass123!',
@@ -232,13 +269,13 @@ describe('US4: Password Management', () => {
         role: 'PARENT',
       });
 
-      // 请求重置密码
+      // Request password reset
       await request(getApp())
         .post('/api/v1/auth/password/reset-request')
         .send({ email: uniqueEmail })
         .expect(200);
 
-      // 尝试使用超长密码
+      // Try with very long password
       const response = await request(getApp())
         .post('/api/v1/auth/password/reset')
         .send({ email: uniqueEmail, code: '123456', newPassword: longPassword })
@@ -253,7 +290,7 @@ describe('US4: Password Management', () => {
       const uniqueEmail = `us4-ec-03-${Date.now()}@example.com`;
       const specialPassword = 'NewPass!@#$%^&*()123';
 
-      // 注册用户
+      // Register user
       await request(getApp()).post('/api/v1/auth/register').send({
         email: uniqueEmail,
         password: 'TestPass123!',
@@ -261,19 +298,34 @@ describe('US4: Password Management', () => {
         role: 'PARENT',
       });
 
-      // 请求重置密码
+      // Request password reset
       await request(getApp())
         .post('/api/v1/auth/password/reset-request')
         .send({ email: uniqueEmail })
         .expect(200);
 
-      // 尝试使用特殊字符密码 (如果验证通过)
-      const response = await request(getApp())
-        .post('/api/v1/auth/password/reset')
-        .send({ email: uniqueEmail, code: '123456', newPassword: specialPassword });
+      // Get the verification code
+      const codeResult = await pool.query(
+        'SELECT code FROM verification_codes WHERE email = $1 AND type = $2 ORDER BY created_at DESC LIMIT 1',
+        [uniqueEmail.toLowerCase(), 'PASSWORD_RESET']
+      );
 
-      // 可能是400(验证码错误)或400(密码格式错误)或200(成功)
-      expect([200, 400]).toContain(response.status);
+      if (codeResult.rows.length > 0) {
+        const response = await request(getApp())
+          .post('/api/v1/auth/password/reset')
+          .send({ email: uniqueEmail, code: codeResult.rows[0].code, newPassword: specialPassword })
+          .expect(200);
+
+        expect(response.body.success).toBe(true);
+
+        // Verify new password works
+        const loginResponse = await request(getApp())
+          .post('/api/v1/auth/login')
+          .send({ email: uniqueEmail, password: specialPassword })
+          .expect(200);
+
+        expect(loginResponse.body.success).toBe(true);
+      }
 
       await cleanupTestUser(uniqueEmail);
     });
