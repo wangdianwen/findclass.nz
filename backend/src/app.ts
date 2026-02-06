@@ -41,7 +41,10 @@ async function initializeDatabase(): Promise<void> {
 // Note: In production, consider running migrations separately
 initializeDatabase().catch((err) => {
   logger.error('Database initialization failed', { error: err.message });
-  process.exit(1);
+  // Don't exit in test environment
+  if (process.env.NODE_ENV !== 'test') {
+    process.exit(1);
+  }
 });
 
 // Create Express application

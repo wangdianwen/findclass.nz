@@ -7,19 +7,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const isIntegration = process.env.INTEGRATION_TESTS === 'true';
+const isPostgresIntegration = process.env.POSTGRES_INTEGRATION_TESTS === 'true';
 
 export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
     root: __dirname,
-    include: isIntegration ? ['tests/integration/**/*.test.ts'] : ['tests/unit/**/*.test.ts'],
+    include: isIntegration
+      ? isPostgresIntegration
+        ? ['tests/integration/**/*.postgres.test.ts']
+        : ['tests/integration/**/*.test.ts']
+      : ['tests/unit/**/*.test.ts'],
     exclude: ['node_modules'],
     pool: 'forks',
     poolOptions: { forks: { singleFork: true } },
     setupFiles: [
       isIntegration
-        ? path.resolve(__dirname, 'tests/integration/setup.integration.ts')
+        ? isPostgresIntegration
+          ? path.resolve(__dirname, 'tests/integration/setup.postgres.ts')
+          : path.resolve(__dirname, 'tests/integration/setup.integration.ts')
         : path.resolve(__dirname, 'tests/unit/setup.unit.ts'),
     ],
     coverage: {

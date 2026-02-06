@@ -4,8 +4,8 @@
 
 import { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
-import { logger } from '../../../core/logger';
-import { UserStatus, UserRole } from '../../../shared/types';
+import { logger } from '@core/logger';
+import { UserStatus, UserRole } from '@shared/types';
 
 export interface User {
   id: string;

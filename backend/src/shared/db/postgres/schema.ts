@@ -4,7 +4,7 @@
  */
 
 import { query } from './client';
-import { logger } from '../../core/logger';
+import { logger } from '../../../core/logger';
 
 export async function initializeSchema(): Promise<void> {
   logger.info('Initializing PostgreSQL schema...');

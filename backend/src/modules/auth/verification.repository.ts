@@ -5,7 +5,7 @@
 
 import { Pool } from 'pg';
 import crypto from 'crypto';
-import { logger } from '../../../core/logger';
+import { logger } from '@core/logger';
 
 export interface VerificationCode {
   id: string;

@@ -4,7 +4,7 @@
  */
 
 import { Pool, QueryResult } from 'pg';
-import { logger } from '../../core/logger';
+import { logger } from '../../../core/logger';
 
 let pool: Pool | null = null;
 
