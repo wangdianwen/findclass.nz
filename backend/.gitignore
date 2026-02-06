@@ -1,0 +1,69 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# TypeScript test declarations and sourcemaps (generated during tsc)
+tests/**/*.d.ts
+tests/**/*.d.ts.map
+
+# Compiled JavaScript test files (generated during tsc/vitest)
+tests/**/*.js
+tests/**/*.js.map
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Docker
+.docker/
+
+# LocalStack
+.localstack/
+
+# AWS SAM
+.aws-sam/
+
+# Package files
+!package.json
+!package-lock.json
+
+# Editor directories and files
+.project
+.classpath
+.settings/
+
+.plans/
