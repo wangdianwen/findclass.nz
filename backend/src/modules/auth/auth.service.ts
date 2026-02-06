@@ -523,7 +523,7 @@ export async function getUserRoles(userId: string): Promise<UserRolesResponse> {
 
   // Add processed role change applications
   for (const app of applications) {
-    if (app.status !== RoleApplicationStatus.PENDING) {
+    if (app.status !== 'PENDING') {
       roles.push({
         role: app.role,
         status: app.status as RoleApplicationStatus,
@@ -618,7 +618,7 @@ export async function approveRoleApplication(
     throw createAppError('Role application not found', ErrorCode.NOT_FOUND);
   }
 
-  if (application.status !== RoleApplicationStatus.PENDING) {
+  if (application.status !== 'PENDING') {
     throw createAppError('Application is not in pending status', ErrorCode.VALIDATION_ERROR);
   }
 

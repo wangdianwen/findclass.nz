@@ -137,12 +137,16 @@ export class LearningRecordRepository {
     const sortedByDate = [...records].sort(
       (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
     );
-    const startedAt = sortedByDate[0]?.created_at || new Date().toISOString();
+    const startedAt = sortedByDate[0]?.created_at
+      ? new Date(sortedByDate[0].created_at).toISOString()
+      : new Date().toISOString();
 
     const sortedByDesc = [...records].sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
-    const lastActivityAt = sortedByDesc[0]?.created_at || new Date().toISOString();
+    const lastActivityAt = sortedByDesc[0]?.created_at
+      ? new Date(sortedByDesc[0].created_at).toISOString()
+      : new Date().toISOString();
 
     const maxProgress = Math.max(...records.map(r => r.progress), 0);
     const status: ProgressStatus = maxProgress >= 100 ? 'COMPLETED' : 'IN_PROGRESS';
@@ -191,7 +195,9 @@ export class LearningRecordRepository {
     const sortedByDesc = [...records].sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
-    const lastActivityAt = sortedByDesc[0]?.created_at || new Date().toISOString();
+    const lastActivityAt = sortedByDesc[0]?.created_at
+      ? new Date(sortedByDesc[0].created_at).toISOString()
+      : new Date().toISOString();
 
     return {
       userId,

@@ -38,11 +38,7 @@ async function performHealthCheck(): Promise<HealthCheckResult> {
   const allHealthy = services.postgres;
 
   return {
-    status: allHealthy
-      ? 'healthy'
-      : services.postgres
-        ? 'degraded'
-        : 'unhealthy',
+    status: allHealthy ? 'healthy' : services.postgres ? 'degraded' : 'unhealthy',
     timestamp: new Date().toISOString(),
     services,
     uptime: process.uptime(),

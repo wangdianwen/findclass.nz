@@ -3,7 +3,6 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Pool } from 'pg';
 
 // Mock PostgreSQL pool
 const mockPool = {
@@ -26,7 +25,21 @@ vi.mock('@core/logger', () => ({
 }));
 
 // Import after mocks are set up
-import { createUsersService } from '@modules/users/users.service';
+import {
+  getUserProfile,
+  updateUserProfile,
+  getChildren,
+  addChild,
+  updateChild,
+  deleteChild,
+  recordParentalConsent,
+  getFavorites,
+  recordLearning,
+  getLearningRecords,
+  getCourseProgress,
+  getLearningStatistics,
+  generateLearningReport,
+} from '@modules/users/users.service';
 
 describe('Users Service (PostgreSQL)', () => {
   beforeEach(() => {
@@ -52,7 +65,6 @@ describe('Users Service (PostgreSQL)', () => {
 
       mockPool.query.mockResolvedValue({ rows: [mockUser] });
 
-      const { getUserProfile } = createUsersService(mockPool as unknown as Pool);
       const result = await getUserProfile('usr_123');
 
       expect(result).toEqual(mockUser);
@@ -65,7 +77,6 @@ describe('Users Service (PostgreSQL)', () => {
     it('should return null when user not found', async () => {
       mockPool.query.mockResolvedValue({ rows: [] });
 
-      const { getUserProfile } = createUsersService(mockPool as unknown as Pool);
       const result = await getUserProfile('nonexistent');
 
       expect(result).toBeNull();
@@ -103,7 +114,6 @@ describe('Users Service (PostgreSQL)', () => {
         return Promise.resolve({ rows: [] });
       });
 
-      const { updateUserProfile } = createUsersService(mockPool as unknown as Pool);
       const result = await updateUserProfile('usr_123', {
         name: 'New Name',
         phone: '1234567890',
@@ -118,8 +128,6 @@ describe('Users Service (PostgreSQL)', () => {
 
     it('should throw error when user not found', async () => {
       mockPool.query.mockResolvedValue({ rows: [] });
-
-      const { updateUserProfile } = createUsersService(mockPool as unknown as Pool);
 
       await expect(
         updateUserProfile('nonexistent', { name: 'New Name' })
@@ -154,7 +162,6 @@ describe('Users Service (PostgreSQL)', () => {
 
       mockPool.query.mockResolvedValue({ rows: mockChildren });
 
-      const { getChildren } = createUsersService(mockPool as unknown as Pool);
       const result = await getChildren('usr_123');
 
       expect(result).toHaveLength(2);
@@ -165,7 +172,6 @@ describe('Users Service (PostgreSQL)', () => {
     it('should return empty array when no children', async () => {
       mockPool.query.mockResolvedValue({ rows: [] });
 
-      const { getChildren } = createUsersService(mockPool as unknown as Pool);
       const result = await getChildren('usr_123');
 
       expect(result).toEqual([]);
@@ -202,7 +208,6 @@ describe('Users Service (PostgreSQL)', () => {
       // Second query for insert
       mockPool.query.mockResolvedValueOnce({ rows: [mockChild] });
 
-      const { addChild } = createUsersService(mockPool as unknown as Pool);
       const result = await addChild('usr_123', {
         name: 'New Child',
         dateOfBirth: '2015-01-01',
@@ -217,8 +222,6 @@ describe('Users Service (PostgreSQL)', () => {
 
     it('should throw error when user not found', async () => {
       mockPool.query.mockResolvedValue({ rows: [] });
-
-      const { addChild } = createUsersService(mockPool as unknown as Pool);
 
       await expect(
         addChild('nonexistent', {
@@ -261,7 +264,6 @@ describe('Users Service (PostgreSQL)', () => {
       // Insert learning record
       mockPool.query.mockResolvedValueOnce({ rows: [mockRecord] });
 
-      const { recordLearning } = createUsersService(mockPool as unknown as Pool);
       const result = await recordLearning('usr_123', {
         courseId: 'course_1',
         lessonId: 'lesson_1',
@@ -276,8 +278,6 @@ describe('Users Service (PostgreSQL)', () => {
 
     it('should throw error when user not found', async () => {
       mockPool.query.mockResolvedValue({ rows: [] });
-
-      const { recordLearning } = createUsersService(mockPool as unknown as Pool);
 
       await expect(
         recordLearning('nonexistent', {
@@ -319,7 +319,6 @@ describe('Users Service (PostgreSQL)', () => {
 
       mockPool.query.mockResolvedValue({ rows: mockRecords });
 
-      const { getLearningRecords } = createUsersService(mockPool as unknown as Pool);
       const result = await getLearningRecords('usr_123');
 
       expect(result).toHaveLength(2);
@@ -342,7 +341,6 @@ describe('Users Service (PostgreSQL)', () => {
 
       mockPool.query.mockResolvedValue({ rows: mockRecords });
 
-      const { getLearningRecords } = createUsersService(mockPool as unknown as Pool);
       const result = await getLearningRecords('usr_123', { courseId: 'course_1' });
 
       expect(result).toHaveLength(1);
@@ -381,7 +379,6 @@ describe('Users Service (PostgreSQL)', () => {
 
       mockPool.query.mockResolvedValue({ rows: mockRecords });
 
-      const { getCourseProgress } = createUsersService(mockPool as unknown as Pool);
       const result = await getCourseProgress('usr_123', 'course_1');
 
       expect(result).not.toBeNull();
@@ -395,7 +392,6 @@ describe('Users Service (PostgreSQL)', () => {
     it('should return null when no records exist', async () => {
       mockPool.query.mockResolvedValue({ rows: [] });
 
-      const { getCourseProgress } = createUsersService(mockPool as unknown as Pool);
       const result = await getCourseProgress('usr_123', 'course_nonexistent');
 
       expect(result).toBeNull();
@@ -431,7 +427,6 @@ describe('Users Service (PostgreSQL)', () => {
 
       mockPool.query.mockResolvedValue({ rows: mockRecords });
 
-      const { getLearningStatistics } = createUsersService(mockPool as unknown as Pool);
       const result = await getLearningStatistics('usr_123');
 
       expect(result.userId).toBe('usr_123');
@@ -445,7 +440,6 @@ describe('Users Service (PostgreSQL)', () => {
     it('should return empty statistics when no records', async () => {
       mockPool.query.mockResolvedValue({ rows: [] });
 
-      const { getLearningStatistics } = createUsersService(mockPool as unknown as Pool);
       const result = await getLearningStatistics('usr_123');
 
       expect(result.totalLearningTime).toBe(0);
@@ -460,7 +454,6 @@ describe('Users Service (PostgreSQL)', () => {
     it('should return true when child deleted', async () => {
       mockPool.query.mockResolvedValue({ rowCount: 1 });
 
-      const { deleteChild } = createUsersService(mockPool as unknown as Pool);
       const result = await deleteChild('child_1');
 
       expect(result).toBe(true);
@@ -469,7 +462,6 @@ describe('Users Service (PostgreSQL)', () => {
     it('should return false when child not found', async () => {
       mockPool.query.mockResolvedValue({ rowCount: 0 });
 
-      const { deleteChild } = createUsersService(mockPool as unknown as Pool);
       const result = await deleteChild('nonexistent');
 
       expect(result).toBe(false);
@@ -478,7 +470,6 @@ describe('Users Service (PostgreSQL)', () => {
 
   describe('getFavorites', () => {
     it('should return empty array for now', async () => {
-      const { getFavorites } = createUsersService(mockPool as unknown as Pool);
       const result = await getFavorites('usr_123');
 
       expect(result).toEqual([]);
@@ -503,7 +494,6 @@ describe('Users Service (PostgreSQL)', () => {
 
       mockPool.query.mockResolvedValue({ rows: mockRecords });
 
-      const { generateLearningReport } = createUsersService(mockPool as unknown as Pool);
       const result = await generateLearningReport('usr_123');
 
       expect(result.userId).toBe('usr_123');

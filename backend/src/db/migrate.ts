@@ -50,7 +50,7 @@ function getMigrationFiles(): string[] {
       .filter(file => file.endsWith('.sql'))
       .sort();
     return files;
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to read migrations directory', { error });
     return [];
   }
@@ -76,7 +76,7 @@ async function runMigration(pool: Pool, filename: string): Promise<void> {
     );
     await client.query('COMMIT');
     logger.info(`Migration completed: ${filename}`);
-  } catch (error) {
+  } catch (error: unknown) {
     await client.query('ROLLBACK');
     logger.error(`Migration failed: ${filename}`, { error });
     throw error;
@@ -151,21 +151,20 @@ export async function getMigrationStatus(pool: Pool): Promise<{
 
 // Run migrations if executed directly
 if (require.main === module) {
-  import('dotenv').then(dotenv => {
+  void import('dotenv').then(async () => {
+    const dotenv = await import('dotenv');
     dotenv.config({ path: join(__dirname, '..', '..', '.env') });
-    import('../../config/env-loader').then(({ getConfig }) => {
-      const config = getConfig();
-      const pool = new Pool({ connectionString: config.database.url });
+    const { getConfig } = await import('../config');
+    const config = getConfig();
+    const pool = new Pool({ connectionString: config.database.url });
 
-      runMigrations(pool)
-        .then(({ executed, skipped }) => {
-          console.log('Migrations completed:', { executed, skipped });
-          process.exit(0);
-        })
-        .catch(error => {
-          console.error('Migration failed:', error);
-          process.exit(1);
-        });
-    });
+    try {
+      const { executed, skipped } = await runMigrations(pool);
+      logger.info('Migrations completed', { executed, skipped });
+      process.exit(0);
+    } catch (error: unknown) {
+      logger.error('Migration failed', { error });
+      process.exit(1);
+    }
   });
 }

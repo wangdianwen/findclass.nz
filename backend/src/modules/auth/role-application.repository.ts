@@ -58,7 +58,7 @@ export class RoleApplicationRepository {
     );
 
     // Create history record
-    await this.createHistory(id, 'SUBMITTED', undefined, data.user_id);
+    this.createHistory(id, 'SUBMITTED', undefined, data.user_id);
 
     logger.info('Role application created', {
       applicationId: id,
@@ -158,7 +158,7 @@ export class RoleApplicationRepository {
 
     if (result.rows.length > 0) {
       // Create history record
-      await this.createHistory(id, historyAction, comment, reviewedBy);
+      this.createHistory(id, historyAction, comment, reviewedBy);
       logger.info('Role application status updated', { applicationId: id, status, reviewedBy });
     }
 
@@ -177,7 +177,7 @@ export class RoleApplicationRepository {
     );
 
     if (result.rowCount && result.rowCount > 0) {
-      await this.createHistory(id, 'CANCELLED', 'Cancelled by user', userId);
+      this.createHistory(id, 'CANCELLED', 'Cancelled by user', userId);
       logger.info('Role application cancelled', { applicationId: id, userId });
     }
 
@@ -187,12 +187,12 @@ export class RoleApplicationRepository {
   /**
    * Create history record
    */
-  async createHistory(
+  createHistory(
     applicationId: string,
     action: HistoryAction,
     comment?: string,
     performedBy?: string
-  ): Promise<RoleApplicationHistory> {
+  ): RoleApplicationHistory {
     const id = uuidv4();
     const now = new Date();
 

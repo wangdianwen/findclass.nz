@@ -7,11 +7,16 @@ import { logger } from '@core/logger';
 import { AppError, ErrorCode } from '@core/errors';
 import type { Pool } from 'pg';
 import { CourseRepository } from './course.repository';
-import type { Course, CreateCourseDTO, UpdateCourseDTO, CourseStatistics } from './course.repository';
+import type {
+  Course,
+  CreateCourseDTO,
+  UpdateCourseDTO,
+  CourseStatistics,
+} from './course.repository';
 import { TeacherRepository } from '@modules/teachers/teacher.repository';
 import { SortBy } from './courses.types';
-import type { CourseCategory, PriceType } from '@shared/types';
-import { CourseSourceType, CourseStatus, TrustLevel } from '@shared/types';
+import type { CourseCategory, PriceType, TrustLevel } from '@shared/types';
+import { CourseSourceType, CourseStatus } from '@shared/types';
 import { getPool } from '@shared/db/postgres/client';
 
 // Factory function to create service with dependencies
@@ -243,7 +248,10 @@ export function createCoursesService(pool: Pool) {
     logger.info('Searching courses', { params });
 
     // Map sortBy enum to repository sort options
-    const sortOptions: Record<string, 'newest' | 'price_asc' | 'price_desc' | 'rating' | 'relevance'> = {
+    const sortOptions: Record<
+      string,
+      'newest' | 'price_asc' | 'price_desc' | 'rating' | 'relevance'
+    > = {
       [SortBy.RELEVANCE]: 'relevance',
       [SortBy.NEWEST]: 'newest',
       [SortBy.PRICE_ASC]: 'price_asc',
@@ -273,9 +281,8 @@ export function createCoursesService(pool: Pool) {
 
     // Fetch teacher details for all courses
     const teacherIds = [...new Set(result.items.map(course => course.teacher_id))];
-    const teachers = teacherIds.length > 0
-      ? await teacherRepository.findAll({ limit: teacherIds.length })
-      : [];
+    const teachers =
+      teacherIds.length > 0 ? await teacherRepository.findAll({ limit: teacherIds.length }) : [];
     const teacherMap = new Map(teachers.map(t => [t.id, t]));
 
     // Map courses to response format
@@ -322,19 +329,17 @@ export function createCoursesService(pool: Pool) {
     logger.info('Getting featured courses', { limit });
 
     // Get top-rated active courses
-    return courseRepository.search(
-      { status: CourseStatus.ACTIVE },
-      { limit, sortBy: 'rating', sortOrder: 'DESC' }
-    ).then(result => result.items);
+    return courseRepository
+      .search({ status: CourseStatus.ACTIVE }, { limit, sortBy: 'rating', sortOrder: 'DESC' })
+      .then(result => result.items);
   }
 
   async function getRecentCourses(limit: number = 10): Promise<Course[]> {
     logger.info('Getting recent courses', { limit });
 
-    return courseRepository.search(
-      { status: CourseStatus.ACTIVE },
-      { limit, sortBy: 'newest', sortOrder: 'DESC' }
-    ).then(result => result.items);
+    return courseRepository
+      .search({ status: CourseStatus.ACTIVE }, { limit, sortBy: 'newest', sortOrder: 'DESC' })
+      .then(result => result.items);
   }
 
   // ==================== Course Enrollment ====================
@@ -434,26 +439,29 @@ export function getCoursesService(): ReturnType<typeof createCoursesService> {
 // Export individual functions for direct import (uses singleton instance)
 export const getCourseById = (courseId: string) => getCoursesService().getCourseById(courseId);
 export const getCourseDetail = (courseId: string) => getCoursesService().getCourseDetail(courseId);
-export const createCourse = (data: Parameters<ReturnType<typeof createCoursesService>['createCourse']>[0]) =>
-  getCoursesService().createCourse(data);
+export const createCourse = (
+  data: Parameters<ReturnType<typeof createCoursesService>['createCourse']>[0]
+) => getCoursesService().createCourse(data);
 export const updateCourse = (
   courseId: string,
   data: Parameters<ReturnType<typeof createCoursesService>['updateCourse']>[1]
 ) => getCoursesService().updateCourse(courseId, data);
 export const deleteCourse = (courseId: string) => getCoursesService().deleteCourse(courseId);
-export const getCoursesByTeacher = (teacherId: string) => getCoursesService().getCoursesByTeacher(teacherId);
-export const searchCourses = (params: Parameters<ReturnType<typeof createCoursesService>['searchCourses']>[0]) =>
-  getCoursesService().searchCourses(params);
-export const getCourseStatistics = (teacherId?: string) => getCoursesService().getCourseStatistics(teacherId);
+export const getCoursesByTeacher = (teacherId: string) =>
+  getCoursesService().getCoursesByTeacher(teacherId);
+export const searchCourses = (
+  params: Parameters<ReturnType<typeof createCoursesService>['searchCourses']>[0]
+) => getCoursesService().searchCourses(params);
+export const getCourseStatistics = (teacherId?: string) =>
+  getCoursesService().getCourseStatistics(teacherId);
 export const getFeaturedCourses = (limit?: number) => getCoursesService().getFeaturedCourses(limit);
 export const getRecentCourses = (limit?: number) => getCoursesService().getRecentCourses(limit);
-export const incrementEnrollment = (courseId: string) => getCoursesService().incrementEnrollment(courseId);
-export const decrementEnrollment = (courseId: string) => getCoursesService().decrementEnrollment(courseId);
-export const updateCourseRating = (
-  courseId: string,
-  averageRating: number,
-  totalReviews: number
-) => getCoursesService().updateCourseRating(courseId, averageRating, totalReviews);
+export const incrementEnrollment = (courseId: string) =>
+  getCoursesService().incrementEnrollment(courseId);
+export const decrementEnrollment = (courseId: string) =>
+  getCoursesService().decrementEnrollment(courseId);
+export const updateCourseRating = (courseId: string, averageRating: number, totalReviews: number) =>
+  getCoursesService().updateCourseRating(courseId, averageRating, totalReviews);
 export const toggleFavorite = (userId: string, courseId: string) =>
   getCoursesService().toggleFavorite(userId, courseId);
 export const getCourseTranslation = (courseId: string, targetLang: 'zh' | 'en') =>

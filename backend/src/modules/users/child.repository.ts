@@ -31,7 +31,7 @@ export interface CreateChildDTO {
   learningGoals?: string[];
 }
 
-export interface UpdateChildDTO extends Partial<CreateChildDTO> {}
+export type UpdateChildDTO = Partial<CreateChildDTO>;
 
 export class ChildRepository {
   constructor(private readonly pool: Pool) {}

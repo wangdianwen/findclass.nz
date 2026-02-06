@@ -5,14 +5,15 @@
 
 import { getPool } from '@shared/db/postgres/client';
 import { logger } from '@core/logger';
-import type {
-  Teacher as SharedTeacher,
-  TrustLevel,
-  VerificationStatus,
-  TeachingMode as SharedTeachingMode,
-} from '@shared/types';
+import type { TrustLevel, VerificationStatus } from '@shared/types';
 import { AppError, ErrorCode } from '@core/errors';
-import { TeacherRepository, TeachingMode, type TeacherQualification, type TeacherCourse } from './teacher.repository';
+import type { TeachingMode } from './teacher.repository';
+import {
+  TeacherRepository,
+  type Teacher,
+  type TeacherQualification,
+  type TeacherCourse,
+} from './teacher.repository';
 
 // ==================== Types ====================
 
@@ -21,7 +22,7 @@ export interface TeacherProfile {
   displayName: string;
   bio?: string;
   teachingSubjects: string[];
-  teachingModes: SharedTeachingMode[];
+  teachingModes: TeachingMode[];
   locations: string[];
   qualifications?: TeacherQualification[];
   trustLevel: TrustLevel;
@@ -39,7 +40,7 @@ export interface CreateTeacherDTO {
   displayName: string;
   bio?: string;
   teachingSubjects: string[];
-  teachingModes: SharedTeachingMode[];
+  teachingModes: TeachingMode[];
   locations: string[];
   qualifications?: Array<{
     type: 'DEGREE' | 'CERTIFICATE' | 'EXPERIENCE';
@@ -54,7 +55,7 @@ export interface UpdateTeacherDTO {
   displayName?: string;
   bio?: string;
   teachingSubjects?: string[];
-  teachingModes?: SharedTeachingMode[];
+  teachingModes?: TeachingMode[];
   locations?: string[];
 }
 
@@ -84,7 +85,7 @@ function getTeacherRepository(): TeacherRepository {
 
 // ==================== CRUD Operations ====================
 
-export async function getTeacherById(teacherId: string): Promise<SharedTeacher | null> {
+export async function getTeacherById(teacherId: string): Promise<Teacher | null> {
   logger.info('Getting teacher by ID', { teacherId });
   const repository = getTeacherRepository();
   return repository.findById(teacherId);
@@ -110,7 +111,7 @@ export async function getTeacherProfile(teacherId: string): Promise<TeacherProfi
     displayName: teacher.display_name,
     bio: teacher.bio,
     teachingSubjects: teacher.teaching_subjects,
-    teachingModes: teacher.teaching_modes as SharedTeachingMode[],
+    teachingModes: teacher.teaching_modes,
     locations: teacher.locations,
     qualifications,
     trustLevel: teacher.trust_level,
@@ -124,13 +125,13 @@ export async function getTeacherProfile(teacherId: string): Promise<TeacherProfi
   };
 }
 
-export async function getTeacherByUserId(userId: string): Promise<SharedTeacher | null> {
+export async function getTeacherByUserId(userId: string): Promise<Teacher | null> {
   logger.info('Getting teacher by user ID', { userId });
   const repository = getTeacherRepository();
   return repository.findByUserId(userId);
 }
 
-export async function createTeacher(data: CreateTeacherDTO): Promise<SharedTeacher> {
+export async function createTeacher(data: CreateTeacherDTO): Promise<Teacher> {
   logger.info('Creating teacher', { userId: data.userId, displayName: data.displayName });
   const repository = getTeacherRepository();
 
@@ -140,7 +141,7 @@ export async function createTeacher(data: CreateTeacherDTO): Promise<SharedTeach
     throw new AppError('Teacher profile already exists for this user', ErrorCode.CONFLICT, 409);
   }
 
-  const teachingModes = data.teachingModes.map(mode => mode as TeachingMode);
+  const teachingModes = data.teachingModes.map(mode => mode);
 
   const teacher = await repository.create({
     userId: data.userId,
@@ -156,10 +157,7 @@ export async function createTeacher(data: CreateTeacherDTO): Promise<SharedTeach
   return teacher;
 }
 
-export async function updateTeacher(
-  teacherId: string,
-  data: UpdateTeacherDTO
-): Promise<SharedTeacher> {
+export async function updateTeacher(teacherId: string, data: UpdateTeacherDTO): Promise<Teacher> {
   logger.info('Updating teacher', { teacherId, data });
   const repository = getTeacherRepository();
 
@@ -201,7 +199,7 @@ export async function deleteTeacher(teacherId: string): Promise<boolean> {
   return true;
 }
 
-export async function listTeachers(filters?: TeacherFilters): Promise<SharedTeacher[]> {
+export async function listTeachers(filters?: TeacherFilters): Promise<Teacher[]> {
   logger.info('Listing teachers', { filters });
   const repository = getTeacherRepository();
   return repository.findAll(filters);
@@ -213,7 +211,7 @@ export async function updateVerificationStatus(
   teacherId: string,
   status: VerificationStatus,
   trustLevel?: TrustLevel
-): Promise<SharedTeacher> {
+): Promise<Teacher> {
   logger.info('Updating teacher verification status', { teacherId, status, trustLevel });
   const repository = getTeacherRepository();
 
@@ -222,11 +220,7 @@ export async function updateVerificationStatus(
     throw new AppError('Teacher not found', ErrorCode.NOT_FOUND, 404);
   }
 
-  const updatedTeacher = await repository.updateVerificationStatus(
-    teacherId,
-    status,
-    trustLevel
-  );
+  const updatedTeacher = await repository.updateVerificationStatus(teacherId, status, trustLevel);
 
   if (!updatedTeacher) {
     throw new AppError('Failed to update verification status', ErrorCode.INTERNAL_ERROR, 500);
@@ -235,7 +229,7 @@ export async function updateVerificationStatus(
   return updatedTeacher;
 }
 
-export async function getVerifiedTeachers(): Promise<SharedTeacher[]> {
+export async function getVerifiedTeachers(): Promise<Teacher[]> {
   logger.info('Getting verified teachers');
   const repository = getTeacherRepository();
   return repository.getVerifiedTeachers();
@@ -349,7 +343,10 @@ export async function addCourseToTeacher(
   return teacherCourse;
 }
 
-export async function removeCourseFromTeacher(teacherId: string, courseId: string): Promise<boolean> {
+export async function removeCourseFromTeacher(
+  teacherId: string,
+  courseId: string
+): Promise<boolean> {
   logger.info('Removing course from teacher', { teacherId, courseId });
   const repository = getTeacherRepository();
 
@@ -375,7 +372,7 @@ export async function submitTeacherOnboarding(
     displayName: string;
     bio: string;
     teachingSubjects: string[];
-    teachingModes: SharedTeachingMode[];
+    teachingModes: TeachingMode[];
     locations: string[];
     qualifications?: Array<{
       type: string;
@@ -393,7 +390,7 @@ export async function submitTeacherOnboarding(
     displayName: data.displayName,
     bio: data.bio,
     teachingSubjects: data.teachingSubjects,
-    teachingModes: data.teachingModes.map(m => m as TeachingMode),
+    teachingModes: data.teachingModes.map(m => m),
     locations: data.locations,
     qualifications: data.qualifications?.map(q => ({
       type: q.type as 'DEGREE' | 'CERTIFICATE' | 'EXPERIENCE',
@@ -441,13 +438,13 @@ export async function updateTeacherRating(
   teacherId: string,
   averageRating: number,
   totalReviews: number
-): Promise<SharedTeacher | null> {
+): Promise<Teacher | null> {
   logger.info('Updating teacher rating', { teacherId, averageRating, totalReviews });
   const repository = getTeacherRepository();
   return repository.updateTeacherRating(teacherId, averageRating, totalReviews);
 }
 
-export async function incrementStudentCount(teacherId: string): Promise<SharedTeacher | null> {
+export async function incrementStudentCount(teacherId: string): Promise<Teacher | null> {
   logger.info('Incrementing student count', { teacherId });
   const repository = getTeacherRepository();
   return repository.incrementStudentCount(teacherId);
