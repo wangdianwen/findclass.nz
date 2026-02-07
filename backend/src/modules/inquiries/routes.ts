@@ -1,6 +1,6 @@
 /**
  * Inquiries Module - Routes
- * API routes for inquiries and reports functionality
+ * API routes for inquiries functionality
  */
 
 import { Router } from 'express';
@@ -10,14 +10,9 @@ import {
   getInquiryController,
   replyInquiryController,
   updateInquiryStatusController,
-  createReportController,
-  getReportController,
-  updateReportStatusController,
 } from './controller';
 
 const router = Router();
-
-// ==================== Inquiry Routes ====================
 
 /**
  * POST /inquiries
@@ -47,29 +42,5 @@ router.post('/:id/reply', authenticate, replyInquiryController);
  * Body: status (PENDING|READ|REPLIED|CLOSED)
  */
 router.patch('/:id/status', authenticate, updateInquiryStatusController);
-
-// ==================== Report Routes ====================
-
-/**
- * POST /reports
- * Create a new report
- * Body: targetType (course|teacher|review|user|comment|other), targetId, reason, description
- * Note: Authentication is optional - users can submit reports without login
- */
-router.post('/', optionalAuth, createReportController);
-
-/**
- * GET /reports/:id
- * Get report by ID
- * Requires authentication
- */
-router.get('/:id', authenticate, getReportController);
-
-/**
- * PATCH /reports/:id/status
- * Update report status (admin only)
- * Body: status (PENDING|REVIEWING|RESOLVED|DISMISSED), adminNotes?
- */
-router.patch('/:id/status', authenticate, updateReportStatusController);
 
 export { router as inquiryRoutes };

@@ -28,6 +28,7 @@ import { uploadRoutes } from './modules/upload/routes';
 import { reviewRoutes } from './modules/reviews/routes';
 import { searchRoutes } from './modules/search/routes';
 import { inquiryRoutes } from './modules/inquiries/routes';
+import { reportRoutes } from './modules/inquiries/reports.routes';
 import { NodeEnv } from './config/env-schema';
 
 // Initialize database schema
@@ -147,6 +148,7 @@ export function createApp(): Application {
   app.use(`/api/${config.apiVersion}/reviews`, reviewRoutes);
   app.use(`/api/${config.apiVersion}/search`, searchRoutes);
   app.use(`/api/${config.apiVersion}/inquiries`, inquiryRoutes);
+  app.use(`/api/${config.apiVersion}/reports`, reportRoutes);
 
   // 404 handler
   app.use((req: Request, res: Response) => {
