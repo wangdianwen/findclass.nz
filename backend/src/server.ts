@@ -3,6 +3,7 @@
  * Development server with hot reload
  */
 
+import 'reflect-metadata';
 import { createApp } from './app';
 import { getConfig, validateConfig } from './config';
 import { logger } from './core/logger';

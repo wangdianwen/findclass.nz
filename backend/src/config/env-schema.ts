@@ -7,6 +7,7 @@ export const NodeEnv = {
   Development: 'development',
   Production: 'production',
   Test: 'test',
+  Staging: 'staging',
 } as const;
 
 export type NodeEnv = (typeof NodeEnv)[keyof typeof NodeEnv];
@@ -14,7 +15,7 @@ export type NodeEnv = (typeof NodeEnv)[keyof typeof NodeEnv];
 // ==================== 环境变量验证 ====================
 
 // Valid NODE_ENV values as a constant array
-const NODE_ENV_VALUES = ['development', 'production', 'test'] as const;
+const NODE_ENV_VALUES = ['development', 'production', 'test', 'staging'] as const;
 
 export const envSchema = z.object({
   NODE_ENV: z.enum(NODE_ENV_VALUES).default('development'),

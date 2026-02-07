@@ -37,8 +37,10 @@ COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/package.json ./package.json
 
-# Copy environment config files
+# Copy environment config files (exclude .env.local)
+COPY --from=builder --chown=nodejs:nodejs /app/src/db ./dist/db
 COPY --from=builder --chown=nodejs:nodejs /app/src/config/env ./dist/config/env
+RUN rm -f /app/dist/config/env/.env.local
 
 # Create logs directory with proper permissions
 RUN mkdir -p logs && chown -R nodejs:nodejs logs
