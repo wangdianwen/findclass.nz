@@ -77,7 +77,8 @@ export const getStorybookReviews = (): Array<{
 }> | null => storybookReviews;
 export const getStorybookIsLoggedIn = (): boolean => storybookIsLoggedIn;
 export const getStorybookIsTeacher = (): boolean => storybookIsTeacher;
-export const getStorybookTeacherStatus = (): 'none' | 'pending' | 'approved' => storybookTeacherStatus;
+export const getStorybookTeacherStatus = (): 'none' | 'pending' | 'approved' =>
+  storybookTeacherStatus;
 
 // Default mock data for UserCenter stories
 export const DEFAULT_MOCK_USER_PROFILE: UserProfile = {

@@ -397,6 +397,311 @@ export function createCoursesService(pool: Pool) {
     };
   }
 
+  // ==================== Filter Options ====================
+
+  function getFilterOptions(): {
+    subjects: Array<{ value: string; label: string }>;
+    grades: Array<{ value: string; label: string }>;
+    regions: Array<{ value: string; label: string }>;
+    teachingModes: Array<{ value: string; label: string }>;
+    priceRanges: Array<{ value: string; label: string; min: number; max: number }>;
+    sortOptions: Array<{ value: string; label: string }>;
+    cities: Array<{ value: string; label: string }>;
+  } {
+    return {
+      subjects: [
+        { value: 'MATH', label: '数学' },
+        { value: 'ENGLISH', label: '英语' },
+        { value: 'CHINESE', label: '语文' },
+        { value: 'PHYSICS', label: '物理' },
+        { value: 'CHEMISTRY', label: '化学' },
+        { value: 'BIOLOGY', label: '生物' },
+        { value: 'PROGRAMMING', label: '编程' },
+        { value: 'ART', label: '美术' },
+        { value: 'MUSIC', label: '音乐' },
+        { value: 'DANCE', label: '舞蹈' },
+      ],
+      grades: [
+        { value: 'PRESCHOOL', label: '学前班' },
+        { value: 'PRIMARY_1_3', label: '小学1-3年级' },
+        { value: 'PRIMARY_4_6', label: '小学4-6年级' },
+        { value: 'JUNIOR_HIGH', label: '初中' },
+        { value: 'SENIOR_HIGH', label: '高中' },
+        { value: 'UNIVERSITY', label: '大学' },
+        { value: 'ADULT', label: '成人' },
+      ],
+      regions: [
+        { value: 'AUCKLAND_CENTRAL', label: '奥克兰市中心' },
+        { value: 'AUCKLAND_EAST', label: '奥克兰东部' },
+        { value: 'AUCKLAND_SOUTH', label: '奥克兰南部' },
+        { value: 'AUCKLAND_WEST', label: '奥克兰西部' },
+        { value: 'AUCKLAND_NORTH', label: '奥克兰北部' },
+        { value: 'WELLINGTON_CENTRAL', label: '惠灵顿市中心' },
+        { value: 'CHRISTCHURCH_CENTRAL', label: '基督城市中心' },
+      ],
+      teachingModes: [
+        { value: 'ONLINE', label: '线上' },
+        { value: 'OFFLINE', label: '线下' },
+        { value: 'BOTH', label: '线上+线下' },
+      ],
+      priceRanges: [
+        { value: '0-50', label: '$0 - $50/课时', min: 0, max: 50 },
+        { value: '50-100', label: '$50 - $100/课时', min: 50, max: 100 },
+        { value: '100-150', label: '$100 - $150/课时', min: 100, max: 150 },
+        { value: '150-200', label: '$150 - $200/课时', min: 150, max: 200 },
+        { value: '200+', label: '$200+/课时', min: 200, max: Infinity },
+      ],
+      sortOptions: [
+        { value: 'relevance', label: '综合排序' },
+        { value: 'newest', label: '最新发布' },
+        { value: 'rating', label: '评分最高' },
+        { value: 'price_asc', label: '价格从低到高' },
+        { value: 'price_desc', label: '价格从高到低' },
+      ],
+      cities: [
+        { value: 'Auckland', label: '奥克兰' },
+        { value: 'Wellington', label: '惠灵顿' },
+        { value: 'Christchurch', label: '基督城' },
+        { value: 'Hamilton', label: '汉密尔顿' },
+        { value: 'Tauranga', label: '陶朗加' },
+        { value: 'Dunedin', label: '但尼丁' },
+      ],
+    };
+  }
+
+  // ==================== Regions by City ====================
+
+  function getRegionsByCity(city: string): Array<{ value: string; label: string }> | null {
+    const cityRegionsMap: Record<string, Array<{ value: string; label: string }>> = {
+      Auckland: [
+        { value: 'CBD', label: '市中心' },
+        { value: 'Parnell', label: 'Parnell' },
+        { value: 'Newmarket', label: 'Newmarket' },
+        { value: 'Remuera', label: 'Remuera' },
+        { value: 'Epsom', label: 'Epsom' },
+        { value: 'Mt Eden', label: 'Mt Eden' },
+        { value: 'Kingsland', label: 'Kingsland' },
+        { value: 'Ponsonby', label: 'Ponsonby' },
+        { value: 'Herne Bay', label: 'Herne Bay' },
+        { value: 'Grey Lynn', label: 'Grey Lynn' },
+        { value: 'Westmere', label: 'Westmere' },
+        { value: 'Pt Chevalier', label: 'Pt Chevalier' },
+        { value: 'Mt Albert', label: 'Mt Albert' },
+        { value: 'Sandringham', label: 'Sandringham' },
+        { value: 'Balmoral', label: 'Balmoral' },
+        { value: 'Three Kings', label: 'Three Kings' },
+        { value: 'Royal Oak', label: 'Royal Oak' },
+        { value: 'One Tree Hill', label: 'One Tree Hill' },
+        { value: 'Green Lane', label: 'Green Lane' },
+        { value: 'Ellerslie', label: 'Ellerslie' },
+        { value: 'Penrose', label: 'Penrose' },
+        { value: 'Mt Wellington', label: 'Mt Wellington' },
+        { value: 'Panmure', label: 'Panmure' },
+        { value: 'Glen Innes', label: 'Glen Innes' },
+        { value: 'Tamaki', label: 'Tamaki' },
+        { value: 'Kohimarama', label: 'Kohimarama' },
+        { value: 'Mission Bay', label: 'Mission Bay' },
+        { value: 'St Heliers', label: 'St Heliers' },
+        { value: 'Orakei', label: 'Orakei' },
+        { value: 'Glendowie', label: 'Glendowie' },
+        { value: 'Howick', label: 'Howick' },
+        { value: 'Meadowlands', label: 'Meadowlands' },
+        { value: 'Bucklands Beach', label: 'Bucklands Beach' },
+        { value: 'Half Moon Bay', label: 'Half Moon Bay' },
+        { value: 'Macleans Park', label: 'Macleans Park' },
+        { value: 'Dannemora', label: 'Dannemora' },
+        { value: 'Shamrock Park', label: 'Shamrock Park' },
+        { value: 'Cockle Bay', label: 'Cockle Bay' },
+        { value: 'Wattle Downs', label: 'Wattle Downs' },
+        { value: 'The Gardens', label: 'The Gardens' },
+        { value: 'Rosehill', label: 'Rosehill' },
+        { value: 'Papatoetoe', label: 'Papatoetoe' },
+        { value: 'Hunters Corner', label: 'Hunters Corner' },
+        { value: 'Middlemore', label: 'Middlemore' },
+        { value: 'Otara', label: 'Otara' },
+        { value: 'Clendon', label: 'Clendon' },
+        { value: 'Wiri', label: 'Wiri' },
+        { value: 'Manukau', label: 'Manukau' },
+        { value: 'Manurewa', label: 'Manurewa' },
+        { value: 'Takanini', label: 'Takanini' },
+        { value: 'Papakura', label: 'Papakura' },
+        { value: 'Hobsonville', label: 'Hobsonville' },
+        { value: 'West Harbour', label: 'West Harbour' },
+        { value: 'Massey', label: 'Massey' },
+        { value: 'Henderson', label: 'Henderson' },
+        { value: 'Ranui', label: 'Ranui' },
+        { value: 'Swanson', label: 'Swanson' },
+        { value: 'Waitakere', label: 'Waitakere' },
+        { value: 'Glen Eden', label: 'Glen Eden' },
+        { value: 'Huia', label: 'Huia' },
+        { value: 'Laingholm', label: 'Laingholm' },
+        { value: 'Titirangi', label: 'Titirangi' },
+        { value: 'Green Bay', label: 'Green Bay' },
+        { value: 'Kaurilands', label: 'Kaurilands' },
+        { value: 'Sunnyvale', label: 'Sunnyvale' },
+        { value: 'Te Atatu', label: 'Te Atatu' },
+        { value: 'Whau', label: 'Whau' },
+        { value: 'Avondale', label: 'Avondale' },
+        { value: 'Blockhouse Bay', label: 'Blockhouse Bay' },
+        { value: 'Lynfield', label: 'Lynfield' },
+        { value: 'Mount Roskill', label: 'Mount Roskill' },
+        { value: 'Mount Albert', label: 'Mount Albert' },
+        { value: 'Sandringham', label: 'Sandringham' },
+        { value: 'Balmoral', label: 'Balmoral' },
+        { value: 'Mount Eden', label: 'Mount Eden' },
+        { value: 'Kensington', label: 'Kensington' },
+        { value: 'Glenfield', label: 'Glenfield' },
+        { value: 'Northcote', label: 'Northcote' },
+        { value: 'Takapuna', label: 'Takapuna' },
+        { value: 'Devonport', label: 'Devonport' },
+        { value: 'Milford', label: 'Milford' },
+        { value: 'Mairangi Bay', label: 'Mairangi Bay' },
+        { value: 'Murrays Bay', label: 'Murrays Bay' },
+        { value: 'Rosedale', label: 'Rosedale' },
+        { value: 'Albany', label: 'Albany' },
+        { value: 'Glenfield', label: 'Glenfield' },
+        { value: 'Bayswater', label: 'Bayswater' },
+        { value: 'Narrow Neck', label: 'Narrow Neck' },
+        { value: 'Stanley Point', label: 'Stanley Point' },
+        { value: 'Point Chevalier', label: 'Point Chevalier' },
+      ],
+      Wellington: [
+        { value: 'CBD', label: '市中心' },
+        { value: 'Lambton Quay', label: 'Lambton Quay' },
+        { value: 'Willis Street', label: 'Willis Street' },
+        { value: 'Courtenay Place', label: 'Courtenay Place' },
+        { value: 'Cuba Street', label: 'Cuba Street' },
+        { value: 'Karo Drive', label: 'Karo Drive' },
+        { value: 'Thorndon', label: 'Thorndon' },
+        { value: 'Pipitea', label: 'Pipitea' },
+        { value: 'Te Aro', label: 'Te Aro' },
+        { value: 'Mount Victoria', label: 'Mount Victoria' },
+        { value: 'Hataitai', label: 'Hataitai' },
+        { value: 'Kilbirnie', label: 'Kilbirnie' },
+        { value: 'Miramar', label: 'Miramar' },
+        { value: 'Roseneath', label: 'Roseneath' },
+        { value: 'Northland', label: 'Northland' },
+        { value: 'Khandallah', label: 'Khandallah' },
+        { value: 'Broadmeadows', label: 'Broadmeadows' },
+        { value: 'Ngaio', label: 'Ngaio' },
+        { value: 'Tawa', label: 'Tawa' },
+        { value: 'Porirua', label: 'Porirua' },
+      ],
+      Christchurch: [
+        { value: 'CBD', label: '市中心' },
+        { value: 'Riccarton', label: 'Riccarton' },
+        { value: 'Addington', label: 'Addington' },
+        { value: 'Sydenham', label: 'Sydenham' },
+        { value: 'Somerfield', label: 'Somerfield' },
+        { value: 'Merivale', label: 'Merivale' },
+        { value: 'Papanui', label: 'Papanui' },
+        { value: 'Bishopdale', label: 'Bishopdale' },
+        { value: 'Burnside', label: 'Burnside' },
+        { value: 'Ilam', label: 'Ilam' },
+        { value: 'Fendalton', label: 'Fendalton' },
+        { value: 'Hagley', label: 'Hagley' },
+        { value: 'Shirley', label: 'Shirley' },
+        { value: 'Richmond', label: 'Richmond' },
+        { value: 'Avonside', label: 'Avonside' },
+        { value: 'Woolston', label: 'Woolston' },
+        { value: 'Opawa', label: 'Opawa' },
+        { value: 'St Martins', label: 'St Martins' },
+        { value: 'Beckenham', label: 'Beckenham' },
+        { value: 'Spreydon', label: 'Spreydon' },
+        { value: 'Hillmorton', label: 'Hillmorton' },
+        { value: 'Hoon Hay', label: 'Hoon Hay' },
+        { value: 'Middleton', label: 'Middleton' },
+        { value: 'Hornby', label: 'Hornby' },
+        { value: 'Sockburn', label: 'Sockburn' },
+      ],
+      Hamilton: [
+        { value: 'CBD', label: '市中心' },
+        { value: 'Claudelands', label: 'Claudelands' },
+        { value: 'Fairfield', label: 'Fairfield' },
+        { value: 'Chartwell', label: 'Chartwell' },
+        { value: 'Silverdale', label: 'Silverdale' },
+        { value: 'Frankton', label: 'Frankton' },
+        { value: 'Glenview', label: 'Glenview' },
+        { value: 'Deanwell', label: 'Deanwell' },
+        { value: 'Melrose', label: 'Melrose' },
+        { value: 'Bader', label: 'Bader' },
+        { value: 'Pukete', label: 'Pukete' },
+        { value: 'Maeroa', label: 'Maeroa' },
+        { value: 'Rotokauri', label: 'Rotokauri' },
+      ],
+      Tauranga: [
+        { value: 'CBD', label: '市中心' },
+        { value: 'Mount Maunganui', label: 'Mount Maunganui' },
+        { value: 'Papamoa', label: 'Papamoa' },
+        { value: 'Greerton', label: 'Greerton' },
+        { value: 'Gate Pa', label: 'Gate Pa' },
+        { value: 'Tauranga South', label: 'Tauranga South' },
+        { value: 'Bethlehem', label: 'Bethlehem' },
+        { value: 'Hairini', label: 'Hairini' },
+      ],
+      Dunedin: [
+        { value: 'CBD', label: '市中心' },
+        { value: 'Central Dunedin', label: 'Central Dunedin' },
+        { value: 'North Dunedin', label: 'North Dunedin' },
+        { value: 'South Dunedin', label: 'South Dunedin' },
+        { value: 'Caversham', label: 'Caversham' },
+        { value: 'St Kilda', label: 'St Kilda' },
+        { value: 'Mornington', label: 'Mornington' },
+        { value: 'Roslyn', label: 'Roslyn' },
+        { value: 'Maori Hill', label: 'Maori Hill' },
+        { value: 'Normanby', label: 'Normanby' },
+        { value: 'Opoho', label: 'Opoho' },
+        { value: 'Glenleith', label: 'Glenleith' },
+        { value: 'Leith Valley', label: 'Leith Valley' },
+        { value: 'Wakari', label: 'Wakari' },
+        { value: 'Belleknowes', label: 'Belleknowes' },
+        { value: 'Andersons Bay', label: 'Andersons Bay' },
+        { value: 'Musselburgh', label: 'Musselburgh' },
+        { value: 'Forbury', label: 'Forbury' },
+        { value: 'Caversham Valley', label: 'Caversham Valley' },
+        { value: 'Calton Hill', label: 'Calton Hill' },
+        { value: 'Gordon Street', label: 'Gordon Street' },
+        { value: 'Kaikorai', label: 'Kaikorai' },
+        { value: 'Kenmure', label: 'Kenmure' },
+        { value: 'Green Island', label: 'Green Island' },
+        { value: 'Brighton', label: 'Brighton' },
+        { value: 'Lawyer', label: 'Lawyer' },
+      ],
+    };
+
+    // Normalize city name for matching
+    const normalizedCity = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
+    return cityRegionsMap[normalizedCity] || null;
+  }
+
+  // ==================== Similar Courses ====================
+
+  async function getSimilarCourses(courseId: string, limit: number = 5): Promise<Course[]> {
+    logger.info('Getting similar courses', { courseId, limit });
+
+    // Get the current course to find its category
+    const course = await courseRepository.findById(courseId);
+    if (!course) {
+      return [];
+    }
+
+    // Search for courses with the same category, excluding the current course
+    const result = await courseRepository.search(
+      {
+        category: course.category,
+        status: CourseStatus.ACTIVE,
+      },
+      {
+        limit: limit + 1, // Get one extra to exclude current course
+        sortBy: 'rating',
+        sortOrder: 'DESC',
+      }
+    );
+
+    // Filter out the current course and return the rest
+    return result.items.filter(item => item.id !== courseId).slice(0, limit);
+  }
+
   return {
     // Course CRUD
     getCourseById,
@@ -420,6 +725,12 @@ export function createCoursesService(pool: Pool) {
     toggleFavorite,
     // Translations
     getCourseTranslation,
+    // Filter Options
+    getFilterOptions,
+    // Regions
+    getRegionsByCity,
+    // Similar Courses
+    getSimilarCourses,
   };
 }
 
@@ -466,3 +777,7 @@ export const toggleFavorite = (userId: string, courseId: string) =>
   getCoursesService().toggleFavorite(userId, courseId);
 export const getCourseTranslation = (courseId: string, targetLang: 'zh' | 'en') =>
   getCoursesService().getCourseTranslation(courseId, targetLang);
+export const getFilterOptions = () => getCoursesService().getFilterOptions();
+export const getRegionsByCity = (city: string) => getCoursesService().getRegionsByCity(city);
+export const getSimilarCourses = (courseId: string, limit?: number) =>
+  getCoursesService().getSimilarCourses(courseId, limit);

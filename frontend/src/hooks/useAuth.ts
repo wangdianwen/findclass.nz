@@ -5,39 +5,45 @@ import { authApi } from '@/services/api';
 export function useAuth() {
   const { user, isLoggedIn, setUser, logout } = useUserStore();
 
-  const login = useCallback(async (email: string, password: string) => {
-    const result = await authApi.login({ email, password });
-    if (result.success && result.data) {
-      localStorage.setItem('auth_token', result.data.accessToken);
-      if (result.data.refreshToken) {
-        localStorage.setItem('refresh_token', result.data.refreshToken);
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const result = await authApi.login({ email, password });
+      if (result.success && result.data) {
+        localStorage.setItem('auth_token', result.data.accessToken);
+        if (result.data.refreshToken) {
+          localStorage.setItem('refresh_token', result.data.refreshToken);
+        }
+        // Fetch user info after login
+        const userResult = await authApi.getMe();
+        if (userResult.success && userResult.data) {
+          setUser(userResult.data);
+        }
+        return { success: true };
       }
-      // Fetch user info after login
-      const userResult = await authApi.getMe();
-      if (userResult.success && userResult.data) {
-        setUser(userResult.data);
-      }
-      return { success: true };
-    }
-    return { success: false, message: result.message };
-  }, [setUser]);
+      return { success: false, message: result.message };
+    },
+    [setUser]
+  );
 
-  const register = useCallback(async (email: string, password: string, code: string) => {
-    const result = await authApi.register({ email, password, code });
-    if (result.success && result.data) {
-      localStorage.setItem('auth_token', result.data.accessToken);
-      if (result.data.refreshToken) {
-        localStorage.setItem('refresh_token', result.data.refreshToken);
+  const register = useCallback(
+    async (email: string, password: string, code: string) => {
+      const result = await authApi.register({ email, password, code });
+      if (result.success && result.data) {
+        localStorage.setItem('auth_token', result.data.accessToken);
+        if (result.data.refreshToken) {
+          localStorage.setItem('refresh_token', result.data.refreshToken);
+        }
+        // Fetch user info after register
+        const userResult = await authApi.getMe();
+        if (userResult.success && userResult.data) {
+          setUser(userResult.data);
+        }
+        return { success: true };
       }
-      // Fetch user info after register
-      const userResult = await authApi.getMe();
-      if (userResult.success && userResult.data) {
-        setUser(userResult.data);
-      }
-      return { success: true };
-    }
-    return { success: false, message: result.message };
-  }, [setUser]);
+      return { success: false, message: result.message };
+    },
+    [setUser]
+  );
 
   const fetchUser = useCallback(async () => {
     try {

@@ -25,6 +25,9 @@ import { courseRoutes } from './modules/courses/routes';
 import { teacherRoutes } from './modules/teachers/routes';
 import { healthRoutes } from './modules/health/routes';
 import { uploadRoutes } from './modules/upload/routes';
+import { reviewRoutes } from './modules/reviews/routes';
+import { searchRoutes } from './modules/search/routes';
+import { inquiryRoutes } from './modules/inquiries/routes';
 import { NodeEnv } from './config/env-schema';
 
 // Initialize database schema
@@ -92,7 +95,7 @@ export function createApp(): Application {
     },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: req => req.ip || 'unknown',
+    skipFailedRequests: true,
   });
 
   // Stricter rate limiting for auth endpoints (disabled in test)
@@ -110,7 +113,7 @@ export function createApp(): Application {
     },
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: req => req.ip || 'unknown',
+    skipFailedRequests: true,
   });
 
   // Disable rate limiting in test environments (check both config and process.env for reliability)
@@ -141,6 +144,9 @@ export function createApp(): Application {
   app.use(`/api/${config.apiVersion}/courses`, courseRoutes);
   app.use(`/api/${config.apiVersion}/teachers`, teacherRoutes);
   app.use(`/api/${config.apiVersion}/upload`, uploadRoutes);
+  app.use(`/api/${config.apiVersion}/reviews`, reviewRoutes);
+  app.use(`/api/${config.apiVersion}/search`, searchRoutes);
+  app.use(`/api/${config.apiVersion}/inquiries`, inquiryRoutes);
 
   // 404 handler
   app.use((req: Request, res: Response) => {

@@ -140,13 +140,14 @@ export const CourseSearchPage: React.FC = () => {
   // Fetch courses from API
   const { data, isLoading, error, refetch } = useQuery<{ data: CourseData[]; total: number }>({
     queryKey: ['courses', apiParams],
-    queryFn: () => courseApi.getCourses({
-      city: apiParams.city as string | undefined,
-      subject: apiParams.subject as string | undefined,
-      grade: apiParams.grade as string | undefined,
-      page: apiParams.page as number | undefined,
-      limit: apiParams.limit as number | undefined,
-    }),
+    queryFn: () =>
+      courseApi.getCourses({
+        city: apiParams.city as string | undefined,
+        subject: apiParams.subject as string | undefined,
+        grade: apiParams.grade as string | undefined,
+        page: apiParams.page as number | undefined,
+        limit: apiParams.limit as number | undefined,
+      }),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
@@ -157,7 +158,7 @@ export const CourseSearchPage: React.FC = () => {
 
   // Extract courses and total from API response
   // Note: data may be undefined initially or on error, ensure courses is always an array
-  const courses: CourseData[] = (Array.isArray(data?.data) ? data.data : []);
+  const courses: CourseData[] = Array.isArray(data?.data) ? data.data : [];
   const totalCount = data?.total || 0;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 

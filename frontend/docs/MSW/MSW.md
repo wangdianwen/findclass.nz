@@ -20,13 +20,13 @@ npm run storybook  # Storybook
 
 ## 目录
 
-| 文档 | 内容 |
-|------|------|
-| [MSW-AUTH.md](./MSW-AUTH.md) | 认证接口 (login, register, refresh, reset-password, send-code) |
-| [MSW-COURSES.md](./MSW-COURSES.md) | 课程接口 (列表、详情、搜索、筛选) |
-| [MSW-REVIEWS.md](./MSW-REVIEWS.md) | 评价接口 |
-| [MSW-TUTORS.md](./MSW-TUTORS.md) | 教师接口 |
-| [MSW-SEARCH.md](./MSW-SEARCH.md) | 搜索接口 |
+| 文档                               | 内容                                                           |
+| ---------------------------------- | -------------------------------------------------------------- |
+| [MSW-AUTH.md](./MSW-AUTH.md)       | 认证接口 (login, register, refresh, reset-password, send-code) |
+| [MSW-COURSES.md](./MSW-COURSES.md) | 课程接口 (列表、详情、搜索、筛选)                              |
+| [MSW-REVIEWS.md](./MSW-REVIEWS.md) | 评价接口                                                       |
+| [MSW-TUTORS.md](./MSW-TUTORS.md)   | 教师接口                                                       |
+| [MSW-SEARCH.md](./MSW-SEARCH.md)   | 搜索接口                                                       |
 
 ---
 
@@ -57,12 +57,13 @@ npm run storybook  # Storybook
 
 ```javascript
 // 高中数学辅导 -> gao-zhong-shu-xue-fu-dao
-generateSlug('高中数学辅导') // "gao-zhong-shu-xue-fu-dao"
+generateSlug('高中数学辅导'); // "gao-zhong-shu-xue-fu-dao"
 ```
 
 ### 响应格式
 
 **成功响应 (200):**
+
 ```json
 {
   "success": true,
@@ -72,6 +73,7 @@ generateSlug('高中数学辅导') // "gao-zhong-shu-xue-fu-dao"
 ```
 
 **失败响应 (400/401/404/409/429):**
+
 ```json
 {
   "success": false,
@@ -83,12 +85,12 @@ generateSlug('高中数学辅导') // "gao-zhong-shu-xue-fu-dao"
 
 ## 测试账号
 
-| 场景 | 邮箱 | 验证码 | 说明 |
-|------|------|--------|------|
-| 登录成功 | `user@example.com` | `123456` | 返回 token |
-| 验证码错误 | 任意 | `000000` | 验证码错误 |
-| 邮箱已注册 | `existing@test.com` | 任意 | 邮箱已被注册 |
-| 发送频率限制 | `ratelimit@test.com` | - | 发送过于频繁 |
+| 场景         | 邮箱                 | 验证码   | 说明         |
+| ------------ | -------------------- | -------- | ------------ |
+| 登录成功     | `user@example.com`   | `123456` | 返回 token   |
+| 验证码错误   | 任意                 | `000000` | 验证码错误   |
+| 邮箱已注册   | `existing@test.com`  | 任意     | 邮箱已被注册 |
+| 发送频率限制 | `ratelimit@test.com` | -        | 发送过于频繁 |
 
 ---
 

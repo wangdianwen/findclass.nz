@@ -18,11 +18,13 @@
 获取当前用户资料。
 
 **请求头**:
+
 ```
 Authorization: Bearer <access_token>
 ```
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -52,12 +54,14 @@ Authorization: Bearer <access_token>
 更新用户资料。
 
 **请求头**:
+
 ```
 Authorization: Bearer <access_token>
 Content-Type: application/json
 ```
 
 **请求体**:
+
 ```json
 {
   "name": "新名称",
@@ -70,6 +74,7 @@ Content-Type: application/json
 ```
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -90,12 +95,14 @@ Content-Type: application/json
 修改密码。
 
 **请求头**:
+
 ```
 Authorization: Bearer <access_token>
 Content-Type: application/json
 ```
 
 **请求体**:
+
 ```json
 {
   "currentPassword": "123456",
@@ -104,6 +111,7 @@ Content-Type: application/json
 ```
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -112,6 +120,7 @@ Content-Type: application/json
 ```
 
 **错误响应**:
+
 ```json
 {
   "success": false,
@@ -129,11 +138,13 @@ Content-Type: application/json
 删除账户。
 
 **请求头**:
+
 ```
 Authorization: Bearer <access_token>
 ```
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -148,17 +159,20 @@ Authorization: Bearer <access_token>
 上传头像。
 
 **请求头**:
+
 ```
 Authorization: Bearer <access_token>
 Content-Type: multipart/form-data
 ```
 
 **请求体** (form-data):
+
 ```
 avatar: [文件]
 ```
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -178,11 +192,13 @@ avatar: [文件]
 获取孩子列表。
 
 **请求头**:
+
 ```
 Authorization: Bearer <access_token>
 ```
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -212,12 +228,14 @@ Authorization: Bearer <access_token>
 添加孩子。
 
 **请求头**:
+
 ```
 Authorization: Bearer <access_token>
 Content-Type: application/json
 ```
 
 **请求体**:
+
 ```json
 {
   "name": "新孩子",
@@ -227,6 +245,7 @@ Content-Type: application/json
 ```
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -247,12 +266,14 @@ Content-Type: application/json
 更新孩子信息。
 
 **请求头**:
+
 ```
 Authorization: Bearer <access_token>
 Content-Type: application/json
 ```
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -273,6 +294,7 @@ Content-Type: application/json
 删除孩子。
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -289,6 +311,7 @@ Content-Type: application/json
 获取学习历史。
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -320,6 +343,7 @@ Content-Type: application/json
 删除学习历史记录。
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -336,6 +360,7 @@ Content-Type: application/json
 获取通知列表。
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -368,6 +393,7 @@ Content-Type: application/json
 标记通知已读。
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -382,6 +408,7 @@ Content-Type: application/json
 标记所有通知已读。
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -396,6 +423,7 @@ Content-Type: application/json
 删除通知。
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -412,6 +440,7 @@ Content-Type: application/json
 获取我的评论列表。
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -437,6 +466,7 @@ Content-Type: application/json
 删除我的评论。
 
 **成功响应 (200)**:
+
 ```json
 {
   "success": true,
@@ -448,8 +478,8 @@ Content-Type: application/json
 
 ## 错误码
 
-| 错误码 | 说明 |
-|-------|------|
-| `UNAUTHORIZED` | 未登录或 token 无效 |
-| `INVALID_REQUEST` | 请求参数错误 |
-| `WRONG_PASSWORD` | 当前密码错误 |
+| 错误码            | 说明                |
+| ----------------- | ------------------- |
+| `UNAUTHORIZED`    | 未登录或 token 无效 |
+| `INVALID_REQUEST` | 请求参数错误        |
+| `WRONG_PASSWORD`  | 当前密码错误        |

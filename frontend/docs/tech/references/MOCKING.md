@@ -6,19 +6,19 @@
 
 > **重要**: MSW 仅在开发环境 (`npm run dev`) 中加载，生产构建会自动排除 MSW 相关代码。
 
-| 环境 | MSW 行为 |
-|------|---------|
-| `npm run dev` | 自动加载并启用 MSW |
-| `npm run build` | **不打包** MSW 代码 |
-| `npm run preview` | 不加载 MSW |
-| Storybook | 通过独立配置加载 MSW |
+| 环境              | MSW 行为             |
+| ----------------- | -------------------- |
+| `npm run dev`     | 自动加载并启用 MSW   |
+| `npm run build`   | **不打包** MSW 代码  |
+| `npm run preview` | 不加载 MSW           |
+| Storybook         | 通过独立配置加载 MSW |
 
 ### 实现原理
 
 ```typescript
 // src/main.tsx
 if (import.meta.env.DEV) {
-  import('./mocks').catch((error) => {
+  import('./mocks').catch(error => {
     console.warn('[MSW] Mock server initialization skipped:', error);
   });
 }
@@ -85,10 +85,7 @@ export const userCenterHandlers = [
 import { userCenterHandlers } from './userCenter';
 import { userApiHandlers } from './user';
 
-export const handlers = [
-  ...userCenterHandlers,
-  ...userApiHandlers,
-];
+export const handlers = [...userCenterHandlers, ...userApiHandlers];
 ```
 
 ### 4. 组件中使用 API
@@ -143,14 +140,15 @@ E2E 测试使用扩展的 Mock 数据，位于 `src/mocks/data/apiData.ts`：
 
 ### 课程数据 (30 个)
 
-| ID 范围 | 数量 | 用途 |
-|---------|------|------|
-| 1-15 | 15 | 基础课程 |
-| 16-30 | 15 | 分页测试 |
+| ID 范围 | 数量 | 用途     |
+| ------- | ---- | -------- |
+| 1-15    | 15   | 基础课程 |
+| 16-30   | 15   | 分页测试 |
 
 ### 分页测试课程 (16-30)
 
 包含多种科目类型：
+
 - 语言课程：日语、韩语、法语、西班牙语
 - 艺术课程：中文字法
 - 体育课程：瑜伽、高尔夫

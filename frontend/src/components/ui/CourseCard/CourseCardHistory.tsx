@@ -91,7 +91,7 @@ export const CourseCardHistory: React.FC<CourseCardHistoryProps> = ({
           type="text"
           danger
           icon={<CloseOutlined />}
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
             onRemove();
           }}

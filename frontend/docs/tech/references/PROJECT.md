@@ -36,16 +36,17 @@ stories/
 
 Group related functionality by domain:
 
-| Pattern | Reusable Location |
-| ------- | ----------------- |
-| Used in 2+ features | `components/shared/` |
-| Used in 2+ sections | `components/ui/` |
-| Used across many | `components/ui/` (base) |
-| Page-specific | `pages/PageName/sections/` |
+| Pattern             | Reusable Location          |
+| ------------------- | -------------------------- |
+| Used in 2+ features | `components/shared/`       |
+| Used in 2+ sections | `components/ui/`           |
+| Used across many    | `components/ui/` (base)    |
+| Page-specific       | `pages/PageName/sections/` |
 
 ### When to Create a New Feature
 
 Create a new feature folder when:
+
 - Components are tightly coupled to a specific domain
 - Pages share significant logic
 - Components are only used within that feature
@@ -53,6 +54,7 @@ Create a new feature folder when:
 ### When to Use Shared
 
 Use shared components when:
+
 - Components are used across 2+ features
 - Components are generic (Header, Footer, Layout)
 - Components are base UI elements (Button, Card)
@@ -74,6 +76,7 @@ export const CTASection = () => <div className="cta">...</div>;
 ### Deduplication Checklist
 
 Before writing new code, check:
+
 1. Is there a similar component already?
 2. Can the logic be extracted to a hook?
 3. Should styles be in a shared mixin?
@@ -94,6 +97,7 @@ export const HomePage = () => (
 ```
 
 **Section structure:**
+
 ```
 pages/PageName/sections/SectionName/
 ├── index.tsx
@@ -114,11 +118,11 @@ import { Button, HeroSection } from '@/components/ui';
 
 ## File Naming Conventions
 
-| Category | Pattern | Example |
-|----------|---------|---------|
-| Component | PascalCase | `CourseCard.tsx` |
-| Page | PascalCase | `HomePage.tsx` |
-| Section | PascalCase | `HeroSection.tsx` |
-| Hook | camelCase + 'use' | `useCity.ts` |
-| Utility | camelCase | `formatDate.ts` |
+| Category    | Pattern           | Example              |
+| ----------- | ----------------- | -------------------- |
+| Component   | PascalCase        | `CourseCard.tsx`     |
+| Page        | PascalCase        | `HomePage.tsx`       |
+| Section     | PascalCase        | `HeroSection.tsx`    |
+| Hook        | camelCase + 'use' | `useCity.ts`         |
+| Utility     | camelCase         | `formatDate.ts`      |
 | SCSS module | Same as component | `Button.module.scss` |

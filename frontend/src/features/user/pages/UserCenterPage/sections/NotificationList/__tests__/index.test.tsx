@@ -47,9 +47,7 @@ describe('NotificationList', () => {
 
   it('does not show unread count when all are read', () => {
     const allReadNotifications = mockNotifications.map(n => ({ ...n, read: true }));
-    render(
-      <NotificationList {...defaultProps} notifications={allReadNotifications} />
-    );
+    render(<NotificationList {...defaultProps} notifications={allReadNotifications} />);
     expect(screen.queryByText(/unread/)).toBeNull();
   });
 

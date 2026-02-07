@@ -326,5 +326,6 @@ GET /api/v1/auth/me
 ### 测试说明
 
 Mock 中通过 token 内容判断用户角色：
+
 - Token 包含 `teacher` → 返回教师用户
 - 其他 → 返回学生用户

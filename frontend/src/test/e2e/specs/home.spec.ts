@@ -27,12 +27,16 @@ test.describe('Home Page', () => {
 
     test('HOME-002: 公告栏显示', async ({ page }) => {
       // Check if announcement bar is visible (check by data-testid or class)
-      const announcementBar = page.locator('[data-testid="announcement-bar"], [class*="announcement"]').first();
+      const announcementBar = page
+        .locator('[data-testid="announcement-bar"], [class*="announcement"]')
+        .first();
       await expect(announcementBar.first()).toBeVisible();
     });
 
     test('HOME-003: 公告栏关闭功能', async ({ page }) => {
-      const closeButton = page.locator('[data-testid="announcement-close"], [class*="announcement"] button').first();
+      const closeButton = page
+        .locator('[data-testid="announcement-close"], [class*="announcement"] button')
+        .first();
       if (await closeButton.isVisible()) {
         await closeButton.click();
         // After close, announcement should be hidden
@@ -55,7 +59,9 @@ test.describe('Home Page', () => {
 
     test('HOME-006: 未登录显示登录按钮', async ({ page }) => {
       // Check if login button is visible when not logged in
-      const loginButton = page.locator('header button:has-text("Log In"), header a[href="/login"]').first();
+      const loginButton = page
+        .locator('header button:has-text("Log In"), header a[href="/login"]')
+        .first();
       await expect(loginButton.first()).toBeVisible();
     });
   });
@@ -63,7 +69,9 @@ test.describe('Home Page', () => {
   test.describe('Language Switching', () => {
     test('HOME-004: 语言切换器存在', async ({ page }) => {
       // Find language switcher
-      const langSwitcher = page.locator('[data-testid="language-switcher"], select[name="lang"], [class*="language"]').first();
+      const langSwitcher = page
+        .locator('[data-testid="language-switcher"], select[name="lang"], [class*="language"]')
+        .first();
       await expect(langSwitcher.first()).toBeVisible();
     });
   });
@@ -71,7 +79,9 @@ test.describe('Home Page', () => {
   test.describe('Featured Courses', () => {
     test('HOME-010: Featured Courses 显示', async ({ page }) => {
       // Wait for courses to load
-      const courseCards = page.locator('[data-testid="course-card"], .course-card, [class*="course"] [class*="card"]');
+      const courseCards = page.locator(
+        '[data-testid="course-card"], .course-card, [class*="course"] [class*="card"]'
+      );
       await expect(courseCards.first()).toBeVisible({ timeout: 10000 });
     });
 
@@ -95,13 +105,17 @@ test.describe('Home Page', () => {
   test.describe('Hero Section', () => {
     test('HOME-008: Hero 标题显示', async ({ page }) => {
       // Check hero section exists
-      const heroSection = page.locator('[data-testid="hero-section"], section[class*="hero"], [class*="banner"]').first();
+      const heroSection = page
+        .locator('[data-testid="hero-section"], section[class*="hero"], [class*="banner"]')
+        .first();
       await expect(heroSection.first()).toBeVisible();
     });
 
     test('HOME-009: CTA 按钮可点击', async ({ page }) => {
       // Find and click CTA button
-      const ctaButton = page.locator('[data-testid="hero-cta"], section[class*="hero"] button').first();
+      const ctaButton = page
+        .locator('[data-testid="hero-cta"], section[class*="hero"] button')
+        .first();
       if (await ctaButton.isVisible()) {
         await ctaButton.click();
         // Should navigate to courses page
@@ -127,11 +141,14 @@ test.describe('Home Page - Logged In User', () => {
     // Set localStorage to simulate logged in user
     await page.addInitScript(() => {
       localStorage.setItem('auth_token', 'test-token');
-      localStorage.setItem('user', JSON.stringify({
-        id: 'user-test-001',
-        name: 'Test User',
-        email: 'test@example.com',
-      }));
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          id: 'user-test-001',
+          name: 'Test User',
+          email: 'test@example.com',
+        })
+      );
     });
 
     await page.goto('/');
@@ -140,13 +157,17 @@ test.describe('Home Page - Logged In User', () => {
 
   test('HOME-007: 已登录显示用户头像', async ({ page }) => {
     // When logged in, should show user avatar instead of login button
-    const userAvatar = page.locator('[data-testid="user-avatar"], header [class*="avatar"]').first();
+    const userAvatar = page
+      .locator('[data-testid="user-avatar"], header [class*="avatar"]')
+      .first();
     await expect(userAvatar.first()).toBeVisible();
   });
 
   test('HOME-014: 用户下拉菜单存在', async ({ page }) => {
     // Click on user avatar to open dropdown
-    const userAvatar = page.locator('[data-testid="user-avatar"], header [class*="avatar"]').first();
+    const userAvatar = page
+      .locator('[data-testid="user-avatar"], header [class*="avatar"]')
+      .first();
     if (await userAvatar.isVisible()) {
       await userAvatar.click();
       // Check dropdown menu exists

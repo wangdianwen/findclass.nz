@@ -299,3 +299,29 @@ export interface UserProfileResponse {
   createdAt: string;
   updatedAt: string;
 }
+
+// Social login DTO
+export class SocialLoginDto {
+  @IsEnum(['google', 'wechat'])
+  provider!: 'google' | 'wechat';
+
+  @IsString()
+  @IsNotEmpty({ message: 'Social token is required' })
+  socialToken!: string;
+
+  @IsOptional()
+  @IsString()
+  avatar?: string;
+
+  @IsOptional()
+  @IsString()
+  name?: string;
+}
+
+// Social login response (matches frontend MSW)
+export interface SocialLoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  tokenType: 'Bearer';
+}

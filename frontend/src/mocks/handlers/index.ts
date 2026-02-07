@@ -28,9 +28,9 @@ const logRequest = (method: string, url: string) => {
 // Helper function to generate consistent GUID for mock data
 // Format: UUID v4
 function generateGuid(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
@@ -163,16 +163,16 @@ export const coursesHandlers = [
 
     // Apply filters
     if (city && city !== 'all') {
-      filteredCourses = filteredCourses.filter((c) => c.city === city);
+      filteredCourses = filteredCourses.filter(c => c.city === city);
     }
     if (subject && subject !== 'all') {
-      filteredCourses = filteredCourses.filter((c) => c.subject === subject);
+      filteredCourses = filteredCourses.filter(c => c.subject === subject);
     }
     if (grade && grade !== 'all') {
-      filteredCourses = filteredCourses.filter((c) => c.grade === grade);
+      filteredCourses = filteredCourses.filter(c => c.grade === grade);
     }
     if (region && region !== 'all') {
-      filteredCourses = filteredCourses.filter((c) => c.region === region);
+      filteredCourses = filteredCourses.filter(c => c.region === region);
     }
 
     // Pagination
@@ -187,7 +187,10 @@ export const coursesHandlers = [
       slug: generateSlug(course.title),
     }));
 
-    console.log('[MSW] Returning courses:', { count: coursesWithGuid.length, total: filteredCourses.length });
+    console.log('[MSW] Returning courses:', {
+      count: coursesWithGuid.length,
+      total: filteredCourses.length,
+    });
 
     return HttpResponse.json({
       data: coursesWithGuid,
@@ -233,10 +236,7 @@ export const coursesHandlers = [
       });
     }
 
-    return HttpResponse.json(
-      { message: 'Course not found' },
-      { status: 404 }
-    );
+    return HttpResponse.json({ message: 'Course not found' }, { status: 404 });
   }),
 
   // GET /api/v1/courses/search - Search courses
@@ -259,7 +259,7 @@ export const coursesHandlers = [
     }
 
     const results = MOCK_COURSES_API.filter(
-      (c) =>
+      c =>
         c.title.toLowerCase().includes(q) ||
         c.subject.toLowerCase().includes(q) ||
         c.teacherName.toLowerCase().includes(q)
@@ -314,10 +314,10 @@ export const reviewsHandlers = [
     let filteredReviews = [...MOCK_REVIEWS_API];
 
     if (teacherId) {
-      filteredReviews = filteredReviews.filter((r) => r.teacherId === teacherId);
+      filteredReviews = filteredReviews.filter(r => r.teacherId === teacherId);
     }
     if (courseId) {
-      filteredReviews = filteredReviews.filter((r) => r.courseId === courseId);
+      filteredReviews = filteredReviews.filter(r => r.courseId === courseId);
     }
 
     // Pagination
@@ -387,10 +387,10 @@ export const tutorsHandlers = [
     }));
 
     if (city && city !== 'all') {
-      tutors = tutors.filter((t) => t.city === city);
+      tutors = tutors.filter(t => t.city === city);
     }
     if (subject && subject !== 'all') {
-      tutors = tutors.filter((t) => t.subject === subject);
+      tutors = tutors.filter(t => t.subject === subject);
     }
 
     return HttpResponse.json(tutors);
@@ -408,10 +408,7 @@ export const tutorsHandlers = [
     const course = findTeacherByGuid(guid);
 
     if (!course) {
-      return HttpResponse.json(
-        { message: 'Teacher not found' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ message: 'Teacher not found' }, { status: 404 });
     }
 
     return HttpResponse.json({
@@ -439,13 +436,7 @@ export const searchHandlers = [
   // GET /api/v1/search/popular - Get popular searches
   http.get(`${API_BASE}/search/popular`, ({ request }) => {
     logRequest('GET', request.url);
-    return HttpResponse.json([
-      '高中数学',
-      '雅思英语',
-      '钢琴辅导',
-      '编程入门',
-      '物理补习',
-    ]);
+    return HttpResponse.json(['高中数学', '雅思英语', '钢琴辅导', '编程入门', '物理补习']);
   }),
 
   // GET /api/v1/search/suggestions - Get search suggestions
@@ -459,13 +450,13 @@ export const searchHandlers = [
     }
 
     const suggestions = MOCK_COURSES_API.filter(
-      (c) =>
+      c =>
         c.title.toLowerCase().includes(query) ||
         c.subject.toLowerCase().includes(query) ||
         c.teacherName.toLowerCase().includes(query)
     )
       .slice(0, 5)
-      .map((c) => ({
+      .map(c => ({
         id: c.id,
         title: c.title,
         type: 'course',
@@ -486,17 +477,17 @@ export const authHandlers = [
   // If email contains "teacher", returns teacher token and user info
   http.post(`${API_BASE}/auth/login`, async ({ request }) => {
     logRequest('POST', request.url);
-    const body = await request.json().catch(() => null) as { email?: string; password?: string } | null;
+    const body = (await request.json().catch(() => null)) as {
+      email?: string;
+      password?: string;
+    } | null;
 
     if (!body) {
-      return HttpResponse.json(
-        { success: false, message: '请求参数错误' },
-        { status: 400 }
-      );
+      return HttpResponse.json({ success: false, message: '请求参数错误' }, { status: 400 });
     }
 
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 800));
 
     // Validate password (mock: 'wrong' will fail)
     if (body.password === 'wrong') {
@@ -507,7 +498,9 @@ export const authHandlers = [
     }
 
     // Check if email contains "teacher" to determine user role
-    const isTeacherEmail = String(body.email || '').toLowerCase().includes('teacher');
+    const isTeacherEmail = String(body.email || '')
+      .toLowerCase()
+      .includes('teacher');
     const tokenRole = isTeacherEmail ? '-teacher' : '';
 
     return HttpResponse.json({
@@ -526,17 +519,18 @@ export const authHandlers = [
   // If email contains "teacher", registers as teacher
   http.post(`${API_BASE}/auth/register`, async ({ request }) => {
     logRequest('POST', request.url);
-    const body = await request.json().catch(() => null) as { email?: string; password?: string; code?: string } | null;
+    const body = (await request.json().catch(() => null)) as {
+      email?: string;
+      password?: string;
+      code?: string;
+    } | null;
 
     if (!body) {
-      return HttpResponse.json(
-        { success: false, message: '请求参数错误' },
-        { status: 400 }
-      );
+      return HttpResponse.json({ success: false, message: '请求参数错误' }, { status: 400 });
     }
 
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Validate code
     if (body.code === '000000') {
@@ -548,14 +542,13 @@ export const authHandlers = [
 
     // Check if email already exists (mock)
     if (String(body.email || '').includes('existing')) {
-      return HttpResponse.json(
-        { success: false, message: '该邮箱已被注册' },
-        { status: 409 }
-      );
+      return HttpResponse.json({ success: false, message: '该邮箱已被注册' }, { status: 409 });
     }
 
     // Check if email contains "teacher" to determine user role
-    const isTeacherEmail = String(body.email || '').toLowerCase().includes('teacher');
+    const isTeacherEmail = String(body.email || '')
+      .toLowerCase()
+      .includes('teacher');
     const tokenRole = isTeacherEmail ? '-teacher' : '';
 
     return HttpResponse.json({
@@ -573,24 +566,18 @@ export const authHandlers = [
   // POST /api/v1/auth/refresh - Refresh access token
   http.post(`${API_BASE}/auth/refresh`, async ({ request }) => {
     logRequest('POST', request.url);
-    const body = await request.json().catch(() => null) as { refreshToken?: string } | null;
+    const body = (await request.json().catch(() => null)) as { refreshToken?: string } | null;
 
     if (!body?.refreshToken) {
-      return HttpResponse.json(
-        { success: false, message: '无效的刷新令牌' },
-        { status: 401 }
-      );
+      return HttpResponse.json({ success: false, message: '无效的刷新令牌' }, { status: 401 });
     }
 
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     // Validate refresh token format (mock)
     if (!String(body.refreshToken).includes('mock-refresh-token')) {
-      return HttpResponse.json(
-        { success: false, message: '无效的刷新令牌' },
-        { status: 401 }
-      );
+      return HttpResponse.json({ success: false, message: '无效的刷新令牌' }, { status: 401 });
     }
 
     return HttpResponse.json({
@@ -606,17 +593,14 @@ export const authHandlers = [
   // POST /api/v1/auth/reset-password - Reset password
   http.post(`${API_BASE}/auth/reset-password`, async ({ request }) => {
     logRequest('POST', request.url);
-    const body = await request.json().catch(() => null) as Record<string, unknown> | null;
+    const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
 
     if (!body) {
-      return HttpResponse.json(
-        { success: false, message: '请求参数错误' },
-        { status: 400 }
-      );
+      return HttpResponse.json({ success: false, message: '请求参数错误' }, { status: 400 });
     }
 
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Validate code
     if (body.code === '000000') {
@@ -635,20 +619,17 @@ export const authHandlers = [
   // POST /api/v1/auth/send-code - Send verification code
   http.post(`${API_BASE}/auth/send-code`, async ({ request }) => {
     logRequest('POST', request.url);
-    const body = await request.json().catch(() => null) as { email?: string } | null;
+    const body = (await request.json().catch(() => null)) as { email?: string } | null;
 
     if (!body || !body.email) {
-      return HttpResponse.json(
-        { success: false, message: '请输入邮箱地址' },
-        { status: 400 }
-      );
+      return HttpResponse.json({ success: false, message: '请输入邮箱地址' }, { status: 400 });
     }
 
     // Note: Email format validation is done by frontend
     // This handler only handles business logic validation
 
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Rate limit check (mock)
     if (body.email.includes('ratelimit')) {
@@ -675,10 +656,7 @@ export const authHandlers = [
     // Check for Authorization header
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return HttpResponse.json(
-        { success: false, message: '未登录' },
-        { status: 401 }
-      );
+      return HttpResponse.json({ success: false, message: '未登录' }, { status: 401 });
     }
 
     // Check if token contains "teacher" to determine user role
@@ -737,7 +715,10 @@ export const socialLoginHandlers = [
   // POST /api/v1/auth/social-login - Social login (Google, WeChat)
   http.post(`${API_BASE}/auth/social-login`, async ({ request }) => {
     logRequest('POST', request.url);
-    const body = await request.json().catch(() => null) as { provider?: string; credential?: string } | null;
+    const body = (await request.json().catch(() => null)) as {
+      provider?: string;
+      credential?: string;
+    } | null;
 
     if (!body || !body.provider) {
       return HttpResponse.json(
@@ -747,7 +728,7 @@ export const socialLoginHandlers = [
     }
 
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Validate Google credential
     if (body.provider === 'google' && !body.credential) {
@@ -808,7 +789,7 @@ export const userHandlers = [
   // POST /api/v1/user/favorites - Toggle favorite
   http.post(`${API_BASE}/user/favorites`, async ({ request }) => {
     logRequest('POST', request.url);
-    const body = await request.json().catch(() => null) as { courseId?: string } | null;
+    const body = (await request.json().catch(() => null)) as { courseId?: string } | null;
 
     if (!body?.courseId) {
       return HttpResponse.json(
@@ -852,7 +833,7 @@ export const inquiryHandlers = [
   // POST /api/v1/inquiries - Send inquiry
   http.post(`${API_BASE}/inquiries`, async ({ request }) => {
     logRequest('POST', request.url);
-    const body = await request.json().catch(() => null) as Record<string, unknown> | null;
+    const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
 
     if (!body) {
       return HttpResponse.json(
@@ -862,7 +843,7 @@ export const inquiryHandlers = [
     }
 
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     return HttpResponse.json({
       success: true,
@@ -874,7 +855,7 @@ export const inquiryHandlers = [
   // POST /api/v1/reports - Submit report
   http.post(`${API_BASE}/reports`, async ({ request }) => {
     logRequest('POST', request.url);
-    const body = await request.json().catch(() => null) as Record<string, unknown> | null;
+    const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
 
     if (!body) {
       return HttpResponse.json(
@@ -899,7 +880,7 @@ export const inquiryHandlers = [
     }
 
     // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     return HttpResponse.json({
       success: true,

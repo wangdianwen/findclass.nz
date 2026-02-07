@@ -6,7 +6,7 @@ const meta = {
   component: FeaturedCoursesSection,
   tags: ['autodocs', 'a11y'],
   decorators: [
-    (Story) => (
+    Story => (
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '24px' }}>
         <Story />
       </div>

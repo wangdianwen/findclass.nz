@@ -11,9 +11,10 @@ function removeTestIdPlugin(): Plugin {
       if (id.includes('node_modules')) return null;
 
       // Keep data-testid in development and test modes
-      const isDevOrTest = process.env.NODE_ENV === 'development' ||
-                          process.env.NODE_ENV === 'test' ||
-                          process.env.NODE_ENV === 'storybook';
+      const isDevOrTest =
+        process.env.NODE_ENV === 'development' ||
+        process.env.NODE_ENV === 'test' ||
+        process.env.NODE_ENV === 'storybook';
       if (isDevOrTest) return null;
 
       const testIdRegex = /\s+data-testid\s*=\s*["'][^"']+["']/g;

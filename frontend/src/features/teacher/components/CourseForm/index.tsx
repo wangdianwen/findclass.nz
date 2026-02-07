@@ -51,7 +51,7 @@ export interface CourseFormValues {
   teachingMode: 'online' | 'offline' | 'both';
   city?: string;
   region?: string;
-  address?: string;  // Specific address field
+  address?: string; // Specific address field
   showAddress?: boolean;
   lessonCount: number;
   price: number;

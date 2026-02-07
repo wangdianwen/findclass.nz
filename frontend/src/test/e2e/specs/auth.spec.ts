@@ -56,7 +56,9 @@ test.describe('Login Page', () => {
 
     test('LOGIN-009: 跳转到忘记密码页链接', async ({ page }) => {
       // Find and click forgot password link
-      const forgotLink = page.locator('a:has-text("Forgot Password"), a:has-text("忘记密码")').first();
+      const forgotLink = page
+        .locator('a:has-text("Forgot Password"), a:has-text("忘记密码")')
+        .first();
       if (await forgotLink.isVisible()) {
         await forgotLink.click();
         await page.waitForURL(/forgot/);

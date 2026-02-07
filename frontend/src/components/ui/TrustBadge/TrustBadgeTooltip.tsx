@@ -63,7 +63,10 @@ export function TrustBadgeTooltip({
   );
 
   const badge = children || (
-    <span className={`${styles.badge} ${styles[size]} ${styles[config.colorClass]}`} data-testid={testId}>
+    <span
+      className={`${styles.badge} ${styles[size]} ${styles[config.colorClass]}`}
+      data-testid={testId}
+    >
       {config.icon}
       <span>{config.label}级</span>
     </span>

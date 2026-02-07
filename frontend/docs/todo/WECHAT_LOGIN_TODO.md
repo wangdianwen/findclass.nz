@@ -7,31 +7,40 @@
 ## 1. 微信开放平台配置
 
 ### 1.1 创建应用
+
 1. 访问 [微信开放平台](https://open.weixin.qq.com/)
 2. 注册开发者账号
 3. 创建网站应用
 
 ### 1.2 获取 AppID 和 AppSecret
+
 创建应用后，你会获得：
+
 - **AppID** - 应用唯一标识
 - **AppSecret** - 应用密钥（需妥善保管）
 
 ### 1.3 配置授权回调域
+
 在开放平台设置：
+
 - 授权回调域：`findclass.nz`
 - 开发环境：`localhost`
 
 ## 2. 环境变量配置
 
 ### 2.1 开发环境
+
 在 `.env.local` 文件中添加：
+
 ```bash
 VITE_WECHAT_APP_ID=your-wechat-app-id
 VITE_WECHAT_APP_SECRET=your-wechat-app-secret
 ```
 
 ### 2.2 生产环境
+
 在 Vercel 或其他部署平台的环境变量中添加：
+
 ```
 VITE_WECHAT_APP_ID=your-wechat-app-id
 VITE_WECHAT_APP_SECRET=your-wechat-app-secret
@@ -42,10 +51,13 @@ VITE_WECHAT_APP_SECRET=your-wechat-app-secret
 ### 3.1 创建后端 endpoints
 
 #### 3.1.1 生成登录二维码
+
 ```
 GET /api/v1/auth/wechat/qrcode
 ```
+
 返回：
+
 ```json
 {
   "qrcode_url": "https://open.weixin.qq.com/connect/qrconnect?...",
@@ -55,10 +67,13 @@ GET /api/v1/auth/wechat/qrcode
 ```
 
 #### 3.1.2 轮询检查登录状态
+
 ```
 GET /api/v1/auth/wechat/status?scene_id=xxx
 ```
+
 返回：
+
 ```json
 {
   "status": "scanning|confirmed|timeout",
@@ -71,10 +86,13 @@ GET /api/v1/auth/wechat/status?scene_id=xxx
 ```
 
 #### 3.1.3 微信回调处理
+
 ```
 GET /auth/wechat/callback?code=XXX&state=XXX
 ```
+
 处理步骤：
+
 1. 用 code 换取 access_token
 2. 获取用户信息
 3. 创建/更新用户
@@ -122,8 +140,8 @@ async function handleWeChatCallback(req, res) {
       appid: process.env.WECHAT_APP_ID,
       secret: process.env.WECHAT_APP_SECRET,
       code,
-      grant_type: 'authorization_code'
-    }
+      grant_type: 'authorization_code',
+    },
   });
 
   const { access_token, openid } = tokenResponse.data;
@@ -133,8 +151,8 @@ async function handleWeChatCallback(req, res) {
     params: {
       access_token,
       openid,
-      lang: 'zh_CN'
-    }
+      lang: 'zh_CN',
+    },
   });
 
   // 3. 创建/更新用户
@@ -174,7 +192,9 @@ const generateWeChatQRUrl = () => {
 
 ```tsx
 // 使用真实的微信二维码
-{qrCodeUrl && <img src={qrCodeUrl} alt="WeChat QR Code" />}
+{
+  qrCodeUrl && <img src={qrCodeUrl} alt="WeChat QR Code" />;
+}
 ```
 
 ### 4.3 轮询登录状态
@@ -208,6 +228,7 @@ React.useEffect(() => {
 ## 5. 用户数据存储
 
 ### 5.1 用户表扩展
+
 ```sql
 ALTER TABLE users ADD COLUMN wechat_openid VARCHAR(255) UNIQUE;
 ALTER TABLE users ADD COLUMN wechat_nickname VARCHAR(255);
@@ -215,6 +236,7 @@ ALTER TABLE users ADD COLUMN wechat_avatar VARCHAR(500);
 ```
 
 ### 5.2 登录逻辑
+
 ```javascript
 async function handleWeChatLogin(wechatUserInfo) {
   // 1. 查找用户
@@ -247,6 +269,7 @@ async function handleWeChatLogin(wechatUserInfo) {
 ## 6. 当前前端状态
 
 ### 6.1 已实现
+
 - [x] WeChatLoginButton UI 组件
 - [x] Modal 弹窗
 - [x] 模拟二维码显示
@@ -255,11 +278,13 @@ async function handleWeChatLogin(wechatUserInfo) {
 - [x] 国际化文本
 
 ### 6.2 待实现
+
 - [ ] 真实微信二维码 URL 生成
 - [ ] 后端轮询接口调用
 - [ ] 真实登录回调处理
 
 ### 6.3 前端代码位置
+
 ```
 src/components/ui/WeChatLoginButton/index.tsx           # 登录按钮组件
 src/components/ui/WeChatLoginButton/WeChatLoginButton.module.scss  # 样式
@@ -270,6 +295,7 @@ src/services/api.ts                                   # socialLogin API
 ## 7. 测试
 
 ### 7.1 本地测试步骤
+
 1. 配置 `.env.local` 中的微信 AppID
 2. 启动开发服务器：`npm run dev`
 3. 访问 `/login` 页面
@@ -277,7 +303,9 @@ src/services/api.ts                                   # socialLogin API
 5. 点击"模拟扫码"按钮（开发环境）
 
 ### 7.2 集成测试
+
 确保后端正确处理：
+
 ```bash
 # 测试二维码生成
 GET /api/v1/auth/wechat/qrcode
@@ -289,17 +317,20 @@ GET /api/v1/auth/wechat/status?scene_id=xxx
 ## 8. 注意事项
 
 ### 8.1 安全考虑
+
 - AppSecret 必须保存在后端，绝不能暴露到前端
 - 使用 HTTPS 在生产环境
 - 验证 state 参数防止 CSRF 攻击
 - 轮询接口需要限流
 
 ### 8.2 微信限制
+
 - 每天生成的二维码数量有限制
 - 每个用户每天只能扫一次二维码
 - 需要审核通过才能正式使用
 
 ### 8.3 用户体验
+
 - 二维码有效期通常为 5 分钟
 - 显示清晰的扫码指引
 - 超时后提供重试选项

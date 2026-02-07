@@ -9,11 +9,13 @@
 ### 1. 用户被删除 (USER_NOT_FOUND)
 
 请求示例：
+
 ```http
 GET /api/v1/users/deleted-user-001
 ```
 
 响应：
+
 ```json
 {
   "success": false,
@@ -31,11 +33,13 @@ GET /api/v1/users/deleted-user-001
 ### 2. 用户被封禁 (USER_BANNED)
 
 请求示例：
+
 ```http
 GET /api/v1/users/banned-user-001
 ```
 
 或在使用需要认证的接口时：
+
 ```http
 Authorization: Bearer banned-token-xxx
 POST /api/v1/user/favorites
@@ -44,6 +48,7 @@ POST /api/v1/reports
 ```
 
 响应：
+
 ```json
 {
   "success": false,
@@ -63,11 +68,13 @@ POST /api/v1/reports
 ### 3. 课程不存在 (COURSE_NOT_FOUND)
 
 请求示例：
+
 ```http
 GET /api/v1/courses/not-found
 ```
 
 响应：
+
 ```json
 {
   "success": false,
@@ -83,11 +90,13 @@ GET /api/v1/courses/not-found
 ### 4. 课程未发布 (COURSE_NOT_PUBLISHED)
 
 请求示例：
+
 ```http
 GET /api/v1/courses/course-draft-001
 ```
 
 响应：
+
 ```json
 {
   "success": false,
@@ -115,6 +124,7 @@ GET /api/v1/courses/course-draft-001
 **课程ID**: `course-nofavorite-001`
 
 请求示例：
+
 ```http
 POST /api/v1/user/favorites
 Content-Type: application/json
@@ -125,6 +135,7 @@ Content-Type: application/json
 ```
 
 响应：
+
 ```json
 {
   "success": false,
@@ -136,11 +147,13 @@ Content-Type: application/json
 ```
 
 检查收藏状态：
+
 ```http
 GET /api/v1/user/favorites/course-nofavorite-001
 ```
 
 响应：
+
 ```json
 {
   "isFavorited": false,
@@ -156,6 +169,7 @@ GET /api/v1/user/favorites/course-nofavorite-001
 **课程ID**: `course-noreport-001`
 
 请求示例：
+
 ```http
 POST /api/v1/reports
 Content-Type: application/json
@@ -169,6 +183,7 @@ Content-Type: application/json
 ```
 
 响应：
+
 ```json
 {
   "success": false,
@@ -186,6 +201,7 @@ Content-Type: application/json
 **课程ID**: `course-noinquiry-001`
 
 请求示例：
+
 ```http
 POST /api/v1/inquiries
 Content-Type: application/json
@@ -199,6 +215,7 @@ Content-Type: application/json
 ```
 
 响应：
+
 ```json
 {
   "success": false,
@@ -224,11 +241,13 @@ Content-Type: application/json
 ### 10. 评论加载失败
 
 请求示例：
+
 ```http
 GET /api/v1/reviews?courseId=1&fail=true
 ```
 
 响应：
+
 ```json
 {
   "success": false,
@@ -246,11 +265,13 @@ GET /api/v1/reviews?courseId=1&fail=true
 ### 11. 无评论内容
 
 请求示例：
+
 ```http
 GET /api/v1/reviews?courseId=1&empty=true
 ```
 
 响应：
+
 ```json
 {
   "data": [],
@@ -270,6 +291,7 @@ GET /api/v1/reviews?courseId=1&empty=true
 ### 12. 发表评论限流
 
 请求示例：
+
 ```http
 Authorization: Bearer ratelimit-token
 POST /api/v1/reviews
@@ -283,6 +305,7 @@ Content-Type: application/json
 ```
 
 响应：
+
 ```json
 {
   "success": false,
@@ -328,6 +351,7 @@ Content-Type: application/json
 ## 课程列表状态过滤
 
 请求示例：
+
 ```http
 GET /api/v1/courses?status=published
 GET /api/v1/courses?status=draft
@@ -339,11 +363,11 @@ GET /api/v1/courses?includeUnpublished=true
 
 ## 测试账号
 
-| 用户类型 | ID | 邮箱 | 状态 |
-|---------|-----|------|------|
-| 正常用户 | user-active-001 | active@example.com | active |
+| 用户类型   | ID               | 邮箱                | 状态    |
+| ---------- | ---------------- | ------------------- | ------- |
+| 正常用户   | user-active-001  | active@example.com  | active  |
 | 已删除用户 | user-deleted-001 | deleted@example.com | deleted |
-| 已封禁用户 | user-banned-001 | banned@example.com | banned |
+| 已封禁用户 | user-banned-001  | banned@example.com  | banned  |
 
 ---
 
@@ -358,7 +382,7 @@ const handleFavorite = async () => {
   const response = await fetch('/api/v1/user/favorites', {
     method: 'POST',
     headers: {
-      'Authorization': 'Bearer banned-token',
+      Authorization: 'Bearer banned-token',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ courseId: '1' }),
@@ -393,15 +417,15 @@ export const BannedUserFavorite: Story = {
 
 ## 错误代码汇总
 
-| 错误码 | 说明 |
-|-------|------|
-| `USER_NOT_FOUND` | 用户不存在或已删除 |
-| `USER_BANNED` | 用户被封禁 |
-| `COURSE_NOT_FOUND` | 课程不存在 |
-| `COURSE_NOT_PUBLISHED` | 课程未发布 |
-| `ACTION_NOT_ALLOWED` | 操作被限制 |
-| `REVIEW_LOAD_ERROR` | 评论加载失败 |
-| `RATE_LIMITED` | 操作过于频繁 |
-| `INTERNAL_ERROR` | 服务器错误 |
-| `UNAUTHORIZED` | 未登录 |
-| `INVALID_REQUEST` | 请求参数错误 |
+| 错误码                 | 说明               |
+| ---------------------- | ------------------ |
+| `USER_NOT_FOUND`       | 用户不存在或已删除 |
+| `USER_BANNED`          | 用户被封禁         |
+| `COURSE_NOT_FOUND`     | 课程不存在         |
+| `COURSE_NOT_PUBLISHED` | 课程未发布         |
+| `ACTION_NOT_ALLOWED`   | 操作被限制         |
+| `REVIEW_LOAD_ERROR`    | 评论加载失败       |
+| `RATE_LIMITED`         | 操作过于频繁       |
+| `INTERNAL_ERROR`       | 服务器错误         |
+| `UNAUTHORIZED`         | 未登录             |
+| `INVALID_REQUEST`      | 请求参数错误       |

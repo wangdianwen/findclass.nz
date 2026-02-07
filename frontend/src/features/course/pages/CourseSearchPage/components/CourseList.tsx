@@ -106,13 +106,16 @@ export const CourseList: React.FC<CourseListProps> = ({
           <h3 data-testid="error-title">{t('error.title', 'Failed to load courses')}</h3>
           <p data-testid="error-message">{t('error.description', 'Please try again later.')}</p>
           {/* E2E test text - screen reader only but visible to Playwright */}
-          <p data-testid="加载失败" className={styles.srOnly}>加载失败</p>
-          <p data-testid="error" className={styles.srOnly}>error</p>
-          <p data-testid="Error" className={styles.srOnly}>Error</p>
-          <Button
-            onClick={() => window.location.reload()}
-            data-testid="retry-button"
-          >
+          <p data-testid="加载失败" className={styles.srOnly}>
+            加载失败
+          </p>
+          <p data-testid="error" className={styles.srOnly}>
+            error
+          </p>
+          <p data-testid="Error" className={styles.srOnly}>
+            Error
+          </p>
+          <Button onClick={() => window.location.reload()} data-testid="retry-button">
             {t('error.button', 'Retry')}
           </Button>
         </div>

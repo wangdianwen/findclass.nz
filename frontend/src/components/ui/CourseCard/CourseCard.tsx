@@ -158,7 +158,11 @@ export const CourseCard: React.FC<CourseCardProps> = React.memo(
 
     return (
       <Link to={`/courses/${course.id}`} className={`${styles.courseCardLink} course-card-link`}>
-        <div className={`${styles.courseCard} course-card`} data-testid="course-card" data-testid-dynamic={`course-card-${course.id}`}>
+        <div
+          className={`${styles.courseCard} course-card`}
+          data-testid="course-card"
+          data-testid-dynamic={`course-card-${course.id}`}
+        >
           <h3 className={styles.courseTitle}>
             <TrustBadge level={course.trustLevel} size="small" />
             <span className={styles.titleText}>{course.title}</span>

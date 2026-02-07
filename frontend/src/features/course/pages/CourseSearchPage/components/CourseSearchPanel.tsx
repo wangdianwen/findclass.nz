@@ -136,7 +136,11 @@ export const CourseSearchPanel: React.FC<CourseSearchPanelProps> = ({
   // ============================================
 
   return (
-    <div className={`${styles.searchPanel} filters`} data-testid="course-search-panel" data-testid-filter-panel="filter-panel">
+    <div
+      className={`${styles.searchPanel} filters`}
+      data-testid="course-search-panel"
+      data-testid-filter-panel="filter-panel"
+    >
       {/* Search Section */}
       <div className={styles.searchSection}>
         <div className={styles.searchBar}>

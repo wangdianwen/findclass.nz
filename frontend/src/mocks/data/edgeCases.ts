@@ -250,10 +250,13 @@ export const MOCK_COURSES_WITH_STATUS: MockCourseData[] = [
 // Course Detail with Extended Properties
 // ============================================
 
-export const MOCK_COURSE_DETAIL_WITH_STATUS: Record<string, CourseDetail & {
-  status: CourseStatus;
-  flags?: MockCourseData['flags'];
-}> = {
+export const MOCK_COURSE_DETAIL_WITH_STATUS: Record<
+  string,
+  CourseDetail & {
+    status: CourseStatus;
+    flags?: MockCourseData['flags'];
+  }
+> = {
   '1': {
     id: '1',
     title: '高中数学提高班',
@@ -303,9 +306,7 @@ export const MOCK_COURSE_DETAIL_WITH_STATUS: Record<string, CourseDetail & {
       isFavorited: false,
       isCompared: false,
     },
-    images: [
-      'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800',
-    ],
+    images: ['https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800'],
     status: 'published',
   },
   'course-draft-001': {
@@ -407,9 +408,7 @@ export const MOCK_COURSE_DETAIL_WITH_STATUS: Record<string, CourseDetail & {
       isFavorited: false,
       isCompared: false,
     },
-    images: [
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800',
-    ],
+    images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800'],
     status: 'published',
     flags: {
       canFavorite: false,

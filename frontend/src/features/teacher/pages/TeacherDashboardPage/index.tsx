@@ -221,15 +221,16 @@ export const TeacherDashboardPage: React.FC<TeacherDashboardPageProps> = ({
   // Load storybook data on mount
   useEffect(() => {
     // Check if we're in Storybook
-    const isStorybook = typeof window !== 'undefined' &&
-      '__STORYBOOK__' in window;
+    const isStorybook = typeof window !== 'undefined' && '__STORYBOOK__' in window;
 
     if (isStorybook) {
-      import('./teacherStorybookData').then(module => {
-        setStorybookData(module);
-      }).catch(() => {
-        // Module not found, use defaults
-      });
+      import('./teacherStorybookData')
+        .then(module => {
+          setStorybookData(module);
+        })
+        .catch(() => {
+          // Module not found, use defaults
+        });
     }
   }, []);
 
@@ -242,7 +243,9 @@ export const TeacherDashboardPage: React.FC<TeacherDashboardPageProps> = ({
     const data = storybookData?.getStorybookStudentsData();
     return data ? [...data] : [...MOCK_TEACHER_STUDENTS];
   });
-  const [revenue] = useState<RevenueData>(() => storybookData?.getStorybookRevenueData() || MOCK_REVENUE_DATA);
+  const [revenue] = useState<RevenueData>(
+    () => storybookData?.getStorybookRevenueData() || MOCK_REVENUE_DATA
+  );
   const [activeTab, setActiveTab] = useState<ActiveTab>('courses');
   const [viewMode, setViewMode] = useState<ViewMode>(initialMode);
   const [editingCourse, setEditingCourse] = useState<TeacherCourse | null>(null);

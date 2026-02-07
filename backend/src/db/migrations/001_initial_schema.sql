@@ -285,6 +285,47 @@ CREATE TABLE IF NOT EXISTS role_application_history (
 );
 
 -- ============================================
+-- INQUIRIES AND REPORTS TABLES
+-- ============================================
+
+-- Inquiries table
+-- Stores user inquiries about courses, teachers, or general questions
+CREATE TABLE IF NOT EXISTS inquiries (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    user_name VARCHAR(100),
+    user_email VARCHAR(255),
+    user_phone VARCHAR(50),
+    target_type VARCHAR(50) NOT NULL,
+    target_id UUID,
+    subject VARCHAR(200),
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'PENDING',
+    reply_content TEXT,
+    replied_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Reports table
+-- Stores user reports for content moderation
+CREATE TABLE IF NOT EXISTS reports (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    user_name VARCHAR(100),
+    user_email VARCHAR(255),
+    target_type VARCHAR(50) NOT NULL,
+    target_id VARCHAR(255) NOT NULL,
+    reason VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'PENDING',
+    admin_notes TEXT,
+    resolved_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================
 -- INDEXES
 -- ============================================
 
@@ -362,6 +403,19 @@ CREATE INDEX IF NOT EXISTS idx_role_application_history_action ON role_applicati
 CREATE INDEX IF NOT EXISTS idx_role_application_history_performed_by ON role_application_history(performed_by);
 CREATE INDEX IF NOT EXISTS idx_role_application_history_created_at ON role_application_history(created_at DESC);
 
+-- Inquiries indexes
+CREATE INDEX IF NOT EXISTS idx_inquiries_user_id ON inquiries(user_id);
+CREATE INDEX IF NOT EXISTS idx_inquiries_status ON inquiries(status);
+CREATE INDEX IF NOT EXISTS idx_inquiries_target ON inquiries(target_type, target_id);
+CREATE INDEX IF NOT EXISTS idx_inquiries_created_at ON inquiries(created_at DESC);
+
+-- Reports indexes
+CREATE INDEX IF NOT EXISTS idx_reports_user_id ON reports(user_id);
+CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
+CREATE INDEX IF NOT EXISTS idx_reports_target ON reports(target_type, target_id);
+CREATE INDEX IF NOT EXISTS idx_reports_reason ON reports(reason);
+CREATE INDEX IF NOT EXISTS idx_reports_created_at ON reports(created_at DESC);
+
 -- ============================================
 -- FUNCTIONS
 -- ============================================
@@ -415,6 +469,16 @@ CREATE TRIGGER update_role_applications_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_inquiries_updated_at
+    BEFORE UPDATE ON inquiries
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_reports_updated_at
+    BEFORE UPDATE ON reports
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
 -- ============================================
 -- COMMENTS
 -- ============================================
@@ -429,6 +493,8 @@ COMMENT ON TABLE sessions IS 'JWT token blacklist for logout functionality';
 COMMENT ON TABLE verification_codes IS 'Email verification codes';
 COMMENT ON TABLE role_applications IS 'User applications for role upgrades';
 COMMENT ON TABLE role_application_history IS 'Audit log for role application status changes';
+COMMENT ON TABLE inquiries IS 'User inquiries about courses, teachers, or general questions';
+COMMENT ON TABLE reports IS 'User reports for content moderation';
 
 COMMENT ON COLUMN users.password_hash IS 'Bcrypt hash of user password';
 COMMENT ON COLUMN users.status IS 'PENDING_PARENTAL_CONSENT requires guardian approval for students under 16';

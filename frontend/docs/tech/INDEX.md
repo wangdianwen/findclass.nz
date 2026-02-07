@@ -9,30 +9,30 @@ description: |
 
 ## Quick Navigation
 
-| Topic | Reference |
-| ------ | ----------|
-| Project structure | [PROJECT.md](./references/PROJECT.md) |
-| Components & Stories | [COMPONENTS.md](./references/COMPONENTS.md) |
-| Testing | [TESTING.md](./references/TESTING.md) |
-| Storybook | [STORYBOOK.md](./references/STORYBOOK.md) |
-| API + Storybook | [STORYBOOK.md#api-calling-patterns](./references/STORYBOOK.md#api-calling-patterns-storybook-compatible) |
-| i18n | [I18N.md](./references/I18N.md) |
-| SCSS | [SCSS.md](./references/SCSS.md) |
-| Code quality | [CODE_QUALITY.md](./references/CODE_QUALITY.md) |
-| Design | [DESIGN.md](./references/DESIGN.md) |
+| Topic                | Reference                                                                                                |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| Project structure    | [PROJECT.md](./references/PROJECT.md)                                                                    |
+| Components & Stories | [COMPONENTS.md](./references/COMPONENTS.md)                                                              |
+| Testing              | [TESTING.md](./references/TESTING.md)                                                                    |
+| Storybook            | [STORYBOOK.md](./references/STORYBOOK.md)                                                                |
+| API + Storybook      | [STORYBOOK.md#api-calling-patterns](./references/STORYBOOK.md#api-calling-patterns-storybook-compatible) |
+| i18n                 | [I18N.md](./references/I18N.md)                                                                          |
+| SCSS                 | [SCSS.md](./references/SCSS.md)                                                                          |
+| Code quality         | [CODE_QUALITY.md](./references/CODE_QUALITY.md)                                                          |
+| Design               | [DESIGN.md](./references/DESIGN.md)                                                                      |
 
 ## Problem Solver
 
-| Problem | Solution |
-|---------|---------|
-| SCSS errors | [SCSS.md](./references/SCSS.md) - nesting limit, naming |
-| Test fails | [TESTING.md](./references/TESTING.md) - data-testid |
-| i18n not working | [I18N.md](./references/I18N.md) - namespace prefix |
-| Lint/TS errors | [CODE_QUALITY.md](./references/CODE_QUALITY.md) |
-| Storybook issues | [STORYBOOK.md](./references/STORYBOOK.md) |
+| Problem             | Solution                                                                                                 |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| SCSS errors         | [SCSS.md](./references/SCSS.md) - nesting limit, naming                                                  |
+| Test fails          | [TESTING.md](./references/TESTING.md) - data-testid                                                      |
+| i18n not working    | [I18N.md](./references/I18N.md) - namespace prefix                                                       |
+| Lint/TS errors      | [CODE_QUALITY.md](./references/CODE_QUALITY.md)                                                          |
+| Storybook issues    | [STORYBOOK.md](./references/STORYBOOK.md)                                                                |
 | Component needs API | [STORYBOOK.md#api-calling-patterns](./references/STORYBOOK.md#api-calling-patterns-storybook-compatible) |
-| Component structure | [COMPONENTS.md](./references/COMPONENTS.md) |
-| Design questions | [DESIGN.md](./references/DESIGN.md) |
+| Component structure | [COMPONENTS.md](./references/COMPONENTS.md)                                                              |
+| Design questions    | [DESIGN.md](./references/DESIGN.md)                                                                      |
 
 ## Tech Stack
 
@@ -129,16 +129,19 @@ stories/
 **BEFORE COMMITTING CODE, YOU MUST ENSURE:**
 
 1. **TypeScript Compilation** passes:
+
    ```bash
    npx tsc --noEmit
    ```
 
 2. **Lint** passes:
+
    ```bash
    npm run lint
    ```
 
 3. **Prettier** passes:
+
    ```bash
    npm run format:check
    ```
@@ -149,23 +152,24 @@ stories/
    ```
 
 **Complete Validation:**
+
 ```bash
 npm run format && npm run lint && npx tsc --noEmit && npm run test
 ```
 
 ## Forbidden
 
-| Category | Forbidden |
-|----------|-----------|
-| i18n | Namespace prefix in key |
-| SCSS | `styles.module.scss`, nesting > 3 |
-| Testing | CSS selectors instead of data-testid |
-| Components | No story |
-| Testing | No interaction test |
-| Components | Duplicate code (extract to shared) |
-| Pages | Large index.tsx (use sections/ directory) |
-| Exports | Default export (use named export only) |
-| API Calls | Component calls API internally (see STORYBOOK.md) |
+| Category   | Forbidden                                         |
+| ---------- | ------------------------------------------------- |
+| i18n       | Namespace prefix in key                           |
+| SCSS       | `styles.module.scss`, nesting > 3                 |
+| Testing    | CSS selectors instead of data-testid              |
+| Components | No story                                          |
+| Testing    | No interaction test                               |
+| Components | Duplicate code (extract to shared)                |
+| Pages      | Large index.tsx (use sections/ directory)         |
+| Exports    | Default export (use named export only)            |
+| API Calls  | Component calls API internally (see STORYBOOK.md) |
 
 ## Git Workflow
 
@@ -178,6 +182,7 @@ git checkout -b feature/your-feature-name
 ```
 
 **Branch naming:**
+
 - `feature/` - New features
 - `bugfix/` - Bug fixes
 - `refactor/` - Code refactoring
@@ -196,6 +201,7 @@ git commit -m "feat: add feature description
 ```
 
 **Commit message format:**
+
 - `feat:` New feature
 - `fix:` Bug fix
 - `refactor:` Code refactoring
