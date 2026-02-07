@@ -379,8 +379,8 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
         <Breadcrumb
           className={styles.breadcrumb}
           items={[
-            { href: '/', title: <HomeOutlined /> },
-            { href: '/courses', title: t('pageTitle') },
+            { title: <HomeOutlined />, href: '/' },
+            { title: t('pageTitle'), href: '/courses' },
             { title: course.title },
           ]}
         />

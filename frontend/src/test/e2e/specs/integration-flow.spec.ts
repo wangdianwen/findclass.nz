@@ -515,6 +515,17 @@ test.describe('INT-006: Favorites Functionality', () => {
     const pageTitle = await page.title();
     console.log('Page title:', pageTitle);
 
+    // Check for error message
+    const subTitle = await page.locator('.ant-result-subtitle').textContent().catch(() => '');
+    console.log('Error message:', subTitle || 'No error message found');
+
+    // Check browser console for errors
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        console.log('Browser console error:', msg.text());
+      }
+    });
+
     const allButtons = await page.locator('button').all();
     const buttonCount = await allButtons.length;
     console.log('Total buttons on page:', buttonCount);
@@ -614,6 +625,13 @@ test.describe('INT-006: Favorites Functionality', () => {
 
     await page.goto(`/courses/${courseId}`);
     await page.waitForLoadState('networkidle');
+
+    // Debug: Check for errors
+    const pageTitle2 = await page.title();
+    console.log('Page title (remove test):', pageTitle2);
+
+    const subTitle2 = await page.locator('.ant-result-subtitle').textContent().catch(() => '');
+    console.log('Error message (remove test):', subTitle2 || 'No error message');
 
     // Find the favorite button (try both old and new selectors)
     const favoriteButton = page.locator(
