@@ -117,9 +117,34 @@ export function createApp(): Application {
     skipFailedRequests: true,
   });
 
-  // Disable rate limiting in test environments (check both config and process.env for reliability)
-  const isTestEnv = config.env === NodeEnv.Test || process.env.NODE_ENV === 'test';
-  if (!isTestEnv) {
+  // Disable rate limiting in test and staging environments for easier integration testing
+  // Check both config.env and process.env for reliability
+  const isTestEnv = config.env === NodeEnv.Test ||
+                       process.env.NODE_ENV === 'test' ||
+                       process.env.NODE_ENV === 'staging';
+
+  if (isTestEnv) {
+    // In test/staging, use very relaxed limits for auth endpoints
+    const authLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 10000, // Very high limit for testing
+      message: {
+        success: false,
+        code: ErrorCode.RATE_LIMIT_EXCEEDED,
+        message: 'Too many authentication attempts, please try again later.',
+        meta: {
+          requestId: '',
+          timestamp: new Date().toISOString(),
+        },
+      },
+      standardHeaders: true,
+      legacyHeaders: false,
+      skipFailedRequests: true,
+    });
+    app.use('/api', generalLimiter);
+    app.use(`/api/${config.apiVersion}/auth`, authLimiter);
+  } else {
+    // Production rate limiting
     app.use('/api', generalLimiter);
     app.use(`/api/${config.apiVersion}/auth`, authLimiter);
   }
