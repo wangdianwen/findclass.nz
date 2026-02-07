@@ -1,16 +1,33 @@
 services:
-  # PostgreSQL Database
-  postgres:
+  # Gateway Nginx - Only service exposing port 80
+  nginx-gateway:
+    image: nginx:alpine
+    container_name: fc-gateway
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites-available:/etc/nginx/sites-available:ro
+      - ./nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+    networks:
+      - findclass-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost/health']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  # Staging PostgreSQL
+  staging-postgres:
     image: postgres:15-alpine
-    container_name: findclass-postgres
+    container_name: fc-staging-postgres
     environment:
       POSTGRES_USER: findclass
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-findclass_dev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-findclass_staging}
       POSTGRES_DB: findclass
-    ports:
-      - '5432:5432'
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - /Users/dianwenwang/findclassdata/staging-new/postgres:/var/lib/postgresql/data
     networks:
       - findclass-network
     healthcheck:
@@ -18,82 +35,28 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    profiles:
+      - staging
 
-  # LocalStack for AWS services simulation (S3, SES, SQS)
-  localstack:
-    image: localstack/localstack:3.0
-    container_name: findclass-localstack
-    ports:
-      - '4566:4566'
-    environment:
-      - SERVICES=s3,ses,sqs
-      - DEBUG=1
-      - DOCKER_HOST=unix:///var/run/docker.sock
-    volumes:
-      - localstack-data:/tmp/localstack
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - findclass-network
-
-  # Backend API server (development mode)
-  api:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    container_name: findclass-api
-    ports:
-      - '3000:3000'
-    environment:
-      - NODE_ENV=production
-      - AWS_REGION=ap-southeast-2
-      - DATABASE_URL=postgresql://findclass:findclass_dev@postgres:5432/findclass
-      - LOCALSTACK_ENDPOINT=http://localstack:4566
-      - UPLOAD_DIR=/app/uploads
-    depends_on:
-      - postgres
-      - localstack
-    volumes:
-      - uploads-data:/app/uploads
-    networks:
-      - findclass-network
-
-  # Frontend static server (Nginx)
-  frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-    container_name: findclass-frontend
-    ports:
-      - '80:80'
-    depends_on:
-      - api
-    networks:
-      - findclass-network
-
-  # Staging environment (with seeded data)
+  # Staging Backend API
   staging-api:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    container_name: findclass-staging-api
-    ports:
-      - '3001:3000'
+    container_name: fc-staging-api
     environment:
       - NODE_ENV=staging
       - AWS_REGION=ap-southeast-2
-      - DATABASE_URL=postgresql://findclass:findclass_dev@postgres:5432/findclass
-      - LOCALSTACK_ENDPOINT=http://localstack:4566
+      - DATABASE_URL=postgresql://findclass:findclass_staging@staging-postgres:5432/findclass
       - SEED_SAMPLE_DATA=true
       - UPLOAD_DIR=/app/uploads
-    depends_on:
-      postgres:
-        condition: service_healthy
-      localstack:
-        condition: service_started
-      staging-maildev:
-        condition: service_healthy
     volumes:
-      - uploads-data:/app/uploads
+      - /Users/dianwenwang/findclassdata/staging-new/uploads:/app/uploads
+    depends_on:
+      staging-postgres:
+        condition: service_healthy
+      staging-maildev:
+        condition: service_started
     networks:
       - findclass-network
     healthcheck:
@@ -108,18 +71,12 @@ services:
   # MailDev for staging email testing
   staging-maildev:
     image: maildev/maildev:2.1.0
-    container_name: findclass-staging-maildev
+    container_name: fc-staging-maildev
     ports:
       - '1080:1080'  # Web UI
       - '1025:1025'  # SMTP server
     networks:
       - findclass-network
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:1080"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 5s
     profiles:
       - staging
 
@@ -128,9 +85,9 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
-    container_name: findclass-staging-frontend
-    ports:
-      - '3002:80'
+      args:
+        BUILD_MODE: staging
+    container_name: fc-staging-frontend
     volumes:
       - ./frontend/nginx.staging.conf:/etc/nginx/nginx.conf:ro
     depends_on:
@@ -147,36 +104,78 @@ services:
     profiles:
       - staging
 
-  # Production environment
-  prod:
+  # Production PostgreSQL
+  prod-postgres:
+    image: postgres:15-alpine
+    container_name: fc-prod-postgres
+    environment:
+      POSTGRES_USER: findclass
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-findclass_prod}
+      POSTGRES_DB: findclass
+    volumes:
+      - /Users/dianwenwang/findclassdata/prod/postgres:/var/lib/postgresql/data
+    networks:
+      - findclass-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U findclass']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - prod
+
+  # Production Backend API
+  prod-api:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: findclass-prod-api
-    ports:
-      - '8080:8080'
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: fc-prod-api
     environment:
       - NODE_ENV=production
       - AWS_REGION=ap-southeast-2
-      - DATABASE_URL=postgresql://findclass:findclass_prod@postgres:5432/findclass
-      - LOCALSTACK_ENDPOINT=http://localstack:4566
+      - DATABASE_URL=postgresql://findclass:findclass_prod@prod-postgres:5432/findclass
       - SEED_SAMPLE_DATA=false
       - UPLOAD_DIR=/app/uploads
-    depends_on:
-      - postgres
-      - localstack
     volumes:
-      - uploads-data:/app/uploads
+      - /Users/dianwenwang/findclassdata/prod/uploads:/app/uploads
+    depends_on:
+      prod-postgres:
+        condition: service_healthy
     networks:
       - findclass-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    profiles:
+      - prod
+
+  # Production Frontend
+  prod-frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        BUILD_MODE: prod
+    container_name: fc-prod-frontend
+    volumes:
+      - ./frontend/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      prod-api:
+        condition: service_healthy
+    networks:
+      - findclass-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost/health']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     profiles:
       - prod
 
 networks:
   findclass-network:
     driver: bridge
-
-volumes:
-  postgres-data:
-  localstack-data:
-  uploads-data:

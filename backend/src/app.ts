@@ -16,7 +16,7 @@ import { logger, logStream } from './core/logger';
 import { AppError, ErrorCode } from './core/errors';
 import { createErrorResponse } from './shared/types/api';
 import type { AuthenticatedRequest } from './shared/middleware/auth';
-import { initializeSchema } from './shared/db/postgres/schema';
+// import { initializeSchema } from './shared/db/postgres/schema'; // Migrations handle schema now
 
 // Import routes
 import { authRoutes } from './modules/auth/routes';
@@ -32,15 +32,16 @@ import { reportRoutes } from './modules/inquiries/reports.routes';
 import { NodeEnv } from './config/env-schema';
 
 // Initialize database schema
+// NOTE: Schema initialization is now handled by migrations to avoid conflicts
+// Only run migrations in production/staging, not in development
 async function initializeDatabase(): Promise<void> {
-  try {
-    logger.info('Initializing database schema...');
-    await initializeSchema();
-    logger.info('Database schema initialized successfully');
-  } catch (error) {
-    logger.error('Failed to initialize database schema', { error });
-    throw error;
-  }
+  const config = getConfig();
+
+  // Skip schema initialization - migrations handle everything
+  logger.info('Database initialization skipped (migrations will handle schema)');
+
+  // TODO: Run migrations here if needed for production
+  // For now, migrations are run separately via npm run migrate
 }
 
 // Initialize on module load (will run before app starts accepting requests)

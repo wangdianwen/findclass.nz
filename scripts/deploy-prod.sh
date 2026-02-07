@@ -1,22 +1,21 @@
 #!/bin/bash
 
 ################################################################################
-# FindClass.nz Staging Deployment Script
+# FindClass.nz Production Deployment Script
 #
-# This script automates the deployment of the staging environment including:
+# This script automates the deployment of the production environment including:
 # - Building Docker images
-# - Starting staging services (API + Frontend + PostgreSQL)
+# - Starting production services (API + Frontend + PostgreSQL)
+# - Running database migrations
 # - Health checks
-# - Database seeding with sample data
 #
 # Usage:
-#   ./scripts/deploy-staging.sh              # Deploy staging
-#   ./scripts/deploy-staging.sh --build      # Force rebuild images
-#   ./scripts/deploy-staging.sh --stop       # Stop staging
-#   ./scripts/deploy-staging.sh --clean      # Clean all volumes
-#   ./scripts/deploy-staging.sh --reset      # Reset database
-#   ./scripts/deploy-staging.sh --status     # Show status
-#   ./scripts/deploy-staging.sh --logs       # Show logs
+#   ./scripts/deploy-prod.sh              # Deploy production
+#   ./scripts/deploy-prod.sh --build      # Force rebuild images
+#   ./scripts/deploy-prod.sh --stop       # Stop production
+#   ./scripts/deploy-prod.sh --clean      # Clean all volumes
+#   ./scripts/deploy-prod.sh --status     # Show status
+#   ./scripts/deploy-prod.sh --logs       # Show logs
 ################################################################################
 
 set -e  # Exit on error
@@ -34,10 +33,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 COMPOSE_FILE="${PROJECT_ROOT}/docker-compose.yml"
 
-# Staging configuration
-STAGING_API_CONTAINER="fc-staging-api"
-STAGING_FRONTEND_CONTAINER="fc-staging-frontend"
-STAGING_POSTGRES_CONTAINER="fc-staging-postgres"
+# Production configuration
+PROD_API_CONTAINER="fc-prod-api"
+PROD_FRONTEND_CONTAINER="fc-prod-frontend"
+PROD_POSTGRES_CONTAINER="fc-prod-postgres"
 MAX_RETRIES=60
 RETRY_INTERVAL=2
 
@@ -137,164 +136,147 @@ build_images() {
 
     log_info "Building frontend image..."
     docker build -f frontend/Dockerfile \
-      --build-arg BUILD_MODE=staging \
+      --build-arg BUILD_MODE=prod \
       -t findclass-frontend:latest .
 
     log_success "Images built successfully"
 }
 
-stop_staging() {
-    print_header "Stopping Staging Environment"
+stop_prod() {
+    print_header "Stopping Production Environment"
 
     local compose_cmd=$(get_docker_compose_cmd)
 
     cd "$PROJECT_ROOT"
-    $compose_cmd -f "$COMPOSE_FILE" --profile staging down
+    $compose_cmd -f "$COMPOSE_FILE" --profile prod down
 
-    log_success "Staging environment stopped"
+    log_success "Production environment stopped"
 }
 
-start_staging() {
-    print_header "Starting Staging Environment"
+run_migrations() {
+    print_header "Running Database Migrations"
+
+    log_info "Waiting for API container to be ready..."
+    wait_for_container "$PROD_API_CONTAINER" "Production API"
+
+    log_info "Running pending migrations on prod database..."
+
+    # Run migrations
+    docker exec "$PROD_API_CONTAINER" npm run migrate
+
+    log_success "Migrations completed"
+
+    # Show migration status
+    echo ""
+    log_info "Migration status:"
+    docker exec "$PROD_API_CONTAINER" npm run migrate:status
+}
+
+start_prod() {
+    print_header "Starting Production Environment"
 
     local compose_cmd=$(get_docker_compose_cmd)
 
     cd "$PROJECT_ROOT"
 
-    # Start staging services first
-    log_info "Starting staging services..."
-    $compose_cmd -f "$COMPOSE_FILE" --profile staging up -d
+    # Start production services first
+    log_info "Starting production services..."
+    $compose_cmd -f "$COMPOSE_FILE" --profile prod up -d
 
     # Then start nginx-gateway
     log_info "Starting nginx-gateway..."
     $compose_cmd -f "$COMPOSE_FILE" up -d nginx-gateway
 
-    log_success "Staging services started"
+    log_success "Production services started"
+
+    # Run migrations BEFORE health checks
+    run_migrations
 }
 
 check_health() {
     print_header "Health Checks"
 
     # Wait for API
-    if ! wait_for_container "$STAGING_API_CONTAINER" "Staging API"; then
-        log_error "Staging API health check failed"
+    if ! wait_for_container "$PROD_API_CONTAINER" "Production API"; then
+        log_error "Production API health check failed"
         return 1
     fi
 
     # Wait for Frontend
-    if ! wait_for_container "$STAGING_FRONTEND_CONTAINER" "Staging Frontend"; then
-        log_error "Staging Frontend health check failed"
+    if ! wait_for_container "$PROD_FRONTEND_CONTAINER" "Production Frontend"; then
+        log_error "Production Frontend health check failed"
         return 1
     fi
 
     return 0
 }
 
-reset_database() {
-    print_header "Resetting Database"
-
-    local compose_cmd=$(get_docker_compose_cmd)
-
-    cd "$PROJECT_ROOT"
-
-    log_warning "This will delete all data in the staging database"
-    read -p "Are you sure? (y/N): " -n 1 -r
-    echo
-
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        log_info "Stopping services..."
-        $compose_cmd -f "$COMPOSE_FILE" --profile staging down
-
-        log_info "Removing database volume..."
-        rm -rf /Users/dianwenwang/findclassdata/staging/postgres/*
-
-        log_info "Starting services with fresh database..."
-        $compose_cmd -f "$COMPOSE_FILE" --profile staging up -d nginx-gateway
-
-        log_success "Database reset complete"
-    else
-        log_info "Database reset cancelled"
-    fi
-}
-
 show_status() {
-    print_header "Staging Environment Status"
+    print_header "Production Environment Status"
 
     local compose_cmd=$(get_docker_compose_cmd)
 
     cd "$PROJECT_ROOT"
-    $compose_cmd -f "$COMPOSE_FILE" --profile staging ps
+    $compose_cmd -f "$COMPOSE_FILE" --profile prod ps
 
     echo ""
     log_info "Service URLs:"
-    echo "  - Frontend:   http://staging.findclass.nz"
-    echo "  - API:        http://api.staging.findclass.nz"
-
-    echo ""
-    log_info "Test Accounts:"
-    echo "  - Demo User:    demo@findclass.nz / password123"
-    echo "  - Teacher:      teacher@findclass.nz / password123"
+    echo "  - Frontend:   http://findclass.nz"
+    echo "  - API:        http://api.findclass.nz"
 
     echo ""
     log_info "Container Health Status:"
 
     # Check API
-    if docker inspect --format='{{.State.Health.Status}}' "$STAGING_API_CONTAINER" 2>/dev/null | grep -q "healthy"; then
+    if docker inspect --format='{{.State.Health.Status}}' "$PROD_API_CONTAINER" 2>/dev/null | grep -q "healthy"; then
         echo -e "  - API:         ${GREEN}✓ Healthy${NC}"
     else
         echo -e "  - API:         ${RED}✗ Unhealthy${NC}"
     fi
 
     # Check Frontend
-    if docker inspect --format='{{.State.Health.Status}}' "$STAGING_FRONTEND_CONTAINER" 2>/dev/null | grep -q "healthy"; then
+    if docker inspect --format='{{.State.Health.Status}}' "$PROD_FRONTEND_CONTAINER" 2>/dev/null | grep -q "healthy"; then
         echo -e "  - Frontend:    ${GREEN}✓ Healthy${NC}"
     else
         echo -e "  - Frontend:    ${RED}✗ Unhealthy${NC}"
     fi
 
     # Check PostgreSQL
-    if docker inspect --format='{{.State.Health.Status}}' "$STAGING_POSTGRES_CONTAINER" 2>/dev/null | grep -q "healthy"; then
+    if docker inspect --format='{{.State.Health.Status}}' "$PROD_POSTGRES_CONTAINER" 2>/dev/null | grep -q "healthy"; then
         echo -e "  - PostgreSQL:  ${GREEN}✓ Healthy${NC}"
     else
         echo -e "  - PostgreSQL:  ${RED}✗ Unhealthy${NC}"
     fi
 
-    # Check MailDev
-    if curl -s -f "http://localhost:1080" >/dev/null 2>&1; then
-        echo -e "  - MailDev:     ${GREEN}✓ Running${NC}"
-    else
-        echo -e "  - MailDev:     ${RED}✗ Down${NC}"
-    fi
-
     echo ""
     log_info "Data Directory:"
-    echo "  - Uploads:    /Users/dianwenwang/findclassdata/staging-new/uploads"
-    echo "  - Database:   /Users/dianwenwang/findclassdata/staging-new/postgres"
+    echo "  - Uploads:    /Users/dianwenwang/findclassdata/prod/uploads"
+    echo "  - Database:   /Users/dianwenwang/findclassdata/prod/postgres"
 }
 
 show_logs() {
-    print_header "Staging Environment Logs"
+    print_header "Production Environment Logs"
 
     local compose_cmd=$(get_docker_compose_cmd)
 
     cd "$PROJECT_ROOT"
-    $compose_cmd -f "$COMPOSE_FILE" --profile staging logs -f --tail=100
+    $compose_cmd -f "$COMPOSE_FILE" --profile prod logs -f --tail=100
 }
 
 clean_all() {
-    print_header "Cleaning Staging Environment"
+    print_header "Cleaning Production Environment"
 
     local compose_cmd=$(get_docker_compose_cmd)
 
-    log_warning "This will stop and remove all staging containers"
-    log_warning "Staging data will be preserved in /Users/dianwenwang/findclassdata/staging/"
+    log_warning "This will stop and remove all production containers and volumes"
+    log_warning "Production data will be preserved in /Users/dianwenwang/findclassdata/prod/"
     read -p "Are you sure? (y/N): " -n 1 -r
     echo
 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         cd "$PROJECT_ROOT"
-        $compose_cmd -f "$COMPOSE_FILE" --profile staging down
-        log_success "Staging environment cleaned"
+        $compose_cmd -f "$COMPOSE_FILE" --profile prod down
+        log_success "Production environment cleaned"
     else
         log_info "Clean cancelled"
     fi
@@ -310,36 +292,33 @@ Usage: $0 [OPTIONS]
 
 Options:
   --build       Force rebuild Docker images before starting
-  --stop        Stop staging environment
-  --clean       Stop and remove all staging containers
-  --reset       Reset database (requires confirmation)
-  --status      Show status of staging services
-  --logs        Show logs from staging services
+  --stop        Stop production environment
+  --clean       Stop and remove all production containers
+  --status      Show status of production services
+  --logs        Show logs from production services
   -h, --help    Show this help message
 
 Examples:
-  $0                    # Deploy staging (start if not running)
+  $0                    # Deploy production (start if not running)
   $0 --build            # Rebuild images and deploy
   $0 --status           # Show service status
   $0 --logs             # Show service logs
-  $0 --reset            # Reset database
-  $0 --stop             # Stop staging
+  $0 --stop             # Stop production
 
 Environment:
-  Staging Frontend:     http://staging.findclass.nz
-  Staging API:          http://api.staging.findclass.nz
-  MailDev UI:           http://localhost:1080
-  Test Account:         demo@findclass.nz / password123
+  Production Frontend:   http://findclass.nz
+  Production API:        http://api.findclass.nz
+  Data Directory:        /Users/dianwenwang/findclassdata/prod/
 
 Notes:
-  - Staging database is seeded with sample data
+  - Migrations run automatically on deployment
+  - Production database is NOT seeded with sample data
   - Only port 80 is exposed (via nginx-gateway)
-  - MailDev UI is accessible at http://localhost:1080
 EOF
 }
 
 main() {
-    print_header "FindClass.nz Staging Deployment"
+    print_header "FindClass.nz Production Deployment"
 
     # Check prerequisites
     check_docker
@@ -360,10 +339,6 @@ main() {
                 ;;
             --clean)
                 action="clean"
-                shift
-                ;;
-            --reset)
-                action="reset"
                 shift
                 ;;
             --status)
@@ -393,32 +368,26 @@ main() {
                 build_images
             fi
 
-            # Stop existing staging if running
-            stop_staging
+            # Stop existing prod if running
+            stop_prod
 
-            # Start staging
-            start_staging
+            # Start prod
+            start_prod
 
             # Health checks
             if check_health; then
                 show_status
-                log_success "Staging deployment completed successfully!"
+                log_success "Production deployment completed successfully!"
             else
-                log_error "Staging deployment failed health checks"
+                log_error "Production deployment failed health checks"
                 exit 1
             fi
             ;;
         stop)
-            stop_staging
+            stop_prod
             ;;
         clean)
             clean_all
-            ;;
-        reset)
-            reset_database
-            if check_health; then
-                show_status
-            fi
             ;;
         status)
             show_status
