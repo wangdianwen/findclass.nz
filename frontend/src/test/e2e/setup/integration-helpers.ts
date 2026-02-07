@@ -114,7 +114,7 @@ export async function createTestUser(apiContext: APIRequestContext, options?: {
   }
 
   const registerData = await registerResponse.json();
-  const token = registerData.data?.token;
+  const token = registerData.data?.accessToken || registerData.data?.token;
 
   // Track for cleanup
   if (registerData.data?.user?.id) {
@@ -148,7 +148,7 @@ export async function loginWithEmail(
 
   const loginData = await loginResponse.json();
   return {
-    token: loginData.data?.token,
+    token: loginData.data?.accessToken || loginData.data?.token,
     user: loginData.data?.user,
   };
 }

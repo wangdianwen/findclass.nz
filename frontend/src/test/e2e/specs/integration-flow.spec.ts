@@ -69,13 +69,13 @@ test.describe('INT-001: User Registration Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Step 2: Fill email
-    await page.fill('[data-testid="email-input"] input[type="email"]', testEmail);
+    await page.fill('input[data-testid="email-input"]', testEmail);
 
     // Step 3: Fill password (meets requirements: 8+ chars, uppercase, lowercase, number)
-    await page.fill('[data-testid="password-input"] input[type="password"]', 'TestPass123!');
+    await page.fill('input[data-testid="password-input"]', 'TestPass123!');
 
     // Step 4: Fill confirm password
-    await page.fill('[data-testid="confirm-password-input"] input[type="password"]', 'TestPass123!');
+    await page.fill('input[data-testid="confirm-password-input"]', 'TestPass123!');
 
     // Step 5: Click send code button
     const sendCodeButton = page.locator('[data-testid="send-code-button"]').first();
@@ -132,12 +132,12 @@ test.describe('INT-002: User Login Flow', () => {
   test('should login with demo credentials successfully', async ({ page }) => {
     // Navigate to login page
     await page.goto('/login');
-    // Wait for page to load
-    await page.waitForLoadState('networkidle');
+    // Wait for login page to be visible
+    await page.waitForSelector('[data-testid="login-page"]', { timeout: 10000 });
 
     // Fill login form
-    await page.fill('[data-testid="email-input"] input[type="email"]', TEST_ACCOUNTS.demo.email);
-    await page.fill('[data-testid="password-input"] input[type="password"]', TEST_ACCOUNTS.demo.password);
+    await page.fill('input[data-testid="email-input"]', TEST_ACCOUNTS.demo.email);
+    await page.fill('input[data-testid="password-input"]', TEST_ACCOUNTS.demo.password);
 
     // Submit form
     await page.click('[data-testid="submit-button"]');
@@ -158,8 +158,8 @@ test.describe('INT-002: User Login Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Fill with invalid credentials
-    await page.fill('[data-testid="email-input"] input[type="email"]', 'invalid@test.com');
-    await page.fill('[data-testid="password-input"] input[type="password"]', 'wrongpassword');
+    await page.fill('input[data-testid="email-input"]', 'invalid@test.com');
+    await page.fill('input[data-testid="password-input"]', 'wrongpassword');
 
     await page.click('[data-testid="submit-button"]');
 
