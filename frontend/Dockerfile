@@ -1,7 +1,13 @@
+# Build mode argument (staging or prod)
+ARG BUILD_MODE=staging
+
 # ============================================
 # Production Build Stage
 # ============================================
 FROM node:18-alpine AS builder
+
+# Declare build mode again for this stage
+ARG BUILD_MODE=staging
 
 WORKDIR /app
 
@@ -15,24 +21,27 @@ COPY frontend/ ./
 COPY tsconfig.base.json ../
 COPY frontend/index.html ./index.html
 
-# Copy staging environment file for build
-COPY frontend/.env.staging ./.env.staging
+# Copy environment file based on build mode
+COPY frontend/.env.${BUILD_MODE} ./.env.${BUILD_MODE}
 
-# Build production assets with staging mode
-# Remove stories and test files FIRST to avoid TypeScript errors
+# Build production assets with specified mode
+# Temporarily remove stories and test files to avoid TS errors
 RUN rm -rf stories src/test
-RUN npm run build -- --mode staging
+RUN npm run build -- --mode ${BUILD_MODE}
 
 # ============================================
 # Production Nginx Stage
 # ============================================
 FROM nginx:alpine AS production
 
+# Declare build mode again for this stage
+ARG BUILD_MODE=staging
+
 # Install curl/wget for health checks
 RUN apk add --no-cache curl
 
-# Copy custom nginx config (default)
-COPY frontend/nginx.conf /etc/nginx/nginx.conf
+# Copy nginx config based on build mode
+COPY frontend/nginx.${BUILD_MODE}.conf /etc/nginx/nginx.conf
 
 # Copy built files from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
