@@ -135,15 +135,13 @@ wait_for_service() {
 build_images() {
     print_header "Building Docker Images"
 
-    log_info "Building backend image..."
-    cd "$PROJECT_ROOT/backend"
-    docker build -t findclass-backend:latest .
     cd "$PROJECT_ROOT"
 
+    log_info "Building backend image..."
+    docker build -f backend/Dockerfile -t findclass-backend:latest .
+
     log_info "Building frontend image..."
-    cd "$PROJECT_ROOT/frontend"
-    docker build -t findclass-frontend:latest .
-    cd "$PROJECT_ROOT"
+    docker build -f frontend/Dockerfile -t findclass-frontend:latest .
 
     log_success "Images built successfully"
 }

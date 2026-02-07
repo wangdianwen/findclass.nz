@@ -8,6 +8,7 @@ import { createApp } from './app';
 import { getConfig, validateConfig } from './config';
 import { logger } from './core/logger';
 import { runMigrations } from './db/migrate';
+import { runSeed } from './shared/db/seed';
 import { getPool } from './shared/db/postgres/client';
 
 interface HealthCheckResult {
@@ -65,6 +66,17 @@ async function startServer(): Promise<void> {
     } catch (error) {
       logger.error('Database migration failed', { error: (error as Error).message });
       process.exit(1);
+    }
+
+    // Seed database with sample data if enabled
+    if (config.seedSampleData) {
+      logger.info('Seeding database with sample data...');
+      try {
+        await runSeed();
+      } catch (error) {
+        logger.error('Database seeding failed', { error: (error as Error).message });
+        process.exit(1);
+      }
     }
 
     const app = createApp();

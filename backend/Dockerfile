@@ -13,7 +13,7 @@ RUN npm install
 
 # Copy source code and config files
 COPY backend/ ./
-COPY tsconfig.base.json ../
+COPY tsconfig.base.json ./
 
 # Build TypeScript
 RUN npm run build

@@ -54,12 +54,7 @@ function getRepositories() {
 }
 
 // Service methods
-export async function register(data: RegisterDto): Promise<{
-  user: User;
-  token: string;
-  refreshToken: string;
-  expiresIn: number;
-}> {
+export async function register(data: RegisterDto): Promise<AuthResponse> {
   const { email: rawEmail, password, name, role, phone, language } = data;
   const email = rawEmail.toLowerCase();
 
@@ -99,9 +94,10 @@ export async function register(data: RegisterDto): Promise<{
 
   return {
     user,
-    token,
+    accessToken: token,
     refreshToken,
     expiresIn: 7 * 24 * 60 * 60,
+    tokenType: 'Bearer',
   };
 }
 
@@ -146,9 +142,10 @@ export async function login(data: LoginDto): Promise<AuthResponse> {
   logger.info('User logged in successfully', { userId: latestUser.id, email });
 
   return {
-    token,
+    accessToken: token,
     refreshToken,
     expiresIn: 7 * 24 * 60 * 60,
+    tokenType: 'Bearer',
     user: {
       id: latestUser.id,
       email: latestUser.email,

@@ -12,55 +12,59 @@ import { getConfig } from '../../config';
 // Sample data for seeding
 const SAMPLE_USERS = [
   {
-    id: 'usr_demo_001',
+    id: '00000000-0000-0000-0000-000000000001',
     email: 'demo@findclass.nz',
     name: 'Demo User',
-    role: 'user',
+    role: 'STUDENT',
     avatar_url: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'usr_teacher_001',
+    id: '00000000-0000-0000-0000-000000000002',
     email: 'teacher@findclass.nz',
     name: 'Jane Smith',
-    role: 'teacher',
+    role: 'TEACHER',
     avatar_url: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
 ];
 
+// Pre-hashed password for all test users (Password123)
+const TEST_PASSWORD_HASH =
+  '$2b$10$I9zkmfYl3Ei.KQXrr3kibuqEULvMQRGSZcoo3obSnBa85i6Hb/v22';
+
 const SAMPLE_TEACHERS = [
   {
-    id: 'tch_001',
-    user_id: 'usr_teacher_001',
-    name: 'Jane Smith',
-    title: 'Mathematics Expert',
+    id: '00000000-0000-0000-0000-000000000002', // Same as user_id for Jane Smith
+    display_name: 'Jane Smith',
     bio: 'Passionate about making math accessible to all students.',
-    subjects: ['Mathematics', 'Calculus', 'Statistics'],
-    teaching_since: 2018,
-    rating: 4.8,
-    review_count: 156,
-    hourly_rate: 65,
-    city: 'Auckland',
-    available: true,
+    teaching_years: 6,
+    qualifications: ['MSc Mathematics', 'Teaching Certificate'],
+    verified: true,
+    verification_status: 'APPROVED',
+    teaching_modes: ['ONLINE'],
+    locations: ['Auckland'],
+    average_rating: 4.8,
+    total_reviews: 156,
+    total_students: 89,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'tch_002',
-    user_id: 'usr_demo_001',
-    name: 'John Doe',
-    title: 'English Language Tutor',
+    id: '00000000-0000-0000-0000-000000000001', // Same as user_id for John Doe
+    display_name: 'John Doe',
     bio: 'Native English speaker with TESOL certification.',
-    subjects: ['English', 'ESOL', 'Writing'],
-    teaching_since: 2020,
-    rating: 4.9,
-    review_count: 89,
-    hourly_rate: 55,
-    city: 'Wellington',
-    available: true,
+    teaching_years: 4,
+    qualifications: ['BA English', 'TESOL Certified'],
+    verified: true,
+    verification_status: 'APPROVED',
+    teaching_modes: ['BOTH'],
+    locations: ['Wellington'],
+    average_rating: 4.9,
+    total_reviews: 89,
+    total_students: 56,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -68,56 +72,74 @@ const SAMPLE_TEACHERS = [
 
 const SAMPLE_COURSES = [
   {
-    id: 'crs_001',
-    teacher_id: 'tch_001',
+    id: '20000000-0000-0000-0000-000000000001',
+    teacher_id: '00000000-0000-0000-0000-000000000002',
     title: 'High School Mathematics',
     description: 'Comprehensive math tutoring covering algebra, geometry, and calculus.',
-    subject: 'Mathematics',
-    level: 'High School',
+    category: 'Mathematics',
+    subcategory: 'High School',
     price: 65,
-    duration_minutes: 60,
-    city: 'Auckland',
-    format: 'Online',
-    max_students: 5,
-    rating: 4.8,
-    review_count: 45,
-    featured: true,
+    price_type: 'hourly',
+    teaching_modes: ['ONLINE'],
+    locations: ['Auckland'],
+    target_age_groups: ['13-18'],
+    max_class_size: 5,
+    current_enrollment: 0,
+    source_type: 'manual',
+    quality_score: 85,
+    trust_level: 'B',
+    average_rating: 4.8,
+    total_reviews: 45,
+    status: 'ACTIVE',
+    published_at: new Date().toISOString(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'crs_002',
-    teacher_id: 'tch_002',
+    id: '20000000-0000-0000-0000-000000000002',
+    teacher_id: '00000000-0000-0000-0000-000000000001',
     title: 'English Conversation Practice',
     description: 'Improve your spoken English with real-world conversations.',
-    subject: 'English',
-    level: 'All Levels',
+    category: 'English',
+    subcategory: 'Conversation',
     price: 45,
-    duration_minutes: 45,
-    city: 'Wellington',
-    format: 'Hybrid',
-    max_students: 8,
-    rating: 4.9,
-    review_count: 32,
-    featured: true,
+    price_type: 'hourly',
+    teaching_modes: ['BOTH'],
+    locations: ['Wellington'],
+    target_age_groups: ['Adult'],
+    max_class_size: 8,
+    current_enrollment: 0,
+    source_type: 'manual',
+    quality_score: 90,
+    trust_level: 'B',
+    average_rating: 4.9,
+    total_reviews: 32,
+    status: 'ACTIVE',
+    published_at: new Date().toISOString(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'crs_003',
-    teacher_id: 'tch_001',
+    id: '20000000-0000-0000-0000-000000000003',
+    teacher_id: '00000000-0000-0000-0000-000000000002',
     title: 'Calculus Preparation',
     description: 'Get ready for calculus with this intensive preparation course.',
-    subject: 'Mathematics',
-    level: 'University',
+    category: 'Mathematics',
+    subcategory: 'University',
     price: 80,
-    duration_minutes: 90,
-    city: 'Auckland',
-    format: 'In-Person',
-    max_students: 4,
-    rating: 4.7,
-    review_count: 28,
-    featured: false,
+    price_type: 'hourly',
+    teaching_modes: ['OFFLINE'],
+    locations: ['Auckland'],
+    target_age_groups: ['18+'],
+    max_class_size: 4,
+    current_enrollment: 0,
+    source_type: 'manual',
+    quality_score: 82,
+    trust_level: 'B',
+    average_rating: 4.7,
+    total_reviews: 28,
+    status: 'ACTIVE',
+    published_at: new Date().toISOString(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -125,20 +147,36 @@ const SAMPLE_COURSES = [
 
 const SAMPLE_REVIEWS = [
   {
-    id: 'rev_001',
-    course_id: 'crs_001',
-    user_id: 'usr_demo_001',
-    rating: 5,
-    comment: 'Excellent teaching! My grades improved significantly.',
+    id: '30000000-0000-0000-0000-000000000001',
+    course_id: '20000000-0000-0000-0000-000000000001',
+    user_id: '00000000-0000-0000-0000-000000000001',
+    teacher_id: '00000000-0000-0000-0000-000000000002',
+    overall_rating: 5,
+    teaching_rating: 5,
+    course_rating: 5,
+    communication_rating: 5,
+    punctuality_rating: 5,
+    title: 'Excellent teaching!',
+    content: 'My grades improved significantly.',
+    status: 'APPROVED',
+    helpful_count: 5,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'rev_002',
-    course_id: 'crs_002',
-    user_id: 'usr_demo_001',
-    rating: 5,
-    comment: 'Great conversation practice. Very helpful for improving fluency.',
+    id: '30000000-0000-0000-0000-000000000002',
+    course_id: '20000000-0000-0000-0000-000000000002',
+    user_id: '00000000-0000-0000-0000-000000000001',
+    teacher_id: '00000000-0000-0000-0000-000000000001',
+    overall_rating: 5,
+    teaching_rating: 5,
+    course_rating: 5,
+    communication_rating: 5,
+    punctuality_rating: 5,
+    title: 'Great conversation practice',
+    content: 'Very helpful for improving fluency.',
+    status: 'APPROVED',
+    helpful_count: 3,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -150,12 +188,22 @@ async function seedDatabase(client: Client): Promise<void> {
   // Seed users
   for (const user of SAMPLE_USERS) {
     await client.query(
-      `INSERT INTO users (id, email, name, role, avatar_url, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO users (id, email, password_hash, name, role, avatar_url, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        ON CONFLICT (id) DO UPDATE SET
          name = EXCLUDED.name,
+         password_hash = EXCLUDED.password_hash,
          updated_at = EXCLUDED.updated_at`,
-      [user.id, user.email, user.name, user.role, user.avatar_url, user.created_at, user.updated_at]
+      [
+        user.id,
+        user.email,
+        TEST_PASSWORD_HASH,
+        user.name,
+        user.role,
+        user.avatar_url,
+        user.created_at,
+        user.updated_at,
+      ]
     );
     logger.debug(`Seeded user: ${user.email}`);
   }
@@ -163,59 +211,68 @@ async function seedDatabase(client: Client): Promise<void> {
   // Seed teachers
   for (const teacher of SAMPLE_TEACHERS) {
     await client.query(
-      `INSERT INTO teachers (id, user_id, name, title, bio, subjects, teaching_since,
-                            rating, review_count, hourly_rate, city, available, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6::text[], $7, $8, $9, $10, $11, $12, $13, $14)
+      `INSERT INTO teachers (id, display_name, bio, teaching_years, qualifications,
+                            verified, verification_status, teaching_modes, locations,
+                            average_rating, total_reviews, total_students, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
        ON CONFLICT (id) DO UPDATE SET
-         name = EXCLUDED.name,
-         rating = EXCLUDED.rating,
+         display_name = EXCLUDED.display_name,
+         average_rating = EXCLUDED.average_rating,
          updated_at = EXCLUDED.updated_at`,
       [
         teacher.id,
-        teacher.user_id,
-        teacher.name,
-        teacher.title,
+        teacher.display_name,
         teacher.bio,
-        JSON.stringify(teacher.subjects),
-        teacher.teaching_since,
-        teacher.rating,
-        teacher.review_count,
-        teacher.hourly_rate,
-        teacher.city,
-        teacher.available,
+        teacher.teaching_years,
+        teacher.qualifications,
+        teacher.verified,
+        teacher.verification_status,
+        teacher.teaching_modes,
+        teacher.locations,
+        teacher.average_rating,
+        teacher.total_reviews,
+        teacher.total_students,
         teacher.created_at,
         teacher.updated_at,
       ]
     );
-    logger.debug(`Seeded teacher: ${teacher.name}`);
+    logger.debug(`Seeded teacher: ${teacher.display_name}`);
   }
 
   // Seed courses
   for (const course of SAMPLE_COURSES) {
     await client.query(
-      `INSERT INTO courses (id, teacher_id, title, description, subject, level, price,
-                           duration_minutes, city, format, max_students, rating, review_count,
-                           featured, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      `INSERT INTO courses (id, teacher_id, title, description, category, subcategory, price,
+                           price_type, teaching_modes, locations, target_age_groups,
+                           max_class_size, current_enrollment, source_type, quality_score,
+                           trust_level, average_rating, total_reviews, status, published_at,
+                           created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
        ON CONFLICT (id) DO UPDATE SET
          title = EXCLUDED.title,
-         rating = EXCLUDED.rating,
+         average_rating = EXCLUDED.average_rating,
          updated_at = EXCLUDED.updated_at`,
       [
         course.id,
         course.teacher_id,
         course.title,
         course.description,
-        course.subject,
-        course.level,
+        course.category,
+        course.subcategory,
         course.price,
-        course.duration_minutes,
-        course.city,
-        course.format,
-        course.max_students,
-        course.rating,
-        course.review_count,
-        course.featured,
+        course.price_type,
+        course.teaching_modes,
+        course.locations,
+        course.target_age_groups,
+        course.max_class_size,
+        course.current_enrollment,
+        course.source_type,
+        course.quality_score,
+        course.trust_level,
+        course.average_rating,
+        course.total_reviews,
+        course.status,
+        course.published_at,
         course.created_at,
         course.updated_at,
       ]
@@ -226,17 +283,27 @@ async function seedDatabase(client: Client): Promise<void> {
   // Seed reviews
   for (const review of SAMPLE_REVIEWS) {
     await client.query(
-      `INSERT INTO reviews (id, course_id, user_id, rating, comment, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO reviews (id, course_id, user_id, teacher_id, overall_rating, teaching_rating,
+                           course_rating, communication_rating, punctuality_rating, title, content,
+                           status, helpful_count, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
        ON CONFLICT (id) DO UPDATE SET
-         comment = EXCLUDED.comment,
+         content = EXCLUDED.content,
          updated_at = EXCLUDED.updated_at`,
       [
         review.id,
         review.course_id,
         review.user_id,
-        review.rating,
-        review.comment,
+        review.teacher_id,
+        review.overall_rating,
+        review.teaching_rating,
+        review.course_rating,
+        review.communication_rating,
+        review.punctuality_rating,
+        review.title,
+        review.content,
+        review.status,
+        review.helpful_count,
         review.created_at,
         review.updated_at,
       ]

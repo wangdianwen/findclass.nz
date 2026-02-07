@@ -22,12 +22,12 @@ const API_TIMEOUT = 10000;
 export const TEST_ACCOUNTS = {
   demo: {
     email: 'demo@findclass.nz',
-    password: 'password123',
+    password: 'Password123',
     name: 'Demo User',
   },
   teacher: {
     email: 'teacher@findclass.nz',
-    password: 'password123',
+    password: 'Password123',
     name: 'Teacher User',
   },
 } as const;
@@ -243,7 +243,7 @@ export async function addFavorite(
   token: string,
   courseId: string
 ) {
-  const response = await apiContext.post(`/courses/${courseId}/favorites`, {
+  const response = await apiContext.post(`/courses/${courseId}/favorite`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -264,7 +264,7 @@ export async function removeFavorite(
   token: string,
   courseId: string
 ) {
-  const response = await apiContext.delete(`/courses/${courseId}/favorites`, {
+  const response = await apiContext.delete(`/courses/${courseId}/favorite`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -281,7 +281,7 @@ export async function removeFavorite(
  * Get user's favorites
  */
 export async function getFavorites(apiContext: APIRequestContext, token: string) {
-  const response = await apiContext.get('/users/me/favorites', {
+  const response = await apiContext.get('/users/favorites', {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -298,14 +298,14 @@ export async function getFavorites(apiContext: APIRequestContext, token: string)
  * Search courses via API
  */
 export async function searchCourses(apiContext: APIRequestContext, params?: {
-  query?: string;
+  keyword?: string;
   city?: string;
   subject?: string;
   page?: number;
   limit?: number;
 }) {
   const searchParams = new URLSearchParams();
-  if (params?.query) searchParams.append('query', params.query);
+  if (params?.keyword) searchParams.append('keyword', params.keyword);
   if (params?.city) searchParams.append('city', params.city);
   if (params?.subject) searchParams.append('subject', params.subject);
   if (params?.page) searchParams.append('page', params.page.toString());
@@ -345,11 +345,15 @@ export async function createReview(
     comment: string;
   }
 ) {
-  const response = await apiContext.post(`/courses/${courseId}/reviews`, {
+  const response = await apiContext.post(`/reviews`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    data: reviewData,
+    data: {
+      courseId,
+      overallRating: reviewData.rating,
+      content: reviewData.comment,
+    },
   });
 
   if (!response.ok()) {

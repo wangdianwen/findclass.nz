@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/test';
  * This configuration is for running integration tests against a real staging backend.
  * Unlike the regular E2E tests which use MSW mocks, these tests connect to:
  * - Staging API: http://localhost:3001
- * - Staging Frontend: http://localhost:3002
+ * - Staging Frontend: http://localhost:3000
  *
  * Usage:
  *   npm run test:e2e:integration       # Run integration tests
@@ -46,8 +46,8 @@ export default defineConfig({
   outputDir: 'test-results/integration',
 
   use: {
-    // Base URL for staging environment
-    baseURL: 'http://localhost:3001',
+    // Base URL for staging environment (staging-frontend container)
+    baseURL: 'http://localhost:3002',
 
     // Action timeouts
     actionTimeout: 15 * 1000, // 15 seconds
@@ -68,6 +68,10 @@ export default defineConfig({
     },
   },
 
+  // NOTE: Integration tests use staging-frontend container running on port 3002
+  // Ensure staging is deployed: npm run staging:deploy
+  // webServer is not needed as we use the Docker container
+
   // Projects for integration tests
   projects: [
     {
@@ -85,13 +89,4 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
   ],
-
-  // No webServer - assume staging is already running
-  // If you want to auto-start staging, use:
-  // webServer: {
-  //   command: 'npm run staging:deploy',
-  //   url: 'http://localhost:3001',
-  //   timeout: 120 * 1000,
-  //   reuseExistingServer: !process.env.CI,
-  // },
 });

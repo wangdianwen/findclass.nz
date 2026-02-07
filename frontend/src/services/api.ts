@@ -137,7 +137,7 @@ export const courseApi = {
   }): Promise<{ data: CourseData[]; total: number }> {
     return request({
       method: 'GET',
-      url: '/courses',
+      url: '/courses/search',
       params,
     });
   },
@@ -155,7 +155,7 @@ export const courseApi = {
     return request({
       method: 'GET',
       url: '/courses/search',
-      params: { q: keyword },
+      params: { keyword },
     });
   },
 
@@ -234,8 +234,7 @@ export const userApi = {
   async toggleFavorite(courseId: string): Promise<{ isFavorited: boolean; message: string }> {
     return request({
       method: 'POST',
-      url: '/user/favorites',
-      data: { courseId },
+      url: `/courses/${courseId}/favorite`,
     });
   },
 
@@ -243,7 +242,7 @@ export const userApi = {
   async getFavorites(): Promise<{ courseIds: string[] }> {
     return request({
       method: 'GET',
-      url: '/user/favorites',
+      url: '/users/favorites',
     });
   },
 
@@ -251,7 +250,7 @@ export const userApi = {
   async checkFavorite(courseId: string): Promise<{ isFavorited: boolean }> {
     return request({
       method: 'GET',
-      url: `/user/favorites/${courseId}`,
+      url: `/users/favorites/${courseId}`,
     });
   },
 };
