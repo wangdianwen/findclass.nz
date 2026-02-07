@@ -19,7 +19,7 @@ COPY frontend/index.html ./index.html
 COPY frontend/.env.staging ./.env.staging
 
 # Build production assets with staging mode
-# Temporarily remove stories and test files to avoid TS errors
+# Remove stories and test files FIRST to avoid TypeScript errors
 RUN rm -rf stories src/test
 RUN npm run build -- --mode staging
 
