@@ -151,10 +151,11 @@ export const courseApi = {
 
   // 获取课程详情
   async getCourseById(id: string): Promise<CourseDetail> {
-    return request({
+    const response = await request<{ data: CourseDetail }>({
       method: 'GET',
       url: `/courses/${id}`,
     });
+    return response.data;
   },
 
   // 搜索课程

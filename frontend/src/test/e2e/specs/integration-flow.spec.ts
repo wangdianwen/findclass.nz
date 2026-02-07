@@ -508,6 +508,27 @@ test.describe('INT-006: Favorites Functionality', () => {
     await page.goto(`/courses/${courseId}`);
     await page.waitForLoadState('networkidle');
 
+    // Wait for React to render
+    await page.waitForTimeout(3000);
+
+    // Debug: Check page content
+    const pageTitle = await page.title();
+    console.log('Page title:', pageTitle);
+
+    const allButtons = await page.locator('button').all();
+    const buttonCount = await allButtons.length;
+    console.log('Total buttons on page:', buttonCount);
+
+    // Check all button testids
+    for (let i = 0; i < Math.min(buttonCount, 20); i++) {
+      const btn = allButtons[i];
+      const testid = await btn.getAttribute('data-testid').catch(() => null);
+      const text = await btn.textContent().catch(() => '');
+      if (testid || text) {
+        console.log(`  Button ${i}: data-testid="${testid}", text="${text?.substring(0, 30)}"`);
+      }
+    }
+
     // Find the favorite button (try both old and new selectors)
     const favoriteButton = page.locator(
       'button[data-testid="favorite-button"], button[data-testid="save-button"]'
@@ -515,6 +536,7 @@ test.describe('INT-006: Favorites Functionality', () => {
 
     // Check initial state - button should be present
     const isVisible = await favoriteButton.isVisible().catch(() => false);
+    console.log('Favorite button visible:', isVisible);
 
     if (!isVisible) {
       // Favorite button might not be implemented yet - skip this test
