@@ -233,7 +233,7 @@ show_status() {
     log_info "Service URLs:"
     echo "  - Frontend:    http://localhost:${STAGING_FRONTEND_PORT}"
     echo "  - Backend API: http://localhost:${STAGING_API_PORT}"
-    echo "  - MailDev UI:  http://localhost:1080"
+    echo "  - MailDev UI:  http://localhost:${MAILDEV_PORT}"
 
     echo ""
     log_info "Test Accounts:"
