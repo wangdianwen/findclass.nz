@@ -37,6 +37,7 @@ COMPOSE_FILE="${PROJECT_ROOT}/docker-compose.yml"
 # Staging configuration
 STAGING_API_PORT=3001
 STAGING_FRONTEND_PORT=3002
+MAILDEV_PORT=1080
 API_HEALTH_URL="http://localhost:${STAGING_API_PORT}/health"
 FRONTEND_HEALTH_URL="http://localhost:${STAGING_FRONTEND_PORT}/health"
 MAX_RETRIES=30
@@ -165,6 +166,7 @@ start_staging() {
     # Check if ports are available
     check_port $STAGING_API_PORT "Staging API" || exit 1
     check_port $STAGING_FRONTEND_PORT "Staging Frontend" || exit 1
+    check_port $MAILDEV_PORT "MailDev" || exit 1
 
     cd "$PROJECT_ROOT"
 
@@ -229,9 +231,9 @@ show_status() {
 
     echo ""
     log_info "Service URLs:"
-    echo "  - API:        http://localhost:${STAGING_API_PORT}"
-    echo "  - Frontend:   http://localhost:${STAGING_FRONTEND_PORT}"
-    echo "  - PostgreSQL: localhost:5432"
+    echo "  - Frontend:    http://localhost:${STAGING_FRONTEND_PORT}"
+    echo "  - Backend API: http://localhost:${STAGING_API_PORT}"
+    echo "  - MailDev UI:  http://localhost:${MAILDEV_PORT}"
 
     echo ""
     log_info "Test Accounts:"
@@ -240,6 +242,7 @@ show_status() {
 
     echo ""
     log_info "Health Status:"
+    # Check API
     if curl -s -f "$API_HEALTH_URL" >/dev/null 2>&1; then
         echo -e "  - API:         ${GREEN}✓ Running${NC}"
     else
@@ -251,6 +254,13 @@ show_status() {
         echo -e "  - Frontend:    ${GREEN}✓ Running${NC}"
     else
         echo -e "  - Frontend:    ${RED}✗ Down${NC}"
+    fi
+
+    # Check MailDev
+    if curl -s -f "http://localhost:1080" >/dev/null 2>&1; then
+        echo -e "  - MailDev:     ${GREEN}✓ Running${NC}"
+    else
+        echo -e "  - MailDev:     ${RED}✗ Down${NC}"
     fi
 }
 
@@ -307,8 +317,9 @@ Examples:
   $0 --stop             # Stop staging
 
 Environment:
-  Staging API:          http://localhost:${STAGING_API_PORT}
   Staging Frontend:     http://localhost:${STAGING_FRONTEND_PORT}
+  Staging API:          http://localhost:${STAGING_API_PORT}
+  MailDev UI:           http://localhost:1080
   Test Account:         demo@findclass.nz / password123
 EOF
 }
