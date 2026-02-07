@@ -379,8 +379,8 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
         <Breadcrumb
           className={styles.breadcrumb}
           items={[
-            { href: '/', title: <HomeOutlined /> },
-            { href: '/courses', title: t('pageTitle') },
+            { title: <HomeOutlined />, href: '/' },
+            { title: t('pageTitle'), href: '/courses' },
             { title: course.title },
           ]}
         />
@@ -541,7 +541,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
                 {t('course.contactNow')}
               </Button>
               <Button
-                data-testid="save-button"
+                data-testid="favorite-button"
                 block
                 className={`${styles.saveButton} ${isFavorited ? styles.saved : ''}`}
                 icon={

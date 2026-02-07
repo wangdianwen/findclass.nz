@@ -218,7 +218,7 @@ export const Header: React.FC<HeaderProps> = ({ onLanguageChange }) => {
                 ) : (
                   <Avatar size="small" icon={<UserOutlined />} className={styles.avatarFallback} />
                 )}
-                <span className={styles.userName}>{user.name || user.email.split('@')[0]}</span>
+                <span className={styles.userName}>{user.name || user.email?.split('@')[0] || 'User'}</span>
               </button>
             </Dropdown>
           ) : (

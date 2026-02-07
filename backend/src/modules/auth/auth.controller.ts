@@ -316,9 +316,10 @@ export const refreshTokenController = async (
     const result = await rotateRefreshToken(dto.refreshToken);
 
     const response: AuthResponse = {
-      token: result.accessToken,
+      accessToken: result.accessToken,
       refreshToken: result.refreshToken,
       expiresIn: result.expiresIn,
+      tokenType: 'Bearer' as const,
       user: {
         id: '',
         email: '',

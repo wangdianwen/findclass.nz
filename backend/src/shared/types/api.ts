@@ -3,6 +3,7 @@
  * Standardized API response format following RFC 7807 Problem Details
  */
 
+import { randomUUID } from 'crypto';
 import { ErrorCode, ERROR_STATUS_MAP } from '../../core/errors';
 export { ErrorCode };
 
@@ -158,5 +159,5 @@ export const HTTP_STATUS_MESSAGES: Record<number, string> = {
 };
 
 function generateRequestId(): string {
-  return crypto.randomUUID();
+  return randomUUID();
 }

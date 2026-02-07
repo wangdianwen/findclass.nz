@@ -135,19 +135,27 @@ export const courseApi = {
     page?: number;
     limit?: number;
   }): Promise<{ data: CourseData[]; total: number }> {
-    return request({
+    const response = await request<{
+      data: { items: CourseData[]; pagination: { total: number } };
+    }>({
       method: 'GET',
-      url: '/courses',
+      url: '/courses/search',
       params,
     });
+    // Transform API response to component-expected format
+    return {
+      data: response.data.items,
+      total: response.data.pagination.total,
+    };
   },
 
   // 获取课程详情
   async getCourseById(id: string): Promise<CourseDetail> {
-    return request({
+    const response = await request<{ data: CourseDetail }>({
       method: 'GET',
       url: `/courses/${id}`,
     });
+    return response.data;
   },
 
   // 搜索课程
@@ -155,7 +163,7 @@ export const courseApi = {
     return request({
       method: 'GET',
       url: '/courses/search',
-      params: { q: keyword },
+      params: { keyword },
     });
   },
 
@@ -234,8 +242,7 @@ export const userApi = {
   async toggleFavorite(courseId: string): Promise<{ isFavorited: boolean; message: string }> {
     return request({
       method: 'POST',
-      url: '/user/favorites',
-      data: { courseId },
+      url: `/courses/${courseId}/favorite`,
     });
   },
 
@@ -243,7 +250,7 @@ export const userApi = {
   async getFavorites(): Promise<{ courseIds: string[] }> {
     return request({
       method: 'GET',
-      url: '/user/favorites',
+      url: '/users/favorites',
     });
   },
 
@@ -251,7 +258,7 @@ export const userApi = {
   async checkFavorite(courseId: string): Promise<{ isFavorited: boolean }> {
     return request({
       method: 'GET',
-      url: `/user/favorites/${courseId}`,
+      url: `/users/favorites/${courseId}`,
     });
   },
 };

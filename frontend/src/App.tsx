@@ -47,6 +47,7 @@ const App: React.FC = () => {
         <Route path="/user" element={<UserCenterPage />} />
         <Route path="/user/:tab" element={<UserCenterPage />} />
         <Route path="/teacher/onboarding" element={<TeacherOnboardingPage />} />
+        <Route path="/teacher/apply" element={<TeacherOnboardingPage />} />
         <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
         <Route path="/teacher/courses" element={<Navigate to="/teacher/dashboard" replace />} />
         <Route path="*" element={<NotFoundPage />} />

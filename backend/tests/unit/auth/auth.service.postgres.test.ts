@@ -269,7 +269,8 @@ describe('AuthService (PostgreSQL)', () => {
       expect(result).toBeDefined();
       expect(result.user.email).toBe(newUserEmail);
       expect(result.user.name).toBe(newUserName);
-      expect(result.token).toBeDefined();
+      expect(result.accessToken).toBeDefined();
+      expect(result.tokenType).toBe('Bearer');
       expect(result.refreshToken).toBeDefined();
       expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
       expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(newUserEmail);
@@ -349,7 +350,7 @@ describe('AuthService (PostgreSQL)', () => {
 
       expect(result).toBeDefined();
       expect(result.user.email).toBe(mockUser.email);
-      expect(result.token).toBe('mocked-token-usr_test123');
+      expect(result.accessToken).toBe('mocked-token-usr_test123');
     });
 
     it('should throw error for non-existent user', async () => {

@@ -26,6 +26,10 @@ async function initMSW() {
       mswError = error instanceof Error ? error : new Error(String(error));
       console.error('[MSW] Initialization failed:', mswError.message);
     }
+  } else {
+    // In production, mark MSW as ready immediately
+    mswReady = true;
+    console.log('[MSW] Production mode - skipping mock server');
   }
 }
 

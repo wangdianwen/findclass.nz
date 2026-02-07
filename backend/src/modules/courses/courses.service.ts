@@ -39,21 +39,113 @@ export function createCoursesService(pool: Pool) {
       return null;
     }
 
-    // Fetch teacher details
-    const teacher = await teacherRepository.findById(course.teacher_id);
+    // Fetch teacher details directly from database to get all fields
+    const teacherResult = await pool.query(
+      `SELECT * FROM teachers WHERE id = $1`,
+      [course.teacher_id]
+    );
 
+    const teacherRow = teacherResult.rows[0];
+
+    // Parse teachingModes from string to array if needed
+    let teachingModes: string[];
+    const modesValue: unknown = course.teaching_modes;
+    if (Array.isArray(modesValue)) {
+      teachingModes = modesValue;
+    } else if (typeof modesValue === 'string') {
+      // Handle both "{ONLINE}" and "ONLINE" formats
+      const modesStr = modesValue.replace(/[{}]/g, '');
+      teachingModes = modesStr.split(',').map((m: string) => m.trim()).filter((m: string) => m);
+    } else {
+      teachingModes = [];
+    }
+
+    // Transform snake_case to camelCase for frontend compatibility
     return {
-      ...course,
-      teacher: teacher
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      price: Number(course.price) || 0,
+      lessonCount: 12, // Default value - database doesn't have this
+      originalPrice: undefined,
+      rating: Number(course.average_rating) || 0,
+      reviewCount: Number(course.total_reviews) || 0,
+      trustLevel: course.trust_level,
+      dataSource: (course.source_type as string) === 'manual' || course.source_type === 'REGISTERED' ? 'first_party' : 'other',
+      sourceWeight: 1.0, // Default value
+      publishedAt: course.published_at,
+      updatedAt: course.updated_at,
+      subject: course.category,
+      grade: course.target_age_groups || [],
+      teachingMode: teachingModes.includes('ONLINE') && teachingModes.includes('OFFLINE')
+        ? 'bilingual'
+        : teachingModes.includes('ONLINE')
+        ? 'online'
+        : 'offline',
+      language: 'english', // Default value - database doesn't have this
+      schedule: {
+        days: ['Sat', 'Sun'], // Default value
+        timeSlots: ['14:00-16:00'], // Default value
+        duration: 60, // Default value (1 hour)
+        location: Array.isArray(course.locations) && course.locations.length > 0
+          ? course.locations[0]
+          : 'TBD',
+        address: undefined,
+        showAddress: false,
+      },
+      teacher: teacherRow
         ? {
-            id: teacher.id,
-            displayName: teacher.display_name,
-            bio: teacher.bio,
-            verificationStatus: teacher.verification_status,
-            averageRating: teacher.average_rating,
-            totalReviews: teacher.total_reviews,
+            id: teacherRow.id,
+            name: teacherRow.display_name,
+            title: undefined,
+            bio: teacherRow.bio || '',
+            avatar: undefined,
+            verified: Boolean(teacherRow.verified),
+            teachingYears: Number(teacherRow.teaching_years) || 0,
+            qualifications: Array.isArray(teacherRow.qualifications) ? teacherRow.qualifications : [],
           }
-        : null,
+        : {
+            // Fallback teacher object when no teacher found
+            id: '',
+            name: 'Unknown Teacher',
+            bio: '',
+            verified: false,
+            teachingYears: 0,
+            qualifications: [],
+          },
+      contact: {
+        phone: undefined,
+        wechat: undefined,
+        email: undefined,
+        wechatQrcode: undefined,
+        showPhone: false,
+        showWechat: false,
+        showEmail: false,
+      },
+      tags: [], // Default value - database doesn't have this
+      images: [], // Default value - database doesn't have this
+      userInteraction: {
+        isFavorited: false,
+        isCompared: false,
+      },
+      // Legacy fields for backward compatibility
+      titleEn: course.title_en,
+      descriptionEn: course.description_en,
+      category: course.category,
+      subcategory: course.subcategory,
+      priceType: course.price_type,
+      teachingModes: teachingModes,
+      locations: course.locations,
+      targetAgeGroups: course.target_age_groups,
+      maxClassSize: course.max_class_size,
+      sourceType: course.source_type,
+      sourceUrl: course.source_url,
+      status: course.status,
+      averageRating: course.average_rating,
+      totalReviews: course.total_reviews,
+      currentEnrollment: course.current_enrollment,
+      createdAt: course.created_at,
+      teacherId: course.teacher_id,
       timeSlots: [],
       reviews: {
         averageRating: course.average_rating || 0,

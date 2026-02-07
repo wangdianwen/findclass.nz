@@ -13,71 +13,71 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- User roles
 DO $$ BEGIN
     CREATE TYPE user_role AS ENUM ('PARENT', 'STUDENT', 'TEACHER', 'INSTITUTION', 'ADMIN');
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- User status
 DO $$ BEGIN
     CREATE TYPE user_status AS ENUM ('ACTIVE', 'PENDING_PARENTAL_CONSENT', 'DISABLED');
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- Trust level for courses and teachers
 DO $$ BEGIN
     CREATE TYPE trust_level AS ENUM ('S', 'A', 'B', 'C', 'D');
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- Verification status
 DO $$ BEGIN
     CREATE TYPE verification_status AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- Course status
 DO $$ BEGIN
     CREATE TYPE course_status AS ENUM ('ACTIVE', 'INACTIVE', 'EXPIRED');
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- Review status
 DO $$ BEGIN
     CREATE TYPE review_status AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- Application status for role applications
 DO $$ BEGIN
     CREATE TYPE application_status AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED');
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- Session status for token blacklist
 DO $$ BEGIN
     CREATE TYPE session_status AS ENUM ('ACTIVE', 'REVOKED');
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- Teaching mode
 DO $$ BEGIN
     CREATE TYPE teaching_mode AS ENUM ('ONLINE', 'OFFLINE', 'BOTH');
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- Gender
 DO $$ BEGIN
     CREATE TYPE gender AS ENUM ('MALE', 'FEMALE', 'OTHER');
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- Learning record type
@@ -91,15 +91,15 @@ DO $$ BEGIN
         'ASSIGNMENT_SUBMIT',
         'NOTES_CREATE'
     );
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- Progress status
 DO $$ BEGIN
     CREATE TYPE progress_status AS ENUM ('NOT_STARTED', 'IN_PROGRESS', 'COMPLETED');
-EXCEPTION
-    WHEN duplicate_object THEN null;
+EXCEPTION WHEN OTHERS THEN
+    IF SQLSTATE IN ('42710', '23505') THEN NULL; ELSE RAISE; END IF;
 END $$;
 
 -- ============================================

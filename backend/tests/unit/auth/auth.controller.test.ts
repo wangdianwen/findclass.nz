@@ -652,8 +652,9 @@ describe('AuthController', () => {
       expect(mockRes.json).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            token: 'new.jwt.token',
+            accessToken: 'new.jwt.token',
             refreshToken: 'new.refresh.token',
+            tokenType: 'Bearer',
           }),
         })
       );
