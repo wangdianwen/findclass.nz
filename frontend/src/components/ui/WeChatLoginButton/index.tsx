@@ -22,10 +22,7 @@ type WeChatLoginStatus = 'idle' | 'polling' | 'success' | 'error';
 // Component
 // ============================================
 
-export const WeChatLoginButton: React.FC<WeChatLoginButtonProps> = ({
-  onSuccess,
-  onError,
-}) => {
+export const WeChatLoginButton: React.FC<WeChatLoginButtonProps> = ({ onSuccess, onError }) => {
   const { t } = useTranslation('registration');
   const navigate = useNavigate();
   const { socialLogin } = useAuth();
@@ -132,11 +129,7 @@ export const WeChatLoginButton: React.FC<WeChatLoginButtonProps> = ({
                   {pollingCount * 2}s {t('wechatLogin.polling')}
                 </span>
               </p>
-              <button
-                type="button"
-                className={styles.mockButton}
-                onClick={handleMockScan}
-              >
+              <button type="button" className={styles.mockButton} onClick={handleMockScan}>
                 {t('wechatLogin.mockScan')} (Dev Only)
               </button>
             </>

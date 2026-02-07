@@ -22,10 +22,7 @@ interface GoogleLoginButtonProps {
 // Component
 // ============================================
 
-export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
-  onSuccess,
-  onError,
-}) => {
+export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ onSuccess, onError }) => {
   const { t } = useTranslation('registration');
   const navigate = useNavigate();
   const { socialLogin } = useAuth();
@@ -58,7 +55,11 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
 
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <div data-testid="google-login" data-testid-google-login-button="google-login-button" aria-label="Google">
+      <div
+        data-testid="google-login"
+        data-testid-google-login-button="google-login-button"
+        aria-label="Google"
+      >
         <GoogleLogin
           onSuccess={handleSuccess}
           onError={handleFailure}

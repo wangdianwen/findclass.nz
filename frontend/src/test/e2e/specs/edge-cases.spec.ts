@@ -19,7 +19,13 @@ test.describe('Error Pages', () => {
     await page.waitForLoadState('networkidle');
 
     // Should show 404 page - use .or() chain for Playwright OR selector
-    await expect(page.locator('text=404').or(page.locator('text=Page Not Found')).or(page.locator('text=页面不存在')).first()).toBeVisible();
+    await expect(
+      page
+        .locator('text=404')
+        .or(page.locator('text=Page Not Found'))
+        .or(page.locator('text=页面不存在'))
+        .first()
+    ).toBeVisible();
   });
 
   test('ERR-002: 课程不存在显示404', async ({ page }) => {
@@ -28,7 +34,13 @@ test.describe('Error Pages', () => {
     await page.waitForLoadState('networkidle');
 
     // Should show course not found - use .or() chain
-    await expect(page.locator('text=课程不存在').or(page.locator('text=not found')).or(page.locator('text=404')).first()).toBeVisible();
+    await expect(
+      page
+        .locator('text=课程不存在')
+        .or(page.locator('text=not found'))
+        .or(page.locator('text=404'))
+        .first()
+    ).toBeVisible();
   });
 });
 
@@ -41,8 +53,8 @@ test.describe('Server Errors', () => {
         status: 500,
         body: JSON.stringify({
           success: false,
-          error: { code: 'INTERNAL_ERROR', message: '服务器错误' }
-        })
+          error: { code: 'INTERNAL_ERROR', message: '服务器错误' },
+        }),
       });
     });
 
@@ -50,7 +62,11 @@ test.describe('Server Errors', () => {
     await page.waitForLoadState('networkidle');
 
     // Should show error message - use .or() chain
-    const errorMsg = page.locator('text=加载失败').or(page.locator('text=error')).or(page.locator('text=Error')).first();
+    const errorMsg = page
+      .locator('text=加载失败')
+      .or(page.locator('text=error'))
+      .or(page.locator('text=Error'))
+      .first();
     await expect(errorMsg).toBeVisible();
   });
 
@@ -80,7 +96,11 @@ test.describe('Empty States', () => {
       await page.waitForLoadState('networkidle');
 
       // Should show empty state - use .or() chain
-      const emptyState = page.locator('text=暂无数据').or(page.locator('text=No results')).or(page.locator('text=No courses')).first();
+      const emptyState = page
+        .locator('text=暂无数据')
+        .or(page.locator('text=No results'))
+        .or(page.locator('text=No courses'))
+        .first();
       await expect(emptyState).toBeVisible();
     }
   });
@@ -177,7 +197,9 @@ test.describe('User Status Edge Cases', () => {
     // Wait for any content to appear (logo, text, etc)
     // The page should render something visible
     try {
-      await page.waitForSelector('[class*="auth"], [class*="login"], [class*="user"], img, h1', { timeout: 5000 });
+      await page.waitForSelector('[class*="auth"], [class*="login"], [class*="user"], img, h1', {
+        timeout: 5000,
+      });
     } catch {
       // If no specific elements found, check if page has rendered
     }

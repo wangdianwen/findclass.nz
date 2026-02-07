@@ -37,7 +37,7 @@ services:
     networks:
       - findclass-network
 
-  # Backend API server (production build)
+  # Backend API server (development mode)
   api:
     build:
       context: ./backend
@@ -50,9 +50,12 @@ services:
       - AWS_REGION=ap-southeast-2
       - DATABASE_URL=postgresql://findclass:findclass_dev@postgres:5432/findclass
       - LOCALSTACK_ENDPOINT=http://localstack:4566
+      - UPLOAD_DIR=/app/uploads
     depends_on:
       - postgres
       - localstack
+    volumes:
+      - uploads-data:/app/uploads
     networks:
       - findclass-network
 
@@ -69,6 +72,56 @@ services:
     networks:
       - findclass-network
 
+  # Staging environment (with seeded data)
+  staging:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: findclass-staging-api
+    ports:
+      - '3001:3000'
+    environment:
+      - NODE_ENV=staging
+      - AWS_REGION=ap-southeast-2
+      - DATABASE_URL=postgresql://findclass:findclass_dev@postgres:5432/findclass
+      - LOCALSTACK_ENDPOINT=http://localstack:4566
+      - SEED_SAMPLE_DATA=true
+      - UPLOAD_DIR=/app/uploads
+    depends_on:
+      - postgres
+      - localstack
+    volumes:
+      - uploads-data:/app/uploads
+    networks:
+      - findclass-network
+    profiles:
+      - staging
+
+  # Production environment
+  prod:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: findclass-prod-api
+    ports:
+      - '8080:8080'
+    environment:
+      - NODE_ENV=production
+      - AWS_REGION=ap-southeast-2
+      - DATABASE_URL=postgresql://findclass:findclass_prod@postgres:5432/findclass
+      - LOCALSTACK_ENDPOINT=http://localstack:4566
+      - SEED_SAMPLE_DATA=false
+      - UPLOAD_DIR=/app/uploads
+    depends_on:
+      - postgres
+      - localstack
+    volumes:
+      - uploads-data:/app/uploads
+    networks:
+      - findclass-network
+    profiles:
+      - prod
+
 networks:
   findclass-network:
     driver: bridge
@@ -76,3 +129,4 @@ networks:
 volumes:
   postgres-data:
   localstack-data:
+  uploads-data:

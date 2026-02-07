@@ -25,13 +25,7 @@ const config: AppConfig = {
   database: {
     url: raw.DATABASE_URL,
   },
-  dynamodb: raw.DYNAMODB_ENDPOINT
-    ? {
-        endpoint: raw.DYNAMODB_ENDPOINT,
-        tableName: raw.DYNAMODB_TABLE_NAME || 'FindClass-MainTable',
-        port: raw.DYNAMODB_PORT || 8000,
-      }
-    : null,
+  dynamodb: null, // Deprecated: DynamoDB removed, using PostgreSQL only
   smtp: {
     host: raw.SMTP_HOST,
     port: raw.SMTP_PORT,
@@ -70,6 +64,7 @@ const config: AppConfig = {
     format: raw.LOG_FORMAT,
     filePath: raw.LOG_FILE_PATH,
   },
+  seedSampleData: raw.SEED_SAMPLE_DATA,
 };
 
 // 生产环境安全验证

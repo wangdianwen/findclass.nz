@@ -36,10 +36,28 @@ export const EmailInput: React.FC<EmailInputProps> = ({
       className={className}
       data-testid={`${testId}-validation`}
     >
-      <Input prefix={<MailOutlined />} placeholder={defaultPlaceholder} data-testid={testId} type="email" name="email" />
+      <Input
+        prefix={<MailOutlined />}
+        placeholder={defaultPlaceholder}
+        data-testid={testId}
+        type="email"
+        name="email"
+      />
       {/* Test IDs for validation messages - visible for E2E tests */}
-      <span data-testid="email-required" className="validation-required" style={{ fontSize: 0, position: 'absolute', left: -9999 }}>required</span>
-      <span data-testid="email-必填" className="validation-required" style={{ fontSize: 0, position: 'absolute', left: -9999 }}>必填</span>
+      <span
+        data-testid="email-required"
+        className="validation-required"
+        style={{ fontSize: 0, position: 'absolute', left: -9999 }}
+      >
+        required
+      </span>
+      <span
+        data-testid="email-必填"
+        className="validation-required"
+        style={{ fontSize: 0, position: 'absolute', left: -9999 }}
+      >
+        必填
+      </span>
     </Form.Item>
   );
 };

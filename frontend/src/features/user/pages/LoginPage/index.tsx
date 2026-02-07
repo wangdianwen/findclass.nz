@@ -107,8 +107,20 @@ export const LoginPage: React.FC = () => {
             data-testid="password-input"
           />
           {/* Test IDs for validation messages - visible for E2E tests */}
-          <span data-testid="required" className="validation-required" style={{ fontSize: 0, position: 'absolute', left: -9999 }}>required</span>
-          <span data-testid="必填" className="validation-required" style={{ fontSize: 0, position: 'absolute', left: -9999 }}>必填</span>
+          <span
+            data-testid="required"
+            className="validation-required"
+            style={{ fontSize: 0, position: 'absolute', left: -9999 }}
+          >
+            required
+          </span>
+          <span
+            data-testid="必填"
+            className="validation-required"
+            style={{ fontSize: 0, position: 'absolute', left: -9999 }}
+          >
+            必填
+          </span>
         </Form.Item>
 
         <Form.Item shouldUpdate>

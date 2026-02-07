@@ -12,8 +12,8 @@ export interface TeacherCourse {
   teachingMode: 'online' | 'offline' | 'both';
   city?: string;
   region?: string;
-  address?: string;  // Specific address, shown when showAddress is true
-  showAddress?: boolean;  // Whether to show address on course details (default: false)
+  address?: string; // Specific address, shown when showAddress is true
+  showAddress?: boolean; // Whether to show address on course details (default: false)
   lessonCount: number;
   price: number;
   description: string;

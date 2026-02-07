@@ -7,6 +7,7 @@ import type { Request, Response, NextFunction } from 'express';
 import {
   register,
   login,
+  socialLogin,
   sendVerificationCode,
   verifyCode,
   rotateRefreshToken,
@@ -38,6 +39,8 @@ import type {
   ApplyRoleDto,
   ApproveRoleDto,
   GetPendingApplicationsDto,
+  SocialLoginDto,
+  SocialLoginResponse,
 } from './auth.types';
 import { UserRole } from '@shared/types';
 
@@ -138,6 +141,40 @@ export const loginController = async (
       )
     );
   } catch (error) {
+    next(error);
+  }
+};
+
+// Social login controller
+export const socialLoginController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const dto = req.body as SocialLoginDto;
+    logger.info('Social login controller: calling socialLogin()', { provider: dto.provider });
+
+    const result = await socialLogin(dto);
+    logger.info('Social login controller: socialLogin() succeeded', { provider: dto.provider });
+
+    const response: SocialLoginResponse = {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      expiresIn: result.expiresIn,
+      tokenType: 'Bearer' as const,
+    };
+
+    res.json(
+      createSuccessResponse(
+        response,
+        'Social login successful',
+        undefined,
+        req.headers['x-request-id'] as string
+      )
+    );
+  } catch (error) {
+    logger.error('Social login controller caught error', { error });
     next(error);
   }
 };

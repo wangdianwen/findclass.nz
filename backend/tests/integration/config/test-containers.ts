@@ -1,27 +1,15 @@
 /**
  * TestContainers Configuration
- * Manages DynamoDB and MailHog containers for integration tests
+ * Manages MailHog container for integration tests
  * MailHog captures all SMTP emails for testing
  *
- * Environment variables are loaded from .env.integration file
- * All services use TestContainers for isolation
+ * Environment variables are loaded from .env.test file
  */
 
 import { GenericContainer, StartedTestContainer, Wait } from 'testcontainers';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { resetClient as resetMainDynamoDBClients, TABLE_NAME } from '@src/shared/db/dynamodb';
 import { getConfig } from '@src/config';
 
 export interface TestContainers {
-  dynamodb: {
-    container: StartedTestContainer;
-    client: DynamoDBClient;
-    docClient: DynamoDBDocumentClient;
-    tableName: string;
-    host: string;
-    port: number;
-  };
   mailhog: {
     container: StartedTestContainer;
     host: string;
@@ -30,7 +18,6 @@ export interface TestContainers {
   };
 }
 
-const DYNAMODB_IMAGE = 'amazon/dynamodb-local:2.0.0';
 const MAILHOG_IMAGE = 'mailhog/mailhog:latest';
 
 let containers: TestContainers | null = null;
@@ -48,10 +35,10 @@ export async function startTestContainers(): Promise<TestContainers> {
   containersPromise = (async () => {
     const config = getConfig();
 
-    console.log('🚀 Starting integration test containers...');
+    console.log('Starting integration test containers...');
     console.log(`   Environment: ${config.env}`);
 
-    console.log('📧 Starting MailHog container...');
+    console.log('Starting MailHog container...');
     const STARTUP_TIMEOUT = 60000;
 
     const mailhogContainer = await new GenericContainer(MAILHOG_IMAGE)
@@ -72,57 +59,10 @@ export async function startTestContainers(): Promise<TestContainers> {
     const host = mailhogContainer.getHost();
 
     console.log(
-      `✅ MailHog started on ${host}:${config.smtp.port} (SMTP), ${config.smtp.apiPort} (API)`
+      `MailHog started on ${host}:${config.smtp.port} (SMTP), ${config.smtp.apiPort} (API)`
     );
 
-    console.log('🗄️  Starting DynamoDB Local container...');
-
-    const dynamodbContainer = await new GenericContainer(DYNAMODB_IMAGE)
-      .withExposedPorts({
-        container: 8000,
-        host: config.dynamodb.port,
-      })
-      .withCommand(['-jar', 'DynamoDBLocal.jar', '-sharedDb'])
-      .withWaitStrategy(Wait.forListeningPorts())
-      .withStartupTimeout(20000)
-      .start();
-
-    const dynamodbPort = dynamodbContainer.getMappedPort(8000);
-    const dynamodbEndpoint = `http://${host}:${dynamodbPort}`;
-
-    console.log(`✅ DynamoDB Local started on ${dynamodbEndpoint}`);
-    console.log('📋 Environment variables updated:');
-    console.log(`   DYNAMODB_ENDPOINT: ${dynamodbEndpoint}`);
-    console.log(`   SMTP_HOST: ${host}:${config.smtp.port}`);
-    console.log(`   FROM_EMAIL: ${config.smtp.fromEmail}`);
-
-    resetMainDynamoDBClients();
-
-    const dynamoDBClient = new DynamoDBClient({
-      endpoint: dynamodbEndpoint,
-      region: config.aws.region,
-      credentials: {
-        accessKeyId: config.aws.accessKeyId,
-        secretAccessKey: config.aws.secretAccessKey,
-      },
-    });
-
-    const docClient = DynamoDBDocumentClient.from(dynamoDBClient, {
-      marshallOptions: {
-        removeUndefinedValues: true,
-        convertClassInstanceToMap: true,
-      },
-    });
-
     containers = {
-      dynamodb: {
-        container: dynamodbContainer,
-        client: dynamoDBClient,
-        docClient: docClient,
-        tableName: TABLE_NAME,
-        host,
-        port: dynamodbPort,
-      },
       mailhog: {
         container: mailhogContainer,
         host,
@@ -131,7 +71,7 @@ export async function startTestContainers(): Promise<TestContainers> {
       },
     };
 
-    console.log('✅ All test containers started successfully');
+    console.log('All test containers started successfully');
     return containers;
   })();
 
@@ -140,24 +80,20 @@ export async function startTestContainers(): Promise<TestContainers> {
 
 export async function stopTestContainers(): Promise<void> {
   if (containers) {
-    console.log('🛑 Stopping test containers...');
+    console.log('Stopping test containers...');
 
     try {
-      if (containers.dynamodb.container) {
-        await containers.dynamodb.container.stop();
-        console.log('   DynamoDB stopped');
-      }
       if (containers.mailhog.container) {
         await containers.mailhog.container.stop();
-        console.log('   MailHog stopped');
+        console.log('MailHog stopped');
       }
     } catch (e) {
-      console.warn('⚠️  Error stopping containers:', e);
+      console.warn('Error stopping containers:', e);
     }
 
     containers = null;
     containersPromise = null;
-    console.log('✅ All containers stopped');
+    console.log('All containers stopped');
   }
 }
 
@@ -243,7 +179,7 @@ export async function clearMailHogEmails(
       throw new Error(`Failed to clear emails: ${response.status}`);
     }
   } catch (error) {
-    console.warn('⚠️  Failed to clear MailHog emails:', error);
+    console.warn('Failed to clear MailHog emails:', error);
   }
 }
 

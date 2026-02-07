@@ -74,16 +74,22 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
   useEffect(() => {
     if (typeof window !== 'undefined' && '__STORYBOOK__' in window) {
       isStorybookRef.current = true;
-      import('./courseStorybookData').then(module => {
-        storybookDataModule.current = module;
-      }).catch(() => {
-        storybookDataModule.current = null;
-      });
+      import('./courseStorybookData')
+        .then(module => {
+          storybookDataModule.current = module;
+        })
+        .catch(() => {
+          storybookDataModule.current = null;
+        });
     }
   }, []);
 
   // Fetch course data from API
-  const { data: apiCourse, isLoading: isCourseLoading, error: courseError } = useQuery({
+  const {
+    data: apiCourse,
+    isLoading: isCourseLoading,
+    error: courseError,
+  } = useQuery({
     queryKey: ['course', effectiveCourseId],
     queryFn: () => courseApi.getCourseById(effectiveCourseId!),
     enabled: !!effectiveCourseId && !isStorybookRef.current,
@@ -107,9 +113,10 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
   });
 
   // Determine course data source
-  const course = isStorybookRef.current && storybookDataModule.current
-    ? storybookDataModule.current.getStorybookCourseData() || MOCK_COURSE_DETAIL
-    : (apiCourse || MOCK_COURSE_DETAIL);
+  const course =
+    isStorybookRef.current && storybookDataModule.current
+      ? storybookDataModule.current.getStorybookCourseData() || MOCK_COURSE_DETAIL
+      : apiCourse || MOCK_COURSE_DETAIL;
 
   // Fetch review stats from API (for ReviewsPage component)
   // Note: stats are keyed by teacherId, not courseId
@@ -120,9 +127,10 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
     staleTime: 5 * 60 * 1000,
   });
 
-  const similarCourses = isStorybookRef.current && storybookDataModule.current
-    ? storybookDataModule.current.getStorybookSimilarCoursesData() || MOCK_SIMILAR_COURSES
-    : (apiSimilarCourses || MOCK_SIMILAR_COURSES);
+  const similarCourses =
+    isStorybookRef.current && storybookDataModule.current
+      ? storybookDataModule.current.getStorybookSimilarCoursesData() || MOCK_SIMILAR_COURSES
+      : apiSimilarCourses || MOCK_SIMILAR_COURSES;
 
   // Clear storybook data on unmount
   useEffect(() => {
@@ -192,36 +200,42 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
   }, [navigate]);
 
   // Handle contact form submission
-  const handleContactSubmit = useCallback(async (values: { subject: string; message: string }) => {
-    try {
-      await inquiryApi.sendInquiry({
-        courseId: course.id,
-        teacherId: course.teacher.id,
-        subject: values.subject,
-        message: values.message,
-      });
-      message.success(t('course.contactSuccess'));
-    } catch {
-      message.error('Failed to send inquiry');
-      throw new Error('API error');
-    }
-  }, [course.id, course.teacher.id, t]);
+  const handleContactSubmit = useCallback(
+    async (values: { subject: string; message: string }) => {
+      try {
+        await inquiryApi.sendInquiry({
+          courseId: course.id,
+          teacherId: course.teacher.id,
+          subject: values.subject,
+          message: values.message,
+        });
+        message.success(t('course.contactSuccess'));
+      } catch {
+        message.error('Failed to send inquiry');
+        throw new Error('API error');
+      }
+    },
+    [course.id, course.teacher.id, t]
+  );
 
   // Handle report form submission
-  const handleReportSubmit = useCallback(async (values: { subject: string; message: string }) => {
-    try {
-      await inquiryApi.submitReport({
-        targetType: 'course',
-        targetId: course.id,
-        reason: values.subject,
-        description: values.message,
-      });
-      message.success(t('course.reportSubmitted'));
-    } catch {
-      message.error('Failed to submit report');
-      throw new Error('API error');
-    }
-  }, [course.id, t]);
+  const handleReportSubmit = useCallback(
+    async (values: { subject: string; message: string }) => {
+      try {
+        await inquiryApi.submitReport({
+          targetType: 'course',
+          targetId: course.id,
+          reason: values.subject,
+          description: values.message,
+        });
+        message.success(t('course.reportSubmitted'));
+      } catch {
+        message.error('Failed to submit report');
+        throw new Error('API error');
+      }
+    },
+    [course.id, t]
+  );
 
   // Tab items
   const tabItems = [
@@ -339,9 +353,15 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
         <div className={styles.headerSpacer} />
         <div className={styles.errorState} data-testid="course-error-state">
           <h2 data-testid="error-title">Failed to load course</h2>
-          <p data-testid="课程不存在" data-text="课程不存在" className={styles.testText}>课程不存在</p>
-          <p data-testid="not-found" data-text="not found" className={styles.testText}>not found</p>
-          <Button onClick={() => window.location.reload()} data-testid="retry-button">Retry</Button>
+          <p data-testid="课程不存在" data-text="课程不存在" className={styles.testText}>
+            课程不存在
+          </p>
+          <p data-testid="not-found" data-text="not found" className={styles.testText}>
+            not found
+          </p>
+          <Button onClick={() => window.location.reload()} data-testid="retry-button">
+            Retry
+          </Button>
         </div>
         <Footer />
       </div>
@@ -479,7 +499,11 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
                   </div>
                 </div>
               </div>
-              <div className={styles.infoItem} data-testid="teacher" data-testid-teacher-info="teacher-info">
+              <div
+                className={styles.infoItem}
+                data-testid="teacher"
+                data-testid-teacher-info="teacher-info"
+              >
                 <TeamOutlined className={styles.icon} />
                 <div className={styles.content}>
                   <div className={styles.label}>{t('course.teacher.label')}</div>

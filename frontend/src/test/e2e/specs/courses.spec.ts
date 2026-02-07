@@ -25,7 +25,9 @@ test.describe('Course Search Page', () => {
 
     test('SEARCH-002: 筛选面板存在', async ({ page }) => {
       // Check filter controls exist
-      const filterPanel = page.locator('[data-testid="filter-panel"], .filters, section[class*="filter"]').first();
+      const filterPanel = page
+        .locator('[data-testid="filter-panel"], .filters, section[class*="filter"]')
+        .first();
       await expect(filterPanel.first()).toBeVisible();
     });
   });
@@ -33,16 +35,22 @@ test.describe('Course Search Page', () => {
   test.describe('Search Functionality', () => {
     test('SEARCH-003: 搜索输入框存在', async ({ page }) => {
       // Check search input exists
-      const searchInput = page.locator('[data-testid="search-input"], input[placeholder*="Search"], input[name="search"]').first();
+      const searchInput = page
+        .locator('[data-testid="search-input"], input[placeholder*="Search"], input[name="search"]')
+        .first();
       await expect(searchInput.first()).toBeVisible();
     });
 
     test('SEARCH-004: 搜索无结果显示空状态', async ({ page }) => {
       // Use search input if available
-      const searchInput = page.locator('[data-testid="search-input"], input[placeholder*="Search"]').first();
+      const searchInput = page
+        .locator('[data-testid="search-input"], input[placeholder*="Search"]')
+        .first();
       if (await searchInput.isVisible()) {
         await searchInput.fill('nosuchcourse12345xyz');
-        const searchBtn = page.locator('[data-testid="search-button"], button[type="submit"]').first();
+        const searchBtn = page
+          .locator('[data-testid="search-button"], button[type="submit"]')
+          .first();
         if (await searchBtn.isVisible()) {
           await searchBtn.click();
           await page.waitForLoadState('networkidle');
@@ -54,19 +62,25 @@ test.describe('Course Search Page', () => {
   test.describe('Filters', () => {
     test('SEARCH-005: 城市筛选存在', async ({ page }) => {
       // Check city filter exists
-      const cityFilter = page.locator('[data-testid="filter-city"], select[name="city"], .city-filter').first();
+      const cityFilter = page
+        .locator('[data-testid="filter-city"], select[name="city"], .city-filter')
+        .first();
       await expect(cityFilter.first()).toBeVisible();
     });
 
     test('SEARCH-006: 科目筛选存在', async ({ page }) => {
       // Check subject filter exists
-      const subjectFilter = page.locator('[data-testid="filter-subject"], select[name="subject"], .subject-filter').first();
+      const subjectFilter = page
+        .locator('[data-testid="filter-subject"], select[name="subject"], .subject-filter')
+        .first();
       await expect(subjectFilter.first()).toBeVisible();
     });
 
     test('SEARCH-007: 年级筛选存在', async ({ page }) => {
       // Check grade filter exists
-      const gradeFilter = page.locator('[data-testid="filter-grade"], select[name="grade"], .grade-filter').first();
+      const gradeFilter = page
+        .locator('[data-testid="filter-grade"], select[name="grade"], .grade-filter')
+        .first();
       await expect(gradeFilter.first()).toBeVisible();
     });
   });
@@ -74,7 +88,10 @@ test.describe('Course Search Page', () => {
   test.describe('Course Cards', () => {
     test('SEARCH-015: 课程卡片存在', async ({ page }) => {
       // Wait for course cards to load
-      await page.waitForSelector('[data-testid="course-card"], .course-card, [class*="course"] [class*="card"]', { timeout: 10000 });
+      await page.waitForSelector(
+        '[data-testid="course-card"], .course-card, [class*="course"] [class*="card"]',
+        { timeout: 10000 }
+      );
       const cards = page.locator('[data-testid="course-card"], .course-card').first();
       await expect(cards.first()).toBeVisible();
     });
@@ -92,14 +109,18 @@ test.describe('Course Search Page', () => {
 
   test.describe('Sorting', () => {
     test('SEARCH-010: 排序选择器存在', async ({ page }) => {
-      const sortSelect = page.locator('[data-testid="sort-select"], select[name="sort"], .sort-select').first();
+      const sortSelect = page
+        .locator('[data-testid="sort-select"], select[name="sort"], .sort-select')
+        .first();
       await expect(sortSelect.first()).toBeVisible();
     });
   });
 
   test.describe('Pagination', () => {
     test('SEARCH-012: 分页控件存在', async ({ page }) => {
-      const pagination = page.locator('[data-testid="pagination"], .pagination, nav[class*="pagination"]').first();
+      const pagination = page
+        .locator('[data-testid="pagination"], .pagination, nav[class*="pagination"]')
+        .first();
       await expect(pagination.first()).toBeVisible();
     });
   });

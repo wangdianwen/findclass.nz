@@ -8,6 +8,10 @@ import {
   getCourseDetail,
   toggleFavorite,
   getCourseTranslation,
+  getFeaturedCourses,
+  getFilterOptions,
+  getRegionsByCity,
+  getSimilarCourses,
 } from './courses.service';
 import { createSuccessResponse, createPaginatedResponse } from '@shared/types/api';
 import { SortBy } from './courses.types';
@@ -172,6 +176,124 @@ export const toggleFavoriteController = async (
         undefined,
         getRequestId(req)
       )
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getFeaturedCoursesController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const language =
+      (extractStringParam(req.query.language as string | string[] | undefined) as 'zh' | 'en') ||
+      'zh';
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
+
+    const courses = await getFeaturedCourses(limit);
+
+    res.json(
+      createSuccessResponse(courses, 'Featured courses retrieved', language, getRequestId(req))
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getFilterOptionsController = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  try {
+    const language =
+      (extractStringParam(req.query.language as string | string[] | undefined) as 'zh' | 'en') ||
+      'zh';
+
+    const filterOptions = getFilterOptions();
+
+    res.json(
+      createSuccessResponse(filterOptions, 'Filter options retrieved', language, getRequestId(req))
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getRegionsByCityController = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  try {
+    const cityParam = req.params.city;
+    if (!cityParam || Array.isArray(cityParam)) {
+      res.status(400).json({
+        success: false,
+        code: 400,
+        message: 'City parameter is required',
+        meta: {
+          requestId: getRequestId(req),
+        },
+      });
+      return;
+    }
+
+    const language =
+      (extractStringParam(req.query.language as string | string[] | undefined) as 'zh' | 'en') ||
+      'zh';
+
+    const regions = getRegionsByCity(cityParam);
+
+    if (!regions) {
+      res.status(404).json({
+        success: false,
+        code: 404,
+        message: `No regions found for city: ${cityParam}`,
+        meta: {
+          requestId: getRequestId(req),
+        },
+      });
+      return;
+    }
+
+    res.json(createSuccessResponse(regions, 'Regions retrieved', language, getRequestId(req)));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSimilarCoursesController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const idParam = req.params.id;
+    if (!idParam || Array.isArray(idParam)) {
+      res.status(400).json({
+        success: false,
+        code: 400,
+        message: 'Course ID is required',
+        meta: {
+          requestId: getRequestId(req),
+        },
+      });
+      return;
+    }
+
+    const language =
+      (extractStringParam(req.query.language as string | string[] | undefined) as 'zh' | 'en') ||
+      'zh';
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 5;
+
+    const courses = await getSimilarCourses(idParam, limit);
+
+    res.json(
+      createSuccessResponse(courses, 'Similar courses retrieved', language, getRequestId(req))
     );
   } catch (error) {
     next(error);

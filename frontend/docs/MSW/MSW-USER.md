@@ -44,10 +44,7 @@ GET /api/v1/user/favorites
 
 ```json
 {
-  "courseIds": [
-    "550e8400-e29b-41d4-a716-446655440000",
-    "550e8400-e29b-41d4-a716-446655440001"
-  ]
+  "courseIds": ["550e8400-e29b-41d4-a716-446655440000", "550e8400-e29b-41d4-a716-446655440001"]
 }
 ```
 
@@ -93,12 +90,12 @@ Content-Type: application/json
 
 ### 请求参数
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `courseId` | string | 是 | 课程 ID |
-| `teacherId` | string | 是 | 教师 ID |
-| `subject` | string | 是 | 咨询主题 (courseInfo/schedule/price/trial/other) |
-| `message` | string | 是 | 咨询内容 |
+| 字段        | 类型   | 必填 | 说明                                             |
+| ----------- | ------ | ---- | ------------------------------------------------ |
+| `courseId`  | string | 是   | 课程 ID                                          |
+| `teacherId` | string | 是   | 教师 ID                                          |
+| `subject`   | string | 是   | 咨询主题 (courseInfo/schedule/price/trial/other) |
+| `message`   | string | 是   | 咨询内容                                         |
 
 ### 成功响应 (200)
 
@@ -132,22 +129,22 @@ Content-Type: application/json
 
 ### 请求参数
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `targetType` | string | 是 | 举报类型 (course/teacher/review) |
-| `targetId` | string | 是 | 被举报对象 ID |
-| `reason` | string | 是 | 举报原因 (inaccurate/misleading/inappropriate/scam/other) |
-| `description` | string | 是 | 详细描述 |
+| 字段          | 类型   | 必填 | 说明                                                      |
+| ------------- | ------ | ---- | --------------------------------------------------------- |
+| `targetType`  | string | 是   | 举报类型 (course/teacher/review)                          |
+| `targetId`    | string | 是   | 被举报对象 ID                                             |
+| `reason`      | string | 是   | 举报原因 (inaccurate/misleading/inappropriate/scam/other) |
+| `description` | string | 是   | 详细描述                                                  |
 
 ### 举报原因说明
 
-| 值 | 说明 |
-|---|------|
-| `inaccurate` | 信息不准确 |
-| `misleading` | 误导性信息 |
-| `inappropriate` | 不当内容 |
-| `scam` | 欺诈行为 |
-| `other` | 其他 |
+| 值              | 说明       |
+| --------------- | ---------- |
+| `inaccurate`    | 信息不准确 |
+| `misleading`    | 误导性信息 |
+| `inappropriate` | 不当内容   |
+| `scam`          | 欺诈行为   |
+| `other`         | 其他       |
 
 ### 成功响应 (200)
 

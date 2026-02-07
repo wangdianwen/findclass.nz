@@ -17,12 +17,15 @@ export { test, expect };
 /**
  * Helper to set localStorage for authenticated user state
  */
-export async function setAuthState(page: any, userData: {
-  id: string;
-  name: string;
-  email: string;
-  token?: string;
-}) {
+export async function setAuthState(
+  page: any,
+  userData: {
+    id: string;
+    name: string;
+    email: string;
+    token?: string;
+  }
+) {
   await page.addInitScript((data: any) => {
     localStorage.setItem('auth_token', data.token || 'test-token');
     localStorage.setItem('user', JSON.stringify(data));

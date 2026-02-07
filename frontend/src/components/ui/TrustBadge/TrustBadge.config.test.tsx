@@ -5,10 +5,7 @@ import {
   type TrustLevelConfig,
   type TrustLevel,
 } from './trustBadgeConstants';
-import {
-  getTrustLevelConfig,
-  getTrustLevelFromScore,
-} from './trustBadgeHelpers';
+import { getTrustLevelConfig, getTrustLevelFromScore } from './trustBadgeHelpers';
 
 describe('TrustBadge Config', () => {
   describe('TRUST_LEVELS', () => {

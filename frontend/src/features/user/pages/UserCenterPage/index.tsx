@@ -18,7 +18,14 @@ import styles from './UserCenterPage.module.scss';
 
 type ActiveTab = 'profile' | 'favorites' | 'history' | 'notifications' | 'children' | 'reviews';
 
-const VALID_TABS: ActiveTab[] = ['profile', 'favorites', 'history', 'notifications', 'children', 'reviews'];
+const VALID_TABS: ActiveTab[] = [
+  'profile',
+  'favorites',
+  'history',
+  'notifications',
+  'children',
+  'reviews',
+];
 
 const { confirm } = Modal;
 
@@ -173,9 +180,12 @@ export const UserCenterPage: React.FC = () => {
   const [teacherStatus] = useState<'none' | 'pending' | 'approved'>('none');
 
   // Handle tab change - updates URL which triggers re-render
-  const handleTabChange = useCallback((key: string) => {
-    setSearchParams({ tab: key }, { replace: true });
-  }, [setSearchParams]);
+  const handleTabChange = useCallback(
+    (key: string) => {
+      setSearchParams({ tab: key }, { replace: true });
+    },
+    [setSearchParams]
+  );
 
   // Authentication check - useEffect for redirect
   // Use useLayoutEffect only in browser environment
@@ -188,7 +198,8 @@ export const UserCenterPage: React.FC = () => {
     const sessionToken = sessionStorage.getItem('auth_token');
 
     // Check for obviously invalid/expired tokens
-    const isExpiredToken = authToken === 'expired-token' ||
+    const isExpiredToken =
+      authToken === 'expired-token' ||
       sessionToken === 'expired-token' ||
       (!authToken && !sessionToken);
 
@@ -267,13 +278,14 @@ export const UserCenterPage: React.FC = () => {
   );
 
   // Transform favorites data for display
-  const favorites = favoritesData?.courseIds?.map((id, index) => ({
-    id,
-    title: `课程 ${index + 1}`,
-    institution: '机构名称',
-    price: 0,
-    rating: 0,
-  })) || [];
+  const favorites =
+    favoritesData?.courseIds?.map((id, index) => ({
+      id,
+      title: `课程 ${index + 1}`,
+      institution: '机构名称',
+      price: 0,
+      rating: 0,
+    })) || [];
 
   // Transform children data
   const children = childrenData?.data || [];
@@ -322,12 +334,7 @@ export const UserCenterPage: React.FC = () => {
     {
       key: 'profile',
       label: <span>{t('nav.profile')}</span>,
-      children: (
-        <UserProfile
-          profile={profileData?.data}
-          isLoading={profileLoading}
-        />
-      ),
+      children: <UserProfile profile={profileData?.data} isLoading={profileLoading} />,
     },
     {
       key: 'favorites',
@@ -381,12 +388,7 @@ export const UserCenterPage: React.FC = () => {
     {
       key: 'reviews',
       label: <span>{t('nav.reviews')}</span>,
-      children: (
-        <MyReviews
-          reviews={reviews}
-          isLoading={reviewsLoading}
-        />
-      ),
+      children: <MyReviews reviews={reviews} isLoading={reviewsLoading} />,
     },
   ];
 

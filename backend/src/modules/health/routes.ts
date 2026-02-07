@@ -6,8 +6,6 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { checkCacheHealth, checkRateLimitsHealth } from '@shared/db/cache';
-import { tableExists } from '@shared/db/dynamodb';
-import { getConfig } from '../../config';
 
 const router = Router();
 
@@ -29,7 +27,6 @@ router.get('/', (_req: Request, res: Response) => {
  * Readiness check - verifies all dependencies are available
  */
 router.get('/ready', async (_req: Request, res: Response) => {
-  const config = getConfig();
   const checks: Record<string, boolean> = {
     server: true,
   };
@@ -47,18 +44,6 @@ router.get('/ready', async (_req: Request, res: Response) => {
       checks.rateLimits = await checkRateLimitsHealth();
     } catch {
       checks.rateLimits = false;
-    }
-
-    // Check DynamoDB
-    if (config.env !== 'ut') {
-      try {
-        const exists = await tableExists();
-        checks.dynamodb = exists;
-      } catch {
-        checks.dynamodb = false;
-      }
-    } else {
-      checks.dynamodb = true;
     }
 
     const allHealthy = Object.values(checks).every(v => v);

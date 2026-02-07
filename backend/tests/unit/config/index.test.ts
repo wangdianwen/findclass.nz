@@ -81,11 +81,7 @@ describe('Config Module', () => {
           accessKeyId: parsed.AWS_ACCESS_KEY_ID,
           secretAccessKey: parsed.AWS_SECRET_ACCESS_KEY,
         },
-        dynamodb: {
-          endpoint: parsed.DYNAMODB_ENDPOINT,
-          tableName: parsed.DYNAMODB_TABLE_NAME,
-          port: parsed.DYNAMODB_PORT,
-        },
+        dynamodb: null, // Deprecated: DynamoDB removed
         smtp: {
           host: parsed.SMTP_HOST,
           port: parsed.SMTP_PORT,
@@ -131,7 +127,7 @@ describe('Config Module', () => {
       expect(config.port).toBe(3000);
       expect(config.auth).toBeDefined();
       expect(config.aws).toBeDefined();
-      expect(config.dynamodb).toBeDefined();
+      expect(config.dynamodb).toBeNull(); // DynamoDB removed
       expect(config.smtp).toBeDefined();
       expect(config.jwt).toBeDefined();
       expect(config.cors).toBeDefined();

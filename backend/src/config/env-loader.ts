@@ -6,9 +6,13 @@ const env = (process.env.NODE_ENV ?? NodeEnv.Development) as NodeEnv;
 const configDir = path.resolve(__dirname, 'env');
 
 // 环境文件加载顺序（后者覆盖前者）
+// Priority: .env.base -> .env.{env} -> .env.staging -> .env.local -> .env.test
 const envFiles = [
   { name: 'base', path: path.join(configDir, '.env.base'), override: false },
   { name: env, path: path.join(configDir, `.env.${env}`), override: true },
+  { name: 'staging', path: path.join(configDir, '.env.staging'), override: true },
+  { name: 'local', path: path.join(configDir, '.env.local'), override: true },
+  { name: 'test', path: path.join(configDir, '.env.test'), override: true },
 ];
 
 // 加载环境文件
@@ -25,3 +29,6 @@ export function loadEnvFiles(): void {
     }
   }
 }
+
+// 保持向后兼容的导出
+export const loadEnv = loadEnvFiles;

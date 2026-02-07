@@ -32,30 +32,36 @@ export const MyReviews: React.FC<MyReviewsProps> = ({
   const [submitting, setSubmitting] = useState(false);
 
   // Handle edit click - opens edit modal
-  const handleEdit = useCallback((reviewId: string) => {
-    const review = reviews.find(r => r.id === reviewId);
-    if (review) {
-      setEditingReview(review);
-      setEditModalOpen(true);
-    }
-  }, [reviews]);
+  const handleEdit = useCallback(
+    (reviewId: string) => {
+      const review = reviews.find(r => r.id === reviewId);
+      if (review) {
+        setEditingReview(review);
+        setEditModalOpen(true);
+      }
+    },
+    [reviews]
+  );
 
   // Handle submit edit
-  const handleSubmitEdit = useCallback(async (values: ReviewFormValues) => {
-    if (!editingReview) return;
+  const handleSubmitEdit = useCallback(
+    async (values: ReviewFormValues) => {
+      if (!editingReview) return;
 
-    setSubmitting(true);
-    try {
-      onEdit?.(editingReview.id, values);
-      message.success(t('form.editSuccess'));
-      setEditModalOpen(false);
-      setEditingReview(null);
-    } catch {
-      message.error(t('form.error'));
-    } finally {
-      setSubmitting(false);
-    }
-  }, [editingReview, onEdit, t]);
+      setSubmitting(true);
+      try {
+        onEdit?.(editingReview.id, values);
+        message.success(t('form.editSuccess'));
+        setEditModalOpen(false);
+        setEditingReview(null);
+      } catch {
+        message.error(t('form.error'));
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [editingReview, onEdit, t]
+  );
 
   // Handle cancel edit
   const handleCancelEdit = useCallback(() => {
@@ -129,10 +135,14 @@ export const MyReviews: React.FC<MyReviewsProps> = ({
           onSubmit={handleSubmitEdit}
           onCancel={handleCancelEdit}
           loading={submitting}
-          initialValues={editingReview ? {
-            overallRating: editingReview.overallRating,
-            content: editingReview.content,
-          } : undefined}
+          initialValues={
+            editingReview
+              ? {
+                  overallRating: editingReview.overallRating,
+                  content: editingReview.content,
+                }
+              : undefined
+          }
           isEdit={!!editingReview}
         />
       </Modal>

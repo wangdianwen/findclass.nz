@@ -280,6 +280,45 @@ export async function initializeSchema(): Promise<void> {
     )
   `);
 
+  // Create inquiries table
+  await query(`
+    CREATE TABLE IF NOT EXISTS inquiries (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+      user_name VARCHAR(100),
+      user_email VARCHAR(255),
+      user_phone VARCHAR(50),
+      target_type VARCHAR(50) NOT NULL,
+      target_id UUID,
+      subject VARCHAR(200),
+      message TEXT NOT NULL,
+      status VARCHAR(20) DEFAULT 'PENDING',
+      reply_content TEXT,
+      replied_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+
+  // Create reports table
+  await query(`
+    CREATE TABLE IF NOT EXISTS reports (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+      user_name VARCHAR(100),
+      user_email VARCHAR(255),
+      target_type VARCHAR(50) NOT NULL,
+      target_id VARCHAR(255) NOT NULL,
+      reason VARCHAR(100) NOT NULL,
+      description TEXT NOT NULL,
+      status VARCHAR(20) DEFAULT 'PENDING',
+      admin_notes TEXT,
+      resolved_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+
   // Create indexes
   await createIndexes();
 
@@ -352,6 +391,21 @@ async function createIndexes(): Promise<void> {
   // Rate limits indexes
   await query(`CREATE INDEX IF NOT EXISTS idx_rate_limits_reset ON rate_limits(reset_at)`);
 
+  // Inquiries indexes
+  await query(`CREATE INDEX IF NOT EXISTS idx_inquiries_user ON inquiries(user_id)`);
+  await query(`CREATE INDEX IF NOT EXISTS idx_inquiries_status ON inquiries(status)`);
+  await query(
+    `CREATE INDEX IF NOT EXISTS idx_inquiries_target ON inquiries(target_type, target_id)`
+  );
+  await query(`CREATE INDEX IF NOT EXISTS idx_inquiries_created ON inquiries(created_at DESC)`);
+
+  // Reports indexes
+  await query(`CREATE INDEX IF NOT EXISTS idx_reports_user ON reports(user_id)`);
+  await query(`CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status)`);
+  await query(`CREATE INDEX IF NOT EXISTS idx_reports_target ON reports(target_type, target_id)`);
+  await query(`CREATE INDEX IF NOT EXISTS idx_reports_reason ON reports(reason)`);
+  await query(`CREATE INDEX IF NOT EXISTS idx_reports_created ON reports(created_at DESC)`);
+
   logger.info('Database indexes created');
 }
 
@@ -361,6 +415,8 @@ async function createIndexes(): Promise<void> {
 export async function dropAllTables(): Promise<void> {
   logger.warn('Dropping all tables...');
 
+  await query('DROP TABLE IF EXISTS reports CASCADE');
+  await query('DROP TABLE IF EXISTS inquiries CASCADE');
   await query('DROP TABLE IF EXISTS rate_limits CASCADE');
   await query('DROP TABLE IF EXISTS verification_codes CASCADE');
   await query('DROP TABLE IF EXISTS sessions CASCADE');
@@ -382,6 +438,8 @@ export async function truncateAllTables(): Promise<void> {
   logger.info('Truncating all tables...');
 
   const tables = [
+    'reports',
+    'inquiries',
     'rate_limits',
     'verification_codes',
     'sessions',

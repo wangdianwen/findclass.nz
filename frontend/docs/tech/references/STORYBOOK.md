@@ -102,9 +102,7 @@ Components receive props - Storybook passes static data directly:
 // ✅ Storybook passes static data directly, no API needed
 export const Default: Story = {
   args: {
-    children: [
-      { id: '1', name: '张小明', gender: 'male', grade: 'secondary-7' },
-    ],
+    children: [{ id: '1', name: '张小明', gender: 'male', grade: 'secondary-7' }],
     onAdd: fn(),
     onEdit: fn(),
     onDelete: fn(),
@@ -135,20 +133,20 @@ Full page stories require complex MSW or data simulation, prone to issues and hi
 
 **Alternative:**
 
-| Testing Type | Tool | Description |
-|-------------|------|-------------|
-| Component interaction | Storybook | Pass static data via props |
-| Page integration | Playwright/Cypress | E2E tests for page flows |
-| API integration | Vitest + MSW | Unit tests for API layer |
+| Testing Type          | Tool               | Description                |
+| --------------------- | ------------------ | -------------------------- |
+| Component interaction | Storybook          | Pass static data via props |
+| Page integration      | Playwright/Cypress | E2E tests for page flows   |
+| API integration       | Vitest + MSW       | Unit tests for API layer   |
 
 ### Forbidden: Do NOT Call API in Components
 
-| Practice | Allowed? |
-|----------|-----------|
-| Page layer calls API, components receive props | ✅ Allowed |
-| Component internally calls API | ❌ Forbidden |
-| Component uses useQuery/useMutation | ❌ Forbidden |
-| Component uses useState + props | ✅ Allowed |
+| Practice                                       | Allowed?     |
+| ---------------------------------------------- | ------------ |
+| Page layer calls API, components receive props | ✅ Allowed   |
+| Component internally calls API                 | ❌ Forbidden |
+| Component uses useQuery/useMutation            | ❌ Forbidden |
+| Component uses useState + props                | ✅ Allowed   |
 
 ### Violation Consequences
 

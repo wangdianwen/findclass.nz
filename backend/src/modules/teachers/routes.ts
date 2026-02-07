@@ -6,6 +6,7 @@ import { Router } from 'express';
 import { authenticate } from '@shared/middleware/auth';
 import {
   getTeacherController,
+  listTeachersController,
   teacherOnboardingController,
   uploadQualificationController,
 } from './teachers.controller';
@@ -15,6 +16,7 @@ import { validateRequest } from '@shared/middleware/validator';
 const router = Router();
 
 // Public routes
+router.get('/', listTeachersController);
 router.get('/:id', getTeacherController);
 
 // Protected routes

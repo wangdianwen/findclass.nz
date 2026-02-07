@@ -328,11 +328,7 @@ export function getCoursesForPage(
 }
 
 // Helper to generate pagination metadata
-export function generatePaginationMeta(
-  total: number,
-  page: number,
-  pageSize: number = 10
-) {
+export function generatePaginationMeta(total: number, page: number, pageSize: number = 10) {
   return {
     page,
     pageSize,

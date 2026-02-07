@@ -30,17 +30,11 @@ export const userStatusHandlers = [
 
     // Check for special user IDs that trigger different statuses
     if (userId.includes('deleted')) {
-      return HttpResponse.json(
-        ERROR_RESPONSES.userNotFound,
-        { status: 404 }
-      );
+      return HttpResponse.json(ERROR_RESPONSES.userNotFound, { status: 404 });
     }
 
     if (userId.includes('banned')) {
-      return HttpResponse.json(
-        ERROR_RESPONSES.userBanned,
-        { status: 403 }
-      );
+      return HttpResponse.json(ERROR_RESPONSES.userBanned, { status: 403 });
     }
 
     // Find user in mock data
@@ -73,10 +67,7 @@ export const userStatusHandlers = [
     // Check Authorization header for banned user
     const authHeader = request.headers.get('Authorization');
     if (authHeader?.includes('banned')) {
-      return HttpResponse.json(
-        ERROR_RESPONSES.userBanned,
-        { status: 403 }
-      );
+      return HttpResponse.json(ERROR_RESPONSES.userBanned, { status: 403 });
     }
 
     // Normal response
@@ -92,10 +83,7 @@ export const userStatusHandlers = [
 
     const authHeader = request.headers.get('Authorization');
     if (authHeader?.includes('banned')) {
-      return HttpResponse.json(
-        ERROR_RESPONSES.userBanned,
-        { status: 403 }
-      );
+      return HttpResponse.json(ERROR_RESPONSES.userBanned, { status: 403 });
     }
 
     return HttpResponse.json({
@@ -111,10 +99,7 @@ export const userStatusHandlers = [
 
     const authHeader = request.headers.get('Authorization');
     if (authHeader?.includes('banned')) {
-      return HttpResponse.json(
-        ERROR_RESPONSES.userBanned,
-        { status: 403 }
-      );
+      return HttpResponse.json(ERROR_RESPONSES.userBanned, { status: 403 });
     }
 
     return HttpResponse.json({
@@ -138,17 +123,11 @@ export const courseStatusHandlers = [
 
     // Check for special course IDs
     if (courseId === 'not-found') {
-      return HttpResponse.json(
-        ERROR_RESPONSES.courseNotFound,
-        { status: 404 }
-      );
+      return HttpResponse.json(ERROR_RESPONSES.courseNotFound, { status: 404 });
     }
 
     if (courseId === 'course-draft-001') {
-      return HttpResponse.json(
-        ERROR_RESPONSES.courseNotPublished,
-        { status: 403 }
-      );
+      return HttpResponse.json(ERROR_RESPONSES.courseNotPublished, { status: 403 });
     }
 
     // Find in edge case data
@@ -158,10 +137,7 @@ export const courseStatusHandlers = [
     }
 
     // Default: not found
-    return HttpResponse.json(
-      ERROR_RESPONSES.courseNotFound,
-      { status: 404 }
-    );
+    return HttpResponse.json(ERROR_RESPONSES.courseNotFound, { status: 404 });
   }),
 
   // GET /api/v1/courses - List courses with status filtering
@@ -206,12 +182,12 @@ export const favoriteRestrictionHandlers = [
   http.post(`${API_BASE}/user/favorites`, async ({ request }) => {
     logRequest('POST', request.url);
 
-    const body = await request.json().catch(() => null) as { courseId?: string } | null;
+    const body = (await request.json().catch(() => null)) as { courseId?: string } | null;
     const courseId = body?.courseId || '';
 
     // Check if course has favorite restrictions
     const restrictedCourse = MOCK_COURSES_WITH_STATUS.find(
-      (c) => c.id === courseId && c.flags?.canFavorite === false
+      c => c.id === courseId && c.flags?.canFavorite === false
     );
 
     if (restrictedCourse && restrictedCourse.flags) {
@@ -259,7 +235,7 @@ export const reportRestrictionHandlers = [
   http.post(`${API_BASE}/reports`, async ({ request }) => {
     logRequest('POST', request.url);
 
-    const body = await request.json().catch(() => null) as {
+    const body = (await request.json().catch(() => null)) as {
       targetId?: string;
       targetType?: string;
       reason?: string;
@@ -270,7 +246,7 @@ export const reportRestrictionHandlers = [
 
     // Check if course has report restrictions
     const restrictedCourse = MOCK_COURSES_WITH_STATUS.find(
-      (c) => c.id === targetId && c.flags?.canReport === false
+      c => c.id === targetId && c.flags?.canReport === false
     );
 
     if (restrictedCourse && restrictedCourse.flags) {
@@ -297,7 +273,7 @@ export const inquiryRestrictionHandlers = [
   http.post(`${API_BASE}/inquiries`, async ({ request }) => {
     logRequest('POST', request.url);
 
-    const body = await request.json().catch(() => null) as {
+    const body = (await request.json().catch(() => null)) as {
       courseId?: string;
       teacherId?: string;
       subject?: string;
@@ -308,7 +284,7 @@ export const inquiryRestrictionHandlers = [
 
     // Check if course has inquiry restrictions
     const restrictedCourse = MOCK_COURSES_WITH_STATUS.find(
-      (c) => c.id === courseId && c.flags?.canInquiry === false
+      c => c.id === courseId && c.flags?.canInquiry === false
     );
 
     if (restrictedCourse && restrictedCourse.flags) {
@@ -382,7 +358,7 @@ export const reviewErrorHandlers = [
   http.post(`${API_BASE}/reviews`, async ({ request }) => {
     logRequest('POST', request.url);
 
-    const body = await request.json().catch(() => null) as Record<string, unknown> | null;
+    const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
 
     if (!body) {
       return HttpResponse.json(

@@ -97,9 +97,7 @@ export const ReviewsPage: React.FC<ReviewsPageProps> = ({
           {/* Reviews List */}
           <div className={styles.reviewsSection}>
             <div className={styles.reviewsHeader}>
-              <h3 className={styles.reviewsTitle}>
-                {t('reviewsCount', { count: reviewsTotal })}
-              </h3>
+              <h3 className={styles.reviewsTitle}>{t('reviewsCount', { count: reviewsTotal })}</h3>
             </div>
 
             {reviews.length > 0 ? (

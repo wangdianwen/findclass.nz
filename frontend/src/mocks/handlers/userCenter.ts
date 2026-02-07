@@ -198,7 +198,10 @@ export const userProfileHandlers = [
       );
     }
 
-    const { currentPassword, newPassword } = body as { currentPassword?: string; newPassword?: string };
+    const { currentPassword, newPassword } = body as {
+      currentPassword?: string;
+      newPassword?: string;
+    };
     if (!currentPassword || !newPassword) {
       return HttpResponse.json(
         { success: false, error: { code: 'INVALID_REQUEST', message: '请填写完整信息' } },

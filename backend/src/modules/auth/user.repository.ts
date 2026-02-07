@@ -18,6 +18,8 @@ export interface User {
   role: UserRole;
   status: UserStatus;
   language: string;
+  provider_id?: string;
+  provider_type?: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -29,6 +31,9 @@ export interface CreateUserDTO {
   phone?: string;
   role: UserRole;
   language?: string;
+  avatar_url?: string;
+  provider_id?: string;
+  provider_type?: string;
 }
 
 export interface UpdateUserDTO {
@@ -61,6 +66,16 @@ export class UserRepository {
   }
 
   /**
+   * Find user by social provider ID
+   */
+  async findByProviderId(providerId: string): Promise<User | null> {
+    const result = await this.pool.query<User>('SELECT * FROM users WHERE provider_id = $1', [
+      providerId,
+    ]);
+    return result.rows[0] || null;
+  }
+
+  /**
    * Create a new user
    */
   async create(data: CreateUserDTO): Promise<User> {
@@ -68,8 +83,8 @@ export class UserRepository {
     const now = new Date();
 
     const result = await this.pool.query<User>(
-      `INSERT INTO users (id, email, password_hash, name, phone, role, language, status, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO users (id, email, password_hash, name, phone, role, language, status, avatar_url, provider_id, provider_type, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
        RETURNING *`,
       [
         id,
@@ -80,6 +95,9 @@ export class UserRepository {
         data.role,
         data.language || 'zh',
         UserStatus.ACTIVE,
+        data.avatar_url || null,
+        data.provider_id || null,
+        data.provider_type || null,
         now,
         now,
       ]

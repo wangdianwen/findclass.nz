@@ -16,12 +16,12 @@ GET /api/v1/reviews?teacherId=660e8400-e29b-41d4-a716-446655440000&courseId=550e
 
 ### 查询参数
 
-| 参数 | 说明 |
-|------|------|
-| `teacherId` | 教师 GUID |
-| `courseId` | 课程 GUID |
-| `page` | 页码，默认 1 |
-| `pageSize` | 每页数量，默认 5 |
+| 参数        | 说明             |
+| ----------- | ---------------- |
+| `teacherId` | 教师 GUID        |
+| `courseId`  | 课程 GUID        |
+| `page`      | 页码，默认 1     |
+| `pageSize`  | 每页数量，默认 5 |
 
 ### 成功响应 (200)
 

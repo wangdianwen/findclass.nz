@@ -13,6 +13,8 @@ import 'reflect-metadata';
 import { config } from 'dotenv';
 
 const configDir = resolve(process.cwd(), 'src/config/env');
+// Clear DATABASE_URL before loading env files so testcontainers can set it
+delete process.env.DATABASE_URL;
 config({ path: resolve(configDir, '.env.base') });
 config({ path: resolve(configDir, '.env.test') });
 
@@ -21,6 +23,7 @@ import { Pool } from 'pg';
 import { beforeAll, afterAll } from 'vitest';
 import { createApp } from '@src/app';
 import { initializeSchema } from '@src/shared/db/postgres/schema';
+import { resetPool } from '@src/shared/db/postgres/client';
 
 const POSTGRES_IMAGE = 'postgres:15-alpine';
 const POSTGRES_USER = 'test_user';
@@ -57,6 +60,9 @@ async function startPostgres() {
   // Set DATABASE_URL for the app
   process.env.DATABASE_URL = connectionUri;
 
+  // Reset the pool to ensure new connection
+  resetPool();
+
   // Create pool for tests
   _pool = new Pool({ connectionString: connectionUri });
 
@@ -76,6 +82,7 @@ async function stopPostgres() {
   try {
     await _pool?.end();
     await postgresContainer.stop();
+    resetPool();
     console.log('✅ PostgreSQL container stopped');
   } catch (e) {
     console.warn('⚠️  Stop error:', e);

@@ -1,5 +1,10 @@
 // Storybook data override support for TeacherDashboardPage
-import type { TeacherData, TeacherCourse, TeacherStudent, RevenueData } from './teacherDashboardData';
+import type {
+  TeacherData,
+  TeacherCourse,
+  TeacherStudent,
+  RevenueData,
+} from './teacherDashboardData';
 
 let storybookTeacherData: TeacherData | null = null;
 let storybookCoursesData: ReadonlyArray<TeacherCourse> | null = null;

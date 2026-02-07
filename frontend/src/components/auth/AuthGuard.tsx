@@ -30,14 +30,17 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
       // User is logged in but no user data - fetch it
       // This handles page refresh with persisted login state
       import('@/services/api').then(({ authApi }) => {
-        authApi.getMe().then(result => {
-          if (result.success && result.data) {
-            useUserStore.getState().setUser(result.data);
-          }
-        }).catch(() => {
-          // Token expired, clear session
-          useUserStore.getState().logout();
-        });
+        authApi
+          .getMe()
+          .then(result => {
+            if (result.success && result.data) {
+              useUserStore.getState().setUser(result.data);
+            }
+          })
+          .catch(() => {
+            // Token expired, clear session
+            useUserStore.getState().logout();
+          });
       });
     }
   }, [isLoggedIn, user]);

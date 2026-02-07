@@ -37,7 +37,11 @@ const HomePage: React.FC = () => {
   const { saveConsent } = useCookieConsent();
 
   // Fetch featured courses
-  const { data: courses = [], isLoading, error } = useQuery<CourseData[]>({
+  const {
+    data: courses = [],
+    isLoading,
+    error,
+  } = useQuery<CourseData[]>({
     queryKey: ['featuredCourses'],
     queryFn: () => courseApi.getFeaturedCourses(6),
   });

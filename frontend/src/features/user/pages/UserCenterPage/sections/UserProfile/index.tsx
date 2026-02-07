@@ -30,6 +30,7 @@ import { useUserStore } from '@/stores/userStore';
 import { DefaultAvatarSelector } from '@/components/ui';
 import { DEFAULT_AVATAR } from '@/utils/defaultImages';
 import type { UserProfile as UserProfileType } from '@/services/api';
+import { userCenterApi } from '@/services/api';
 import styles from './UserProfile.module.scss';
 
 interface UserProfileProps {
@@ -65,20 +66,27 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   }, [passwordValues]);
 
   const handleAvatarChange = useCallback(
-    (info: UploadChangeParam<UploadFile>) => {
+    async (info: UploadChangeParam<UploadFile>) => {
+      const file = info.file.originFileObj;
+      if (!file) return;
+
       if (info.file.status === 'uploading') {
         setLoading(true);
         return;
       }
+
       if (info.file.status === 'done') {
-        const url =
-          info.file.response?.url ||
-          (info.file.originFileObj && URL.createObjectURL(info.file.originFileObj));
-        if (url) {
-          setAvatarUrl(url);
+        try {
+          const response = await userCenterApi.uploadAvatar(file);
+          if (response.success && response.data?.url) {
+            setAvatarUrl(response.data.url);
+            message.success(t('success'));
+          }
+        } catch {
+          message.error(t('error'));
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
-        message.success(t('success'));
       }
     },
     [t]
@@ -165,7 +173,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                 <Avatar size={100} src={avatarUrl} alt="Avatar" />
               ) : (
                 <Avatar size={100} src={profile?.avatar || DEFAULT_AVATAR}>
-                  {user?.name?.charAt(0).toUpperCase() || profile?.name?.charAt(0).toUpperCase() || 'U'}
+                  {user?.name?.charAt(0).toUpperCase() ||
+                    profile?.name?.charAt(0).toUpperCase() ||
+                    'U'}
                 </Avatar>
               )}
             </div>
@@ -328,8 +338,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                       ? profile.gender === 'male'
                         ? t('profile.genderMale')
                         : profile.gender === 'female'
-                        ? t('profile.genderFemale')
-                        : t('profile.genderOther')
+                          ? t('profile.genderFemale')
+                          : t('profile.genderOther')
                       : '-'}
                   </span>
                 </div>
@@ -348,10 +358,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               <p className={styles.itemLabel}>{t('settings.privacy.showEmail')}</p>
             </div>
             <div className={styles.itemAction}>
-              <Switch
-                data-testid="show-email-switch"
-                defaultChecked={profile?.showEmail}
-              />
+              <Switch data-testid="show-email-switch" defaultChecked={profile?.showEmail} />
             </div>
           </div>
           <div className={styles.settingsItem}>
@@ -359,10 +366,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               <p className={styles.itemLabel}>{t('settings.privacy.showPhone')}</p>
             </div>
             <div className={styles.itemAction}>
-              <Switch
-                data-testid="show-phone-switch"
-                defaultChecked={profile?.showPhone}
-              />
+              <Switch data-testid="show-phone-switch" defaultChecked={profile?.showPhone} />
             </div>
           </div>
           <div className={styles.settingsItem}>
@@ -370,10 +374,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               <p className={styles.itemLabel}>{t('settings.privacy.showWechat')}</p>
             </div>
             <div className={styles.itemAction}>
-              <Switch
-                data-testid="show-wechat-switch"
-                defaultChecked={profile?.showWechat}
-              />
+              <Switch data-testid="show-wechat-switch" defaultChecked={profile?.showWechat} />
             </div>
           </div>
           <div className={styles.settingsItem}>
@@ -381,10 +382,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               <p className={styles.itemLabel}>{t('settings.privacy.showRealName')}</p>
             </div>
             <div className={styles.itemAction}>
-              <Switch
-                data-testid="show-realname-switch"
-                defaultChecked={profile?.showRealName}
-              />
+              <Switch data-testid="show-realname-switch" defaultChecked={profile?.showRealName} />
             </div>
           </div>
         </div>

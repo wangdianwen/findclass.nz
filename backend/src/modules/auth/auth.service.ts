@@ -35,6 +35,7 @@ import {
   generateRefreshToken,
 } from '@shared/middleware/auth';
 import { sendVerificationEmail } from '@shared/smtp/email.service';
+import type { SocialLoginDto } from './auth.types';
 
 // Verification code configuration
 const VERIFICATION_CODE_TTL = 300; // 5 minutes
@@ -154,6 +155,84 @@ export async function login(data: LoginDto): Promise<AuthResponse> {
       name: latestUser.name,
       role: latestUser.role,
     },
+  };
+}
+
+/**
+ * Social login - authenticate user via Google or WeChat
+ */
+export async function socialLogin(data: SocialLoginDto): Promise<{
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  tokenType: string;
+}> {
+  const { provider, socialToken, avatar, name } = data;
+
+  logger.info('Social login attempt', { provider });
+
+  const { userRepository } = getRepositories();
+  const config = getConfig();
+
+  // Verify social token based on provider
+  // In production, this would call Google/WeChat APIs to verify the token
+  // For now, we'll use the socialToken as a unique identifier
+  const providerId = `${provider}:${socialToken}`;
+
+  // Check if user already exists with this social provider
+  let user = await userRepository.findByProviderId(providerId);
+
+  if (!user) {
+    // Check if user exists by email if we have additional info
+    // For new social login users, create a placeholder account
+    logger.info('Creating new user via social login', { provider });
+
+    const createUserDTO: CreateUserDTO = {
+      email: `${providerId}@social.local`, // Placeholder email
+      password_hash: await bcrypt.hash(
+        crypto.randomBytes(32).toString('hex'),
+        config.auth.bcryptRounds
+      ),
+      name: name || `${provider} User`,
+      role: UserRole.PARENT,
+      avatar_url: avatar,
+      provider_id: providerId,
+      provider_type: provider,
+    };
+
+    user = await userRepository.create(createUserDTO);
+
+    logger.info('Social login user created', { userId: user.id, provider });
+  } else {
+    // Update user's avatar if provided
+    if (avatar && avatar !== user.avatar_url) {
+      await userRepository.update(user.id, { avatar_url: avatar });
+      user = { ...user, avatar_url: avatar };
+    }
+
+    logger.info('Social login user authenticated', { userId: user.id, provider });
+  }
+
+  // Check user status
+  if (user.status === UserStatus.DISABLED) {
+    throw createAppError('Account is disabled', ErrorCode.FORBIDDEN);
+  }
+
+  // Generate tokens
+  const accessToken = generateAccessToken({
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+  });
+  const refreshToken = generateRefreshToken(user.id);
+
+  logger.info('Social login successful', { userId: user.id, provider });
+
+  return {
+    accessToken,
+    refreshToken,
+    expiresIn: 7 * 24 * 60 * 60, // 7 days in seconds
+    tokenType: 'Bearer',
   };
 }
 

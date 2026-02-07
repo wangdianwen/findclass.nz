@@ -4,11 +4,11 @@
 
 ## Three-Layer Testing
 
-| Layer | Tool | Purpose | Location |
-|-------|------|---------|----------|
-| Unit | Vitest | Utilities, hooks | `src/**/*.test.{ts,tsx}` |
-| Component | Storybook + Vitest | Components, interactions | `stories/**/*.stories.tsx` |
-| E2E | Playwright | User flows | `src/test/e2e/**/*.spec.ts` |
+| Layer     | Tool               | Purpose                  | Location                    |
+| --------- | ------------------ | ------------------------ | --------------------------- |
+| Unit      | Vitest             | Utilities, hooks         | `src/**/*.test.{ts,tsx}`    |
+| Component | Storybook + Vitest | Components, interactions | `stories/**/*.stories.tsx`  |
+| E2E       | Playwright         | User flows               | `src/test/e2e/**/*.spec.ts` |
 
 ```
         /\
@@ -90,7 +90,7 @@ test('shows error on 500', async ({ page }) => {
   await page.route('**/api/v1/courses', route => {
     route.fulfill({
       status: 500,
-      body: JSON.stringify({ success: false, error: { code: 'INTERNAL_ERROR' } })
+      body: JSON.stringify({ success: false, error: { code: 'INTERNAL_ERROR' } }),
     });
   });
 
@@ -102,11 +102,14 @@ test('shows error on 500', async ({ page }) => {
 test('logged in user sees avatar', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('auth_token', 'test-token');
-    localStorage.setItem('user', JSON.stringify({
-      id: 'user-test-001',
-      name: 'Test User',
-      email: 'test@example.com',
-    }));
+    localStorage.setItem(
+      'user',
+      JSON.stringify({
+        id: 'user-test-001',
+        name: 'Test User',
+        email: 'test@example.com',
+      })
+    );
   });
 
   await page.goto('/');
@@ -132,14 +135,14 @@ See `src/test/e2e/setup/test-data.ts` for test data utilities.
 
 Edge cases are documented in `docs/MSW/MSW-EDGE-CASES.md`:
 
-| Scenario | Trigger |
-|----------|---------|
-| USER_NOT_FOUND | User ID contains "deleted" |
-| USER_BANNED | User ID contains "banned" |
-| COURSE_NOT_FOUND | Course ID = "not-found" |
-| COURSE_NOT_PUBLISHED | Course ID = "course-draft-001" |
-| ACTION_NOT_ALLOWED | Course ID = "course-nofavorite-001" |
-| RATE_LIMITED | Authorization header contains "ratelimit" |
+| Scenario             | Trigger                                   |
+| -------------------- | ----------------------------------------- |
+| USER_NOT_FOUND       | User ID contains "deleted"                |
+| USER_BANNED          | User ID contains "banned"                 |
+| COURSE_NOT_FOUND     | Course ID = "not-found"                   |
+| COURSE_NOT_PUBLISHED | Course ID = "course-draft-001"            |
+| ACTION_NOT_ALLOWED   | Course ID = "course-nofavorite-001"       |
+| RATE_LIMITED         | Authorization header contains "ratelimit" |
 
 ### Running E2E Tests
 
@@ -170,23 +173,23 @@ npx playwright test --project=chromium --reporter=html
 
 ### Story Requirements
 
-| Type | Required | Location |
-|------|----------|----------|
-| UI Base components | ✅ | `stories/UI/*.stories.tsx` |
-| Shared components | ✅ | `stories/Shared/*.stories.tsx` |
-| Page sections | ✅ | `stories/Components/*.stories.tsx` |
-| Pages | ✅ | `stories/Pages/*.stories.tsx` |
+| Type               | Required | Location                           |
+| ------------------ | -------- | ---------------------------------- |
+| UI Base components | ✅       | `stories/UI/*.stories.tsx`         |
+| Shared components  | ✅       | `stories/Shared/*.stories.tsx`     |
+| Page sections      | ✅       | `stories/Components/*.stories.tsx` |
+| Pages              | ✅       | `stories/Pages/*.stories.tsx`      |
 
 ### Interaction Tests Required
 
-| Component | Interaction | Test Name |
-|-----------|-------------|-----------|
-| Header | City/Language dropdown | ✅ |
-| HeroSection | Search input | ✅ |
-| FeaturedCoursesSection | Filter | ✅ |
-| CookieConsent | Accept/Decline | ✅ |
-| AnnouncementBar | Close | ✅ |
-| Display-only | None | ❌ Default only |
+| Component              | Interaction            | Test Name       |
+| ---------------------- | ---------------------- | --------------- |
+| Header                 | City/Language dropdown | ✅              |
+| HeroSection            | Search input           | ✅              |
+| FeaturedCoursesSection | Filter                 | ✅              |
+| CookieConsent          | Accept/Decline         | ✅              |
+| AnnouncementBar        | Close                  | ✅              |
+| Display-only           | None                   | ❌ Default only |
 
 ### data-testid Rule
 
@@ -204,12 +207,12 @@ const button = canvas.getByText('Submit');
 
 ### Naming Convention
 
-| Element | Example |
-|---------|---------|
-| Button | `submit-button`, `save-button` |
-| Input | `search-input`, `name-input` |
-| Card | `course-card-123` |
-| Tab | `about-tab` |
+| Element | Example                        |
+| ------- | ------------------------------ |
+| Button  | `submit-button`, `save-button` |
+| Input   | `search-input`, `name-input`   |
+| Card    | `course-card-123`              |
+| Tab     | `about-tab`                    |
 
 ## Commands
 
@@ -255,22 +258,22 @@ describe('useCity', () => {
 
 ## Test Priorities
 
-| Priority | What to Test |
-|----------|--------------|
-| **High** | Utility functions, custom hooks, API services |
-| **Medium** | Complex form validation, filtering logic |
-| **Low** | Simple props passing, UI rendering details |
+| Priority   | What to Test                                  |
+| ---------- | --------------------------------------------- |
+| **High**   | Utility functions, custom hooks, API services |
+| **Medium** | Complex form validation, filtering logic      |
+| **Low**    | Simple props passing, UI rendering details    |
 
 ## Common Issues
 
-| Issue | Solution |
-|-------|----------|
-| `getByTestId` not found | Add `data-testid` to element |
-| `getByText` fails | Check i18n namespace, use `data-testid` |
-| A11y test fails | Fix issue or disable specific rule in parameters |
-| Router component fails | Add `reactRouter` parameters |
-| MSW not intercepting | Check dev server port (3001) |
-| Tests timing out | Increase `actionTimeout`/`navigationTimeout` |
+| Issue                   | Solution                                         |
+| ----------------------- | ------------------------------------------------ |
+| `getByTestId` not found | Add `data-testid` to element                     |
+| `getByText` fails       | Check i18n namespace, use `data-testid`          |
+| A11y test fails         | Fix issue or disable specific rule in parameters |
+| Router component fails  | Add `reactRouter` parameters                     |
+| MSW not intercepting    | Check dev server port (3001)                     |
+| Tests timing out        | Increase `actionTimeout`/`navigationTimeout`     |
 
 ## Production Build
 

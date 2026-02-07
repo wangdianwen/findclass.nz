@@ -1,19 +1,12 @@
 /**
- * DynamoDB Cache & Rate Limit Service
- * Uses single table design with SYSTEM#CACHE# and SYSTEM#RATE_LIMIT# prefixes
- * All data stored in FindClass-MainTable
+ * PostgreSQL Cache & Rate Limit Service
+ * Uses PostgreSQL tables for caching and rate limiting
+ * All data stored in the findclass database
  */
 
-import {
-  GetCommand,
-  PutCommand,
-  DeleteCommand,
-  UpdateCommand,
-  ScanCommand,
-} from '@aws-sdk/lib-dynamodb';
-import pRetry from 'p-retry';
+import { Client } from 'pg';
 import { logger } from '../../core/logger';
-import { getDynamoDBDocClient, createSystemKey, TABLE_NAME } from './dynamodb';
+import { getConfig } from '../../config';
 
 export type CacheType =
   | 'SEARCH'
@@ -29,32 +22,6 @@ export type CacheType =
 
 export type RateLimitKeyType = 'email' | 'ip' | 'token' | 'user';
 
-interface SystemCacheItem {
-  PK: string;
-  SK: string;
-  entityType: 'SYSTEM_CACHE';
-  dataCategory: 'SYSTEM';
-  cacheType: CacheType;
-  cacheKey: string;
-  cachedData: string;
-  expiresAt: number;
-  createdAt: number;
-}
-
-interface SystemRateLimitItem {
-  PK: string;
-  SK: string;
-  entityType: 'SYSTEM_RATE_LIMIT';
-  dataCategory: 'SYSTEM';
-  keyType: RateLimitKeyType;
-  keyValue: string;
-  count: number;
-  limit: number;
-  windowSeconds: number;
-  expiresAt: number;
-  createdAt: number;
-}
-
 const DEFAULT_CACHE_TTL: Record<CacheType, number> = {
   SEARCH: 300,
   FACET: 3600,
@@ -68,12 +35,62 @@ const DEFAULT_CACHE_TTL: Record<CacheType, number> = {
   ROLE_APP: 86400 * 30, // 30 days for role applications
 };
 
-function getDocClient() {
-  return getDynamoDBDocClient();
+let pool: Client | null = null;
+
+function getPool(): Client {
+  if (!pool) {
+    const config = getConfig();
+    pool = new Client({
+      connectionString: config.database.url,
+    });
+    pool.on('error', err => {
+      logger.error('PostgreSQL pool error', { error: err.message });
+    });
+  }
+  return pool;
 }
 
-function getEffectiveTableName(): string {
-  return process.env.DYNAMODB_TABLE_NAME || TABLE_NAME;
+export async function initCacheDb(): Promise<void> {
+  const client = getPool();
+  await client.connect();
+  logger.info('PostgreSQL cache connection established');
+
+  // Create cache table
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS cache (
+      key VARCHAR(255) PRIMARY KEY,
+      value TEXT NOT NULL,
+      cache_type VARCHAR(50) NOT NULL,
+      expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    )
+  `);
+
+  // Create index for cleanup
+  await client.query(`
+    CREATE INDEX IF NOT EXISTS cache_expires_idx ON cache (expires_at)
+  `);
+
+  // Create rate_limit table
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS rate_limit (
+      key VARCHAR(255) PRIMARY KEY,
+      key_type VARCHAR(50) NOT NULL,
+      count INTEGER DEFAULT 0,
+      limit_count INTEGER NOT NULL,
+      window_seconds INTEGER NOT NULL,
+      window_start TIMESTAMP WITH TIME ZONE NOT NULL,
+      expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    )
+  `);
+
+  // Create indexes for rate limit cleanup
+  await client.query(`
+    CREATE INDEX IF NOT EXISTS rate_limit_expires_idx ON rate_limit (expires_at)
+  `);
+
+  logger.info('Cache database tables initialized');
 }
 
 export function generateCacheKey(prefix: string, ...parts: (string | number)[]): string {
@@ -98,58 +115,26 @@ export const CacheKeys = {
   roleApplication: (userId: string) => generateCacheKey('roleapp', userId),
 };
 
-async function withRetry<T>(fn: () => Promise<T>, operation: string, key: string): Promise<T> {
-  return pRetry(fn, {
-    retries: 1,
-    onFailedAttempt: (error: any) => {
-      logger.warn(`${operation} retry`, {
-        key,
-        attempt: error.attemptNumber,
-        error: error.message,
-      });
-    },
-  });
-}
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export async function getFromCache<T>(key: string, cacheType: CacheType): Promise<T | null> {
-  const client = getDocClient();
-  const { PK, SK } = createSystemKey('CACHE', cacheType, key);
-  const tableName = getEffectiveTableName();
-  const now = Date.now() / 1000;
+  const client = getPool();
+  const now = new Date();
 
   try {
-    const result = await withRetry(
-      async () =>
-        client.send(
-          new GetCommand({
-            TableName: tableName,
-            Key: { PK, SK },
-          })
-        ),
-      'CacheGet',
-      key
+    const result = await client.query(
+      `SELECT value FROM cache WHERE key = $1 AND cache_type = $2 AND expires_at > $3`,
+      [key, cacheType, now]
     );
 
-    if (!result.Item) {
+    if (result.rows.length === 0) {
       return null;
     }
 
-    const item = result.Item as SystemCacheItem;
-
-    if (item.expiresAt < now) {
-      await client.send(
-        new DeleteCommand({
-          TableName: tableName,
-          Key: { PK, SK },
-        })
-      );
-      return null;
-    }
-
+    const row = result.rows[0];
     try {
-      return JSON.parse(item.cachedData) as T;
+      return JSON.parse(row.value) as T;
     } catch {
-      return item.cachedData as unknown as T;
+      return row.value as unknown as T;
     }
   } catch (error) {
     logger.error('Cache get failed', { key, error: (error as Error).message });
@@ -164,30 +149,21 @@ export async function setCache<T>(
   value: T,
   ttlSeconds?: number
 ): Promise<void> {
-  const client = getDocClient();
-  const { PK, SK } = createSystemKey('CACHE', cacheType, key);
-  const tableName = getEffectiveTableName();
-  const now = Math.floor(Date.now() / 1000);
+  const client = getPool();
+  const now = new Date();
   const ttl = ttlSeconds || DEFAULT_CACHE_TTL[cacheType];
+  const expiresAt = new Date(now.getTime() + ttl * 1000);
 
   try {
-    await withRetry(
-      async () =>
-        client.send(
-          new PutCommand({
-            TableName: tableName,
-            Item: {
-              PK,
-              SK,
-              cachedData: JSON.stringify(value),
-              expiresAt: now + ttl,
-              createdAt: now,
-              __typename: 'SystemCache',
-            },
-          })
-        ),
-      'CacheSet',
-      key
+    await client.query(
+      `INSERT INTO cache (key, value, cache_type, expires_at)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (key) DO UPDATE SET
+         value = EXCLUDED.value,
+         cache_type = EXCLUDED.cache_type,
+         expires_at = EXCLUDED.expires_at,
+         created_at = NOW()`,
+      [key, JSON.stringify(value), cacheType, expiresAt]
     );
   } catch (error) {
     logger.error('Cache set failed', { key, error: (error as Error).message });
@@ -195,52 +171,25 @@ export async function setCache<T>(
 }
 
 export async function deleteFromCache(key: string, cacheType: CacheType): Promise<void> {
-  const client = getDocClient();
-  const { PK, SK } = createSystemKey('CACHE', cacheType, key);
-  const tableName = getEffectiveTableName();
+  const client = getPool();
 
   try {
-    await client.send(
-      new DeleteCommand({
-        TableName: tableName,
-        Key: { PK, SK },
-      })
-    );
+    await client.query(`DELETE FROM cache WHERE key = $1 AND cache_type = $2`, [key, cacheType]);
   } catch (error) {
     logger.warn('Cache delete failed', { key, error: (error as Error).message });
   }
 }
 
 export async function existsInCache(key: string, cacheType: CacheType): Promise<boolean> {
-  const client = getDocClient();
-  const { PK, SK } = createSystemKey('CACHE', cacheType, key);
-  const tableName = getEffectiveTableName();
-  const now = Date.now() / 1000;
+  const client = getPool();
+  const now = new Date();
 
   try {
-    const result = await client.send(
-      new GetCommand({
-        TableName: tableName,
-        Key: { PK, SK },
-      })
+    const result = await client.query(
+      `SELECT 1 FROM cache WHERE key = $1 AND cache_type = $2 AND expires_at > $3`,
+      [key, cacheType, now]
     );
-
-    if (!result.Item) {
-      return false;
-    }
-
-    const item = result.Item as SystemCacheItem;
-    if (item.expiresAt < now) {
-      await client.send(
-        new DeleteCommand({
-          TableName: tableName,
-          Key: { PK, SK },
-        })
-      );
-      return false;
-    }
-
-    return true;
+    return result.rows.length > 0;
   } catch {
     return false;
   }
@@ -252,55 +201,44 @@ export async function incrementRateLimit(
   limit: number,
   windowSeconds: number
 ): Promise<{ count: number; allowed: boolean; remaining: number; resetAt: number }> {
-  const client = getDocClient();
-  const { PK, SK } = createSystemKey('RATE_LIMIT', keyType, key);
-  const tableName = getEffectiveTableName();
-  const now = Math.floor(Date.now() / 1000);
-  const expiresAt = now + windowSeconds;
+  const client = getPool();
+  const now = new Date();
+  const windowStart = new Date(now.getTime() - (now.getTime() % (windowSeconds * 1000)));
+  const expiresAt = new Date(windowStart.getTime() + windowSeconds * 1000 * 2); // 2x window for cleanup
 
   try {
-    const result = await withRetry(
-      async () =>
-        client.send(
-          new UpdateCommand({
-            TableName: tableName,
-            Key: { PK, SK },
-            UpdateExpression:
-              'SET #et = :et, #kt = :kt, #kv = :kv, #cnt = if_not_exists(#cnt, :zero) + :one, #limit = :limit, #win = :win, #created = if_not_exists(#created, :now)',
-            ExpressionAttributeNames: {
-              '#et': 'entityType',
-              '#kt': 'keyType',
-              '#kv': 'keyValue',
-              '#cnt': 'count',
-              '#limit': 'limit',
-              '#win': 'windowSeconds',
-              '#created': 'createdAt',
-            },
-            ExpressionAttributeValues: {
-              ':et': 'SYSTEM_RATE_LIMIT',
-              ':kt': keyType,
-              ':kv': key,
-              ':zero': 0,
-              ':one': 1,
-              ':limit': limit,
-              ':win': windowSeconds,
-              ':now': now,
-            },
-            ReturnValues: 'UPDATED_NEW',
-          })
-        ),
-      'RateLimitIncrement',
-      key
+    const result = await client.query(
+      `INSERT INTO rate_limit (key, key_type, count, limit_count, window_seconds, window_start, expires_at)
+       VALUES ($1, $2, 1, $3, $4, $5, $6)
+       ON CONFLICT (key) DO UPDATE SET
+         count = CASE
+           WHEN rate_limit.window_start = EXCLUDED.window_start
+           THEN rate_limit.count + 1
+           ELSE 1
+         END,
+         limit_count = EXCLUDED.limit_count,
+         window_seconds = EXCLUDED.window_seconds,
+         window_start = EXCLUDED.window_start,
+         expires_at = EXCLUDED.expires_at
+       RETURNING count, window_start`,
+      [key, keyType, limit, windowSeconds, windowStart, expiresAt]
     );
 
-    const count = (result.Attributes?.count as number) || 1;
+    const row = result.rows[0];
+    const count = row.count;
     const remaining = Math.max(0, limit - count);
     const allowed = count <= limit;
+    const resetAt = windowStart.getTime() + windowSeconds * 1000;
 
-    return { count, allowed, remaining, resetAt: expiresAt };
+    return { count, allowed, remaining, resetAt };
   } catch (error) {
     logger.warn('Rate limit failed, allowing request', { key, error: (error as Error).message });
-    return { count: 1, allowed: true, remaining: limit - 1, resetAt: expiresAt };
+    return {
+      count: 1,
+      allowed: true,
+      remaining: limit - 1,
+      resetAt: now.getTime() + windowSeconds * 1000,
+    };
   }
 }
 
@@ -308,54 +246,38 @@ export async function getRateLimit(
   key: string,
   keyType: RateLimitKeyType
 ): Promise<{ count: number; limit: number; remaining: number; resetAt: number } | null> {
-  const client = getDocClient();
-  const { PK, SK } = createSystemKey('RATE_LIMIT', keyType, key);
-  const tableName = getEffectiveTableName();
-  const now = Date.now() / 1000;
+  const client = getPool();
+  const now = new Date();
 
   try {
-    const result = await client.send(
-      new GetCommand({
-        TableName: tableName,
-        Key: { PK, SK },
-      })
+    const result = await client.query(
+      `SELECT count, limit_count, window_seconds, window_start FROM rate_limit
+       WHERE key = $1 AND key_type = $2 AND expires_at > $3`,
+      [key, keyType, now]
     );
 
-    if (!result.Item) {
+    if (result.rows.length === 0) {
       return null;
     }
 
-    const item = result.Item as SystemRateLimitItem;
-
-    if (item.expiresAt < now) {
-      await client.send(
-        new DeleteCommand({
-          TableName: tableName,
-          Key: { PK, SK },
-        })
-      );
-      return null;
-    }
-
-    const remaining = Math.max(0, item.limit - item.count);
-    return { count: item.count, limit: item.limit, remaining, resetAt: item.expiresAt };
+    const row = result.rows[0];
+    const remaining = Math.max(0, row.limit_count - row.count);
+    return {
+      count: row.count,
+      limit: row.limit_count,
+      remaining,
+      resetAt: new Date(row.window_start).getTime() + row.window_seconds * 1000,
+    };
   } catch {
     return null;
   }
 }
 
 export async function resetRateLimit(key: string, keyType: RateLimitKeyType): Promise<void> {
-  const client = getDocClient();
-  const { PK, SK } = createSystemKey('RATE_LIMIT', keyType, key);
-  const tableName = getEffectiveTableName();
+  const client = getPool();
 
   try {
-    await client.send(
-      new DeleteCommand({
-        TableName: tableName,
-        Key: { PK, SK },
-      })
-    );
+    await client.query(`DELETE FROM rate_limit WHERE key = $1 AND key_type = $2`, [key, keyType]);
   } catch (error) {
     logger.warn('Rate limit reset failed', { key, error: (error as Error).message });
   }
@@ -366,27 +288,17 @@ export async function setRateLimitLock(
   keyType: RateLimitKeyType,
   ttlSeconds: number
 ): Promise<void> {
-  const client = getDocClient();
-  const { PK, SK } = createSystemKey('RATE_LIMIT', 'LOCK', key);
-  const tableName = getEffectiveTableName();
-  const now = Math.floor(Date.now() / 1000);
+  const client = getPool();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + ttlSeconds * 1000);
 
   try {
-    await client.send(
-      new PutCommand({
-        TableName: tableName,
-        Item: {
-          PK,
-          SK,
-          entityType: 'SYSTEM_RATE_LIMIT',
-          dataCategory: 'SYSTEM',
-          keyType,
-          keyValue: key,
-          locked: true,
-          expiresAt: now + ttlSeconds,
-          createdAt: now,
-        },
-      })
+    await client.query(
+      `INSERT INTO rate_limit (key, key_type, count, limit_count, window_seconds, window_start, expires_at)
+       VALUES ($1, $2, 0, 0, 0, $3, $4)
+       ON CONFLICT (key) DO UPDATE SET
+         expires_at = EXCLUDED.expires_at`,
+      [key, keyType, now, expiresAt]
     );
   } catch (error) {
     logger.warn('Rate limit lock failed', { key, error: (error as Error).message });
@@ -394,54 +306,25 @@ export async function setRateLimitLock(
 }
 
 export async function isRateLimitLocked(key: string): Promise<boolean> {
-  const client = getDocClient();
-  const { PK, SK } = createSystemKey('RATE_LIMIT', 'LOCK', key);
-  const tableName = getEffectiveTableName();
-  const now = Date.now() / 1000;
+  const client = getPool();
+  const now = new Date();
 
   try {
-    const result = await client.send(
-      new GetCommand({
-        TableName: tableName,
-        Key: { PK, SK },
-      })
+    const result = await client.query(
+      `SELECT 1 FROM rate_limit WHERE key = $1 AND expires_at > $2`,
+      [key, now]
     );
-
-    if (!result.Item) {
-      return false;
-    }
-
-    const item = result.Item as SystemRateLimitItem & { locked?: boolean };
-    if (item.expiresAt < now) {
-      await client.send(
-        new DeleteCommand({
-          TableName: tableName,
-          Key: { PK, SK },
-        })
-      );
-      return false;
-    }
-
-    return item.locked === true;
+    return result.rows.length > 0;
   } catch {
     return false;
   }
 }
 
 export async function checkCacheHealth(): Promise<boolean> {
+  const client = getPool();
+
   try {
-    const client = getDocClient();
-    const tableName = getEffectiveTableName();
-    await client.send(
-      new ScanCommand({
-        TableName: tableName,
-        FilterExpression: 'begins_with(PK, :prefix)',
-        ExpressionAttributeValues: {
-          ':prefix': 'SYSTEM#CACHE#',
-        },
-        Limit: 1,
-      })
-    );
+    await client.query(`SELECT 1 FROM cache LIMIT 1`);
     return true;
   } catch {
     return false;
@@ -449,19 +332,10 @@ export async function checkCacheHealth(): Promise<boolean> {
 }
 
 export async function checkRateLimitsHealth(): Promise<boolean> {
+  const client = getPool();
+
   try {
-    const client = getDocClient();
-    const tableName = getEffectiveTableName();
-    await client.send(
-      new ScanCommand({
-        TableName: tableName,
-        FilterExpression: 'begins_with(PK, :prefix)',
-        ExpressionAttributeValues: {
-          ':prefix': 'SYSTEM#RATE_LIMIT#',
-        },
-        Limit: 1,
-      })
-    );
+    await client.query(`SELECT 1 FROM rate_limit LIMIT 1`);
     return true;
   } catch {
     return false;
@@ -469,42 +343,34 @@ export async function checkRateLimitsHealth(): Promise<boolean> {
 }
 
 export async function clearCacheByPattern(pattern: string): Promise<number> {
-  const client = getDocClient();
-  const tableName = getEffectiveTableName();
-  let deletedCount = 0;
-  let lastKey: Record<string, string> | undefined;
+  const client = getPool();
 
-  do {
-    try {
-      const result = await client.send(
-        new ScanCommand({
-          TableName: tableName,
-          FilterExpression: 'begins_with(PK, :pattern)',
-          ExpressionAttributeValues: {
-            ':pattern': `SYSTEM#CACHE#${pattern}`,
-          },
-          ExclusiveStartKey: lastKey,
-          Limit: 100,
-        })
-      );
+  try {
+    const result = await client.query(`DELETE FROM cache WHERE key LIKE $1`, [`%${pattern}%`]);
+    return result.rowCount || 0;
+  } catch {
+    return 0;
+  }
+}
 
-      const items = result.Items || [];
+export async function cleanupExpiredCache(): Promise<number> {
+  const client = getPool();
 
-      for (const item of items) {
-        await client.send(
-          new DeleteCommand({
-            TableName: tableName,
-            Key: { PK: item.PK as string, SK: item.SK as string },
-          })
-        );
-        deletedCount++;
-      }
+  try {
+    const result = await client.query(`DELETE FROM cache WHERE expires_at < NOW()`);
+    return result.rowCount || 0;
+  } catch {
+    return 0;
+  }
+}
 
-      lastKey = result.LastEvaluatedKey as Record<string, string> | undefined;
-    } catch {
-      break;
-    }
-  } while (lastKey);
+export async function cleanupExpiredRateLimits(): Promise<number> {
+  const client = getPool();
 
-  return deletedCount;
+  try {
+    const result = await client.query(`DELETE FROM rate_limit WHERE expires_at < NOW()`);
+    return result.rowCount || 0;
+  } catch {
+    return 0;
+  }
 }

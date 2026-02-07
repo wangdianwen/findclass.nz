@@ -6,19 +6,22 @@ if (import.meta.env.DEV) {
   console.log('[MSW] Starting initialization...');
   // Dynamically import the worker to avoid affecting production build
   import('./browser')
-    .then((module) => {
+    .then(module => {
       console.log('[MSW] Browser module loaded successfully');
       if (typeof module.initMockServer === 'function') {
-        module.initMockServer().then(() => {
-          console.log('[MSW] Mock server initialized');
-        }).catch((error) => {
-          console.error('[MSW] Failed to initialize mock server:', error);
-        });
+        module
+          .initMockServer()
+          .then(() => {
+            console.log('[MSW] Mock server initialized');
+          })
+          .catch(error => {
+            console.error('[MSW] Failed to initialize mock server:', error);
+          });
       } else {
         console.warn('[MSW] initMockServer is not a function');
       }
     })
-    .catch((error) => {
+    .catch(error => {
       console.error('[MSW] Failed to load browser module:', error);
     });
 } else {

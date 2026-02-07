@@ -30,11 +30,6 @@ export const envSchema = z.object({
   // PostgreSQL Configuration (primary database)
   DATABASE_URL: z.string().url().startsWith('postgresql://'),
 
-  // DynamoDB Configuration (deprecated, for migration only)
-  DYNAMODB_ENDPOINT: z.string().optional(),
-  DYNAMODB_TABLE_NAME: z.string().optional(),
-  DYNAMODB_PORT: z.coerce.number().optional(),
-
   // S3 配置
   S3_ENDPOINT: z.string().default('http://localhost:4566'),
   S3_BUCKET_UPLOADS: z.string().default('findclass-uploads'),
@@ -119,12 +114,13 @@ export interface AppConfig {
   auth: AuthConfig;
   aws: AWSConfig;
   database: DatabaseConfig;
-  dynamodb: DynamoDBConfig | null;
+  dynamodb: null; // Deprecated, kept for backward compatibility
   smtp: SMTPConfig;
   jwt: JWTConfig;
   cors: CorsConfig;
   rateLimit: RateLimitConfig;
   logging: LoggingConfig;
+  seedSampleData: boolean;
 }
 
 export interface DatabaseConfig {

@@ -75,14 +75,16 @@ const AppLoader: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   if (!isReady) {
     return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        flexDirection: 'column',
-        gap: '16px'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
         <div style={{ fontSize: '18px' }}>Loading...</div>
         <div style={{ fontSize: '14px', color: '#666' }}>Initializing mock server...</div>
       </div>

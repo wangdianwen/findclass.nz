@@ -17,10 +17,12 @@ import {
   UpdateProfileDto,
   ApplyRoleDto,
   ApproveRoleDto,
+  SocialLoginDto,
 } from './auth.types';
 import {
   registerController,
   loginController,
+  socialLoginController,
   sendVerificationCodeController,
   verifyCodeController,
   refreshTokenController,
@@ -44,6 +46,7 @@ const router = Router();
 // Public routes
 router.post('/register', validateRequest(RegisterDto), registerController);
 router.post('/login', validateRequest(LoginDto), loginController);
+router.post('/social-login', validateRequest(SocialLoginDto), socialLoginController);
 router.post(
   '/send-verification-code',
   validateRequest(SendVerificationCodeDto),
