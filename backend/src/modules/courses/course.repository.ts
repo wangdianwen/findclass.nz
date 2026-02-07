@@ -36,6 +36,23 @@ export interface Course {
   status: CourseStatus;
   created_at: Date;
   updated_at: Date;
+  // New fields from migration 003
+  lesson_count?: number;
+  language?: string;
+  days?: string[];
+  time_slots?: string[];
+  original_price?: number;
+  tags?: string[];
+  images?: string[];
+  duration?: number;
+  // Contact information
+  contact_phone?: string;
+  contact_wechat?: string;
+  contact_email?: string;
+  contact_wechat_qrcode?: string;
+  show_contact_phone?: boolean;
+  show_contact_wechat?: boolean;
+  show_contact_email?: boolean;
 }
 
 export interface CreateCourseDTO {

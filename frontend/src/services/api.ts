@@ -117,8 +117,8 @@ function getErrorCodeFromStatus(status: number): (typeof ErrorCodes)[keyof typeo
 // ============================================
 
 async function request<T>(config: AxiosRequestConfig): Promise<T> {
-  const response = await apiClient.request<T>(config);
-  return response.data;
+  const response = await apiClient.request(config);
+  return response.data as T;
 }
 
 // ============================================
@@ -151,11 +151,18 @@ export const courseApi = {
 
   // 获取课程详情
   async getCourseById(id: string): Promise<CourseDetail> {
-    const response = await request<{ data: CourseDetail }>({
+    const response = await apiClient.request<{
+      success: boolean;
+      code: number;
+      message: string;
+      data: CourseDetail;
+      meta: { requestId: string; timestamp: string };
+    }>({
       method: 'GET',
       url: `/courses/${id}`,
     });
-    return response.data;
+    // Extract the course detail from the API response
+    return response.data.data;
   },
 
   // 搜索课程

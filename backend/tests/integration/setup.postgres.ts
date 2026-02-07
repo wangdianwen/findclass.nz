@@ -26,12 +26,14 @@ import { initializeSchema } from '@src/shared/db/postgres/schema';
 import { resetPool } from '@src/shared/db/postgres/client';
 
 const POSTGRES_IMAGE = 'postgres:15-alpine';
+const MAILDEV_IMAGE = 'maildev/maildev:2.1.0';
 const POSTGRES_USER = 'test_user';
 const POSTGRES_PASSWORD = 'test_password';
 const POSTGRES_DB = 'findclass_test';
 
 // Global state
 let postgresContainer: StartedGenericContainer | null = null;
+let maildevContainer: StartedGenericContainer | null = null;
 let _app: ReturnType<typeof createApp> | null = null;
 let _pool: Pool | null = null;
 
@@ -91,6 +93,44 @@ async function stopPostgres() {
   _pool = null;
 }
 
+async function startMailDev() {
+  if (maildevContainer) return maildevContainer;
+
+  console.log('🚀 Starting MailDev container...');
+
+  const container = await new GenericContainer(MAILDEV_IMAGE)
+    .withExposedPorts({ container: 1025, host: 1025 }) // SMTP
+    .withExposedPorts({ container: 1080, host: 1080 }) // Web UI
+    .withWaitStrategy(Wait.forListeningPorts())
+    .withStartupTimeout(120000)
+    .start();
+
+  console.log(`✅ MailDev started: ${container.getHost()}:${container.getMappedPort(1025)} (SMTP)`);
+  console.log(`✅ MailDev Web UI: http://${container.getHost()}:${container.getMappedPort(1080)}`);
+
+  // Set SMTP environment variables for the app
+  process.env.SMTP_HOST = container.getHost();
+  process.env.SMTP_PORT = container.getMappedPort(1025).toString();
+  process.env.SMTP_API_PORT = container.getMappedPort(1080).toString();
+  process.env.SMTP_SECURE = 'false';
+
+  maildevContainer = container;
+  return maildevContainer;
+}
+
+async function stopMailDev() {
+  if (!maildevContainer) return;
+
+  console.log('🛑 Stopping MailDev container...');
+  try {
+    await maildevContainer.stop();
+    console.log('✅ MailDev container stopped');
+  } catch (e) {
+    console.warn('⚠️  MailDev stop error:', e);
+  }
+  maildevContainer = null;
+}
+
 async function cleanupTestData(pool: Pool) {
   // Clean up test data in correct order (respecting foreign keys)
   try {
@@ -122,6 +162,7 @@ async function cleanupTestData(pool: Pool) {
 
 // Integration test hooks
 beforeAll(async () => {
+  await startMailDev();
   const { pool } = await startPostgres();
   await cleanupTestData(pool);
   _app = createApp();
@@ -129,11 +170,13 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await stopPostgres();
+  await stopMailDev();
 });
 
 // Cleanup on process exit
 async function exitHandler() {
   await stopPostgres();
+  await stopMailDev();
   process.exit(0);
 }
 

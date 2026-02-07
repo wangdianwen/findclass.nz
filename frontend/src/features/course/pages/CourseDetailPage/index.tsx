@@ -29,7 +29,7 @@ import { ReviewsPage } from '@/features/review';
 import { useUserStore } from '@/stores/userStore';
 import { courseApi, userApi, inquiryApi, reviewApi } from '@/services/api';
 
-import type { CourseDetailTab } from '@/types/courseDetail';
+import type { CourseDetail, CourseDetailTab } from '@/types/courseDetail';
 import { MOCK_COURSE_DETAIL, MOCK_SIMILAR_COURSES } from '@/data/courseDetail';
 import styles from './CourseDetailPage.module.scss';
 
@@ -113,10 +113,38 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
   });
 
   // Determine course data source
-  const course =
+  const rawCourse =
     isStorybookRef.current && storybookDataModule.current
       ? storybookDataModule.current.getStorybookCourseData() || MOCK_COURSE_DETAIL
       : apiCourse || MOCK_COURSE_DETAIL;
+
+  // Normalize course data to ensure arrays are properly initialized
+  const course: CourseDetail = {
+    ...rawCourse,
+    tags: Array.isArray(rawCourse.tags) ? rawCourse.tags : [],
+    images: Array.isArray(rawCourse.images) ? rawCourse.images : [],
+    grade: Array.isArray(rawCourse.grade) ? rawCourse.grade : [],
+    schedule: rawCourse.schedule || {
+      days: [],
+      timeSlots: [],
+      duration: 60,
+      location: 'TBD',
+      showAddress: false,
+    },
+    teacher: rawCourse.teacher || {
+      id: '',
+      name: 'Unknown Teacher',
+      bio: '',
+      verified: false,
+      teachingYears: 0,
+      qualifications: [],
+    },
+    contact: rawCourse.contact || {
+      showPhone: false,
+      showWechat: false,
+      showEmail: false,
+    },
+  };
 
   // Fetch review stats from API (for ReviewsPage component)
   // Note: stats are keyed by teacherId, not courseId
@@ -257,7 +285,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
           {course.tags.length > 0 && (
             <section className={styles.section}>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {course.tags.map(tag => (
+                {course.tags.map((tag: string) => (
                   <Tag key={tag}>{tag}</Tag>
                 ))}
               </div>
@@ -300,7 +328,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
                 </div>
                 {course.teacher.qualifications && course.teacher.qualifications.length > 0 && (
                   <div className={styles.qualifications}>
-                    {course.teacher.qualifications.map((qual, index) => (
+                    {course.teacher.qualifications.map((qual: string, index: number) => (
                       <span key={index} className={styles.tag}>
                         {qual}
                       </span>
@@ -437,7 +465,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
               />
               {course.images && course.images.length > 1 && (
                 <div className={styles.thumbnailRow} role="tablist" aria-label="Course images">
-                  {course.images.map((image, index) => (
+                  {course.images.map((image: string, index: number) => (
                     <img
                       key={index}
                       src={image}
@@ -515,7 +543,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
                 <div className={styles.content}>
                   <div className={styles.label}>{t('course.schedule.label')}</div>
                   <div className={styles.value}>
-                    {course.schedule.days.map(day => t(`course.days.${day}`)).join(', ')}
+                    {course.schedule.days.map((day: string) => t(`course.days.${day}`)).join(', ')}
                   </div>
                 </div>
               </div>

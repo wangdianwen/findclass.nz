@@ -18,15 +18,7 @@
     "test:frontend": "npm run test --workspace=frontend",
     "lint": "npm run lint --workspaces",
     "format": "npm run format --workspaces",
-    "install:all": "npm install",
-    "staging:deploy": "bash scripts/deploy-staging.sh",
-    "staging:deploy:build": "bash scripts/deploy-staging.sh --build",
-    "staging:stop": "bash scripts/deploy-staging.sh --stop",
-    "staging:clean": "bash scripts/deploy-staging.sh --clean",
-    "staging:reset": "bash scripts/deploy-staging.sh --reset",
-    "staging:status": "bash scripts/deploy-staging.sh --status",
-    "staging:logs": "bash scripts/deploy-staging.sh --logs",
-    "test:integration": "bash scripts/deploy-staging.sh && npm run test:e2e:integration && bash scripts/deploy-staging.sh --stop"
+    "install:all": "npm install"
   },
   "engines": {
     "node": ">=18.0.0"

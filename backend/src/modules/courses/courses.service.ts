@@ -60,35 +60,57 @@ export function createCoursesService(pool: Pool) {
       teachingModes = [];
     }
 
+    // Helper function to parse PostgreSQL array fields
+    const parseArrayField = (value: unknown): string[] => {
+      if (Array.isArray(value)) {
+        return value;
+      }
+      if (typeof value === 'string' && value.startsWith('{')) {
+        // PostgreSQL array format: "{Sat,Sun}" or "{14:00-16:00}"
+        const parsed = value.slice(1, -1).split(',');
+        return parsed.length === 1 && parsed[0] === '' ? [] : parsed;
+      }
+      return [];
+    };
+
+    // Parse days and timeSlots from database
+    const parsedDays = parseArrayField(course.days);
+    const parsedTimeSlots = parseArrayField(course.time_slots);
+    const parsedLocations = parseArrayField(course.locations);
+    const parsedAgeGroups = parseArrayField(course.target_age_groups);
+    const parsedTags = parseArrayField(course.tags);
+    const parsedImages = parseArrayField(course.images);
+    const parsedQualifications = parseArrayField(teacherRow?.qualifications);
+
     // Transform snake_case to camelCase for frontend compatibility
     return {
       id: course.id,
       title: course.title,
       description: course.description,
       price: Number(course.price) || 0,
-      lessonCount: 12, // Default value - database doesn't have this
-      originalPrice: undefined,
+      lessonCount: course.lesson_count || 12,
+      originalPrice: course.original_price || undefined,
       rating: Number(course.average_rating) || 0,
       reviewCount: Number(course.total_reviews) || 0,
       trustLevel: course.trust_level,
       dataSource: (course.source_type as string) === 'manual' || course.source_type === 'REGISTERED' ? 'first_party' : 'other',
-      sourceWeight: 1.0, // Default value
+      sourceWeight: 1.0,
       publishedAt: course.published_at,
       updatedAt: course.updated_at,
       subject: course.category,
-      grade: course.target_age_groups || [],
+      grade: parsedAgeGroups,
       teachingMode: teachingModes.includes('ONLINE') && teachingModes.includes('OFFLINE')
         ? 'bilingual'
         : teachingModes.includes('ONLINE')
         ? 'online'
         : 'offline',
-      language: 'english', // Default value - database doesn't have this
+      language: course.language || 'english',
       schedule: {
-        days: ['Sat', 'Sun'], // Default value
-        timeSlots: ['14:00-16:00'], // Default value
-        duration: 60, // Default value (1 hour)
-        location: Array.isArray(course.locations) && course.locations.length > 0
-          ? course.locations[0]
+        days: parsedDays.length > 0 ? parsedDays : ['Sat', 'Sun'],
+        timeSlots: parsedTimeSlots.length > 0 ? parsedTimeSlots : ['14:00-16:00'],
+        duration: course.duration || 60,
+        location: parsedLocations.length > 0
+          ? parsedLocations[0]
           : 'TBD',
         address: undefined,
         showAddress: false,
@@ -97,12 +119,12 @@ export function createCoursesService(pool: Pool) {
         ? {
             id: teacherRow.id,
             name: teacherRow.display_name,
-            title: undefined,
+            title: teacherRow.title || undefined,
             bio: teacherRow.bio || '',
-            avatar: undefined,
+            avatar: teacherRow.avatar_url || undefined,
             verified: Boolean(teacherRow.verified),
             teachingYears: Number(teacherRow.teaching_years) || 0,
-            qualifications: Array.isArray(teacherRow.qualifications) ? teacherRow.qualifications : [],
+            qualifications: parsedQualifications,
           }
         : {
             // Fallback teacher object when no teacher found
@@ -114,16 +136,16 @@ export function createCoursesService(pool: Pool) {
             qualifications: [],
           },
       contact: {
-        phone: undefined,
-        wechat: undefined,
-        email: undefined,
-        wechatQrcode: undefined,
-        showPhone: false,
-        showWechat: false,
-        showEmail: false,
+        phone: course.contact_phone || undefined,
+        wechat: course.contact_wechat || undefined,
+        email: course.contact_email || undefined,
+        wechatQrcode: course.contact_wechat_qrcode || undefined,
+        showPhone: Boolean(course.show_contact_phone),
+        showWechat: Boolean(course.show_contact_wechat),
+        showEmail: Boolean(course.show_contact_email),
       },
-      tags: [], // Default value - database doesn't have this
-      images: [], // Default value - database doesn't have this
+      tags: parsedTags,
+      images: parsedImages,
       userInteraction: {
         isFavorited: false,
         isCompared: false,
@@ -135,7 +157,7 @@ export function createCoursesService(pool: Pool) {
       subcategory: course.subcategory,
       priceType: course.price_type,
       teachingModes: teachingModes,
-      locations: course.locations,
+      locations: parsedLocations,
       targetAgeGroups: course.target_age_groups,
       maxClassSize: course.max_class_size,
       sourceType: course.source_type,

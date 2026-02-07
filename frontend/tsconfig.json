@@ -25,6 +25,7 @@
     // Type Definitions
     "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["src", "tests", "stories"],
+  "include": ["src", "tests"],
+  "exclude": ["stories", "src/test"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
