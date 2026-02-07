@@ -331,7 +331,16 @@ export async function searchCourses(apiContext: APIRequestContext, params?: {
     throw new Error(`Course search failed: ${response.status()} - ${errorText}`);
   }
 
-  return response.json();
+  const data = await response.json();
+
+  // Normalize response: return items as courses for compatibility
+  return {
+    ...data,
+    data: {
+      ...data.data,
+      courses: data.data?.items || [],
+    },
+  };
 }
 
 /**
