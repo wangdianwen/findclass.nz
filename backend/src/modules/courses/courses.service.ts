@@ -42,8 +42,32 @@ export function createCoursesService(pool: Pool) {
     // Fetch teacher details
     const teacher = await teacherRepository.findById(course.teacher_id);
 
+    // Transform snake_case to camelCase for frontend compatibility
     return {
-      ...course,
+      id: course.id,
+      title: course.title,
+      titleEn: course.title_en,
+      description: course.description,
+      descriptionEn: course.description_en,
+      category: course.category,
+      subcategory: course.subcategory,
+      price: course.price,
+      priceType: course.price_type,
+      teachingModes: course.teaching_modes,
+      locations: course.locations,
+      targetAgeGroups: course.target_age_groups,
+      maxClassSize: course.max_class_size,
+      sourceType: course.source_type,
+      sourceUrl: course.source_url,
+      status: course.status,
+      trustLevel: course.trust_level,
+      averageRating: course.average_rating,
+      totalReviews: course.total_reviews,
+      currentEnrollment: course.current_enrollment,
+      publishedAt: course.published_at,
+      createdAt: course.created_at,
+      updatedAt: course.updated_at,
+      teacherId: course.teacher_id,
       teacher: teacher
         ? {
             id: teacher.id,

@@ -239,19 +239,12 @@ export async function deleteTestUser(apiContext: APIRequestContext, userId: stri
 
 /**
  * Apply for teacher role
+ * NOTE: Backend expects { role, reason } not { role, application: {...} }
  */
 export async function applyForTeacherRole(
   apiContext: APIRequestContext,
   token: string,
-  applicationData?: {
-    name?: string;
-    email?: string;
-    phone?: string;
-    qualifications?: string;
-    experience?: string;
-    subjects?: string[];
-    bio?: string;
-  }
+  reason?: string
 ) {
   const response = await apiContext.post(`${API_BASE_URL}/auth/roles/apply`, {
     headers: {
@@ -259,27 +252,20 @@ export async function applyForTeacherRole(
     },
     data: {
       role: 'TEACHER',
-      application: {
-        name: applicationData?.name || 'Test Teacher',
-        email: applicationData?.email || generateTestEmail('teacher'),
-        phone: applicationData?.phone || generateTestPhone(),
-        qualifications: applicationData?.qualifications || 'Bachelor of Education',
-        experience: applicationData?.experience || '5 years teaching experience',
-        subjects: applicationData?.subjects || ['Math', 'English'],
-        bio: applicationData?.bio || 'Passionate teacher',
-      },
+      reason: reason || 'I want to teach mathematics and help students learn',
     },
   });
 
   if (!response.ok()) {
-    throw new Error(`Teacher application failed: ${response.status()}`);
+    const errorText = await response.text();
+    throw new Error(`Teacher application failed: ${response.status()} - ${errorText}`);
   }
 
   const data = await response.json();
 
   // Track for cleanup
-  if (data.data?.id) {
-    createdTestData.applications.push(data.data.id);
+  if (data.data?.applicationId) {
+    createdTestData.applications.push(data.data.applicationId);
   }
 
   return data.data;

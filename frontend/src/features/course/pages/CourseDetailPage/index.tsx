@@ -541,7 +541,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({
                 {t('course.contactNow')}
               </Button>
               <Button
-                data-testid="save-button"
+                data-testid="favorite-button"
                 block
                 className={`${styles.saveButton} ${isFavorited ? styles.saved : ''}`}
                 icon={
