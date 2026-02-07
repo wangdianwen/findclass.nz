@@ -135,11 +135,18 @@ export const courseApi = {
     page?: number;
     limit?: number;
   }): Promise<{ data: CourseData[]; total: number }> {
-    return request({
+    const response = await request<{
+      data: { items: CourseData[]; pagination: { total: number } };
+    }>({
       method: 'GET',
       url: '/courses/search',
       params,
     });
+    // Transform API response to component-expected format
+    return {
+      data: response.data.items,
+      total: response.data.pagination.total,
+    };
   },
 
   // 获取课程详情

@@ -41,6 +41,47 @@ const createdTestData = {
   reviews: [] as string[],
 };
 
+// Cached tokens to avoid repeated logins (reduces rate limiting)
+const cachedTokens = new Map<string, { token: string; user: any; timestamp: number }>();
+const TOKEN_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Get cached token or login
+ */
+async function getCachedToken(
+  apiContext: APIRequestContext,
+  email: string,
+  password: string,
+  loginFn: (api: APIRequestContext, e: string, p: string) => Promise<{ token: string; user: any }>
+) {
+  const cacheKey = email;
+  const cached = cachedTokens.get(cacheKey);
+
+  // Return cached token if still valid
+  if (cached && Date.now() - cached.timestamp < TOKEN_CACHE_TTL) {
+    console.log('[Integration Test] Using cached token for:', email);
+    return cached;
+  }
+
+  // Login and cache the result
+  console.log('[Integration Test] Logging in:', email);
+  const result = await loginFn(apiContext, email, password);
+  cachedTokens.set(cacheKey, {
+    token: result.token,
+    user: result.user,
+    timestamp: Date.now(),
+  });
+
+  return result;
+}
+
+/**
+ * Clear cached tokens (call between test suites if needed)
+ */
+export function clearTokenCache() {
+  cachedTokens.clear();
+}
+
 /**
  * Create an API context for making direct backend calls
  */
@@ -163,17 +204,17 @@ export async function loginWithEmail(
 }
 
 /**
- * Login as demo user
+ * Login as demo user (with caching to avoid rate limits)
  */
 export async function loginAsDemo(apiContext: APIRequestContext) {
-  return loginWithEmail(apiContext, TEST_ACCOUNTS.demo.email, TEST_ACCOUNTS.demo.password);
+  return getCachedToken(apiContext, TEST_ACCOUNTS.demo.email, TEST_ACCOUNTS.demo.password, loginWithEmail);
 }
 
 /**
- * Login as teacher
+ * Login as teacher (with caching to avoid rate limits)
  */
 export async function loginAsTeacher(apiContext: APIRequestContext) {
-  return loginWithEmail(apiContext, TEST_ACCOUNTS.teacher.email, TEST_ACCOUNTS.teacher.password);
+  return getCachedToken(apiContext, TEST_ACCOUNTS.teacher.email, TEST_ACCOUNTS.teacher.password, loginWithEmail);
 }
 
 /**

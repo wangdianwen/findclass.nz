@@ -139,13 +139,24 @@ test.describe('INT-003: Course Search and Filter', () => {
     await page.goto('/courses');
     await page.waitForLoadState('networkidle');
 
-    // Verify course cards are rendered
-    const courseCards = page.locator('[data-testid="course-card"], .course-card');
-    await expect(courseCards.first()).toBeVisible({ timeout: 15000 });
+    // Wait for React to render
+    await page.waitForTimeout(2000);
 
-    // Verify at least some courses are displayed
+    // Verify course cards are rendered - use CSS class (always present in staging)
+    const courseCards = page.locator('.course-card');
     const count = await courseCards.count();
-    expect(count).toBeGreaterThan(0);
+
+    // If no cards found, dump page content for debugging
+    if (count === 0) {
+      const pageContent = await page.content();
+      console.log('Page HTML (first 2000 chars):', pageContent.substring(0, 2000));
+      const hasCourseData = await page.evaluate(() => {
+        return window.localStorage.getItem('course_data') || 'no data';
+      });
+      console.log('Has course data:', hasCourseData);
+    }
+
+    expect(count, 'Expected at least one course card to be rendered').toBeGreaterThan(0);
   });
 
   test('should filter courses by search keyword', async ({ page }) => {
