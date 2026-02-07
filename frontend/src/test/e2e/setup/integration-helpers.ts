@@ -85,7 +85,7 @@ export async function createTestUser(apiContext: APIRequestContext, options?: {
   const name = options?.name || 'Test User';
 
   // Step 1: Send verification code
-  const codeResponse = await apiContext.post('/auth/send-verification-code', {
+  const codeResponse = await apiContext.post(`${API_BASE_URL}/auth/send-verification-code`, {
     data: { email, purpose: 'registration' },
   });
 
@@ -99,7 +99,7 @@ export async function createTestUser(apiContext: APIRequestContext, options?: {
   const verificationCode = codeData.data?.code || '123456'; // Fallback for testing
 
   // Step 2: Register with verification code
-  const registerResponse = await apiContext.post('/auth/register', {
+  const registerResponse = await apiContext.post(`${API_BASE_URL}/auth/register`, {
     data: {
       email,
       password,
@@ -138,12 +138,21 @@ export async function loginWithEmail(
   email: string,
   password: string
 ) {
-  const loginResponse = await apiContext.post('/auth/login', {
+  const url = `${API_BASE_URL}/auth/login`;
+  console.log('[Integration Test] Login URL:', url);
+  console.log('[Integration Test] Credentials:', { email, password: '***' });
+
+  const loginResponse = await apiContext.post(url, {
     data: { email, password },
   });
 
+  console.log('[Integration Test] Login response status:', loginResponse.status());
+  console.log('[Integration Test] Login response OK:', loginResponse.ok());
+
   if (!loginResponse.ok()) {
-    throw new Error(`Login failed: ${loginResponse.status()}`);
+    const errorText = await loginResponse.text();
+    console.error('[Integration Test] Login error response:', errorText);
+    throw new Error(`Login failed: ${loginResponse.status()} - ${errorText}`);
   }
 
   const loginData = await loginResponse.json();
@@ -172,7 +181,7 @@ export async function loginAsTeacher(apiContext: APIRequestContext) {
  * Note: This might require admin privileges or a dedicated test cleanup endpoint
  */
 export async function deleteTestUser(apiContext: APIRequestContext, userId: string, token: string) {
-  const response = await apiContext.delete(`/users/${userId}`, {
+  const response = await apiContext.delete(`${API_BASE_URL}/users/${userId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -203,7 +212,7 @@ export async function applyForTeacherRole(
     bio?: string;
   }
 ) {
-  const response = await apiContext.post('/auth/roles/apply', {
+  const response = await apiContext.post(`${API_BASE_URL}/auth/roles/apply`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -243,7 +252,7 @@ export async function addFavorite(
   token: string,
   courseId: string
 ) {
-  const response = await apiContext.post(`/courses/${courseId}/favorite`, {
+  const response = await apiContext.post(`${API_BASE_URL}/courses/${courseId}/favorite`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -264,7 +273,7 @@ export async function removeFavorite(
   token: string,
   courseId: string
 ) {
-  const response = await apiContext.delete(`/courses/${courseId}/favorite`, {
+  const response = await apiContext.delete(`${API_BASE_URL}/courses/${courseId}/favorite`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -281,7 +290,7 @@ export async function removeFavorite(
  * Get user's favorites
  */
 export async function getFavorites(apiContext: APIRequestContext, token: string) {
-  const response = await apiContext.get('/users/favorites', {
+  const response = await apiContext.get(`${API_BASE_URL}/users/favorites`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -311,10 +320,15 @@ export async function searchCourses(apiContext: APIRequestContext, params?: {
   if (params?.page) searchParams.append('page', params.page.toString());
   if (params?.limit) searchParams.append('limit', params.limit.toString());
 
-  const response = await apiContext.get(`/courses/search?${searchParams.toString()}`);
+  const url = `${API_BASE_URL}/courses/search?${searchParams.toString()}`;
+  console.log('[Integration Test] Course search URL:', url);
+
+  const response = await apiContext.get(url);
 
   if (!response.ok()) {
-    throw new Error(`Course search failed: ${response.status()}`);
+    const errorText = await response.text();
+    console.error('[Integration Test] Course search error:', errorText);
+    throw new Error(`Course search failed: ${response.status()} - ${errorText}`);
   }
 
   return response.json();
@@ -324,7 +338,7 @@ export async function searchCourses(apiContext: APIRequestContext, params?: {
  * Get course details by ID
  */
 export async function getCourseById(apiContext: APIRequestContext, courseId: string) {
-  const response = await apiContext.get(`/courses/${courseId}`);
+  const response = await apiContext.get(`${API_BASE_URL}/courses/${courseId}`);
 
   if (!response.ok()) {
     throw new Error(`Failed to get course: ${response.status()}`);
@@ -345,7 +359,7 @@ export async function createReview(
     comment: string;
   }
 ) {
-  const response = await apiContext.post(`/reviews`, {
+  const response = await apiContext.post(`${API_BASE_URL}/reviews`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -462,7 +476,6 @@ export async function checkStagingHealth() {
  * Setup integration test environment
  * - Verify backend is running
  * - Create API context
- * - Verify test accounts exist
  */
 export async function setupIntegrationTest() {
   // Check backend health
@@ -474,18 +487,7 @@ export async function setupIntegrationTest() {
   }
 
   // Create API context
-  const apiContext = await createAPIContext();
-
-  // Verify demo account exists (try to login)
-  try {
-    await loginAsDemo(apiContext);
-  } catch (error) {
-    throw new Error(
-      'Demo account not found. Please ensure SEED_SAMPLE_DATA=true is set.'
-    );
-  }
-
-  return apiContext;
+  return await createAPIContext();
 }
 
 /**

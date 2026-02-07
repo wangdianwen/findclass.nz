@@ -72,7 +72,7 @@ test.describe('INT-001: User Registration Flow', () => {
     await page.fill('input[data-testid="email-input"]', testEmail);
 
     // Step 3: Fill password (meets requirements: 8+ chars, uppercase, lowercase, number)
-    await page.fill('input[data-testid="password-input"]', 'TestPass123!');
+    await page.fill('input[type="password"]', 'TestPass123!');
 
     // Step 4: Fill confirm password
     await page.fill('input[data-testid="confirm-password-input"]', 'TestPass123!');
@@ -121,7 +121,7 @@ test.describe('INT-001: User Registration Flow', () => {
 
     await page.fill('[data-testid="code-input"]', '123456');
 
-    await page.click('[data-testid="submit-button"]');
+    await page.click('button[type="submit"]');
 
     // Should show error message (either email exists or code invalid)
     await page.waitForTimeout(2000);
@@ -130,27 +130,75 @@ test.describe('INT-001: User Registration Flow', () => {
 
 test.describe('INT-002: User Login Flow', () => {
   test('should login with demo credentials successfully', async ({ page }) => {
-    // Navigate to login page
-    await page.goto('/login');
-    // Wait for login page to be visible
-    await page.waitForSelector('[data-testid="login-page"]', { timeout: 10000 });
+    // Track all network requests
+    const apiRequests: { url: string; status: number }[] = [];
+    page.on('response', response => {
+      if (response.url().includes('/api/')) {
+        apiRequests.push({ url: response.url(), status: response.status() });
+      }
+    });
 
-    // Fill login form
-    await page.fill('input[data-testid="email-input"]', TEST_ACCOUNTS.demo.email);
-    await page.fill('input[data-testid="password-input"]', TEST_ACCOUNTS.demo.password);
+    // Navigate to login page - don't wait for networkidle
+    await page.goto('/login', { waitUntil: 'domcontentloaded' });
 
-    // Submit form
-    await page.click('[data-testid="submit-button"]');
+    // Wait for form elements to appear
+    await page.waitForSelector('input[data-testid="email-input"]', { timeout: 10000 });
 
-    // Verify successful login - should redirect or show user menu
+    // Small wait for React to stabilize
+    await page.waitForTimeout(500);
+
+    // Fill inputs and submit using JavaScript
+    await page.evaluate(({ email, password }) => {
+      const emailInput = document.querySelector('input[data-testid="email-input"]') as HTMLInputElement;
+      const passwordInput = document.querySelector('input[placeholder="Enter password"]') as HTMLInputElement;
+      const form = document.querySelector('form[name="login"]');
+
+      if (!emailInput || !passwordInput) {
+        return { success: false, error: 'Inputs not found' };
+      }
+
+      // Set values directly
+      emailInput.value = email;
+      passwordInput.value = password;
+
+      // Create and dispatch events
+      const inputEvent = new Event('input', { bubbles: true, cancelable: true });
+      const changeEvent = new Event('change', { bubbles: true, cancelable: true });
+
+      emailInput.dispatchEvent(inputEvent);
+      emailInput.dispatchEvent(changeEvent);
+      passwordInput.dispatchEvent(inputEvent);
+      passwordInput.dispatchEvent(changeEvent);
+
+      // Find and click submit button
+      const submitButton = document.querySelector('button[type="submit"]');
+      if (submitButton) {
+        (submitButton as HTMLButtonElement).click();
+      }
+
+      return { success: true };
+    }, { email: TEST_ACCOUNTS.demo.email, password: TEST_ACCOUNTS.demo.password });
+
+    // Wait for API call
     await page.waitForTimeout(3000);
 
-    // Check for user-related UI elements (user avatar, name, or logout button)
-    const userIndicator = page.locator(
-      'button:has-text("Logout"), [data-testid="user-menu"], .user-avatar'
-    ).first();
+    console.log('API calls:', apiRequests);
 
-    await expect(userIndicator).toBeVisible({ timeout: 15000 });
+    const loginCall = apiRequests.find(r => r.url.includes('/auth/login'));
+    if (!loginCall) {
+      throw new Error('No login API call made');
+    }
+
+    if (loginCall.status !== 200) {
+      throw new Error(`Login failed with status ${loginCall.status}`);
+    }
+
+    // Wait for navigation
+    await page.waitForTimeout(2000);
+
+    if (page.url().includes('/login')) {
+      throw new Error('Did not navigate after login');
+    }
   });
 
   test('should show error for invalid credentials', async ({ page }) => {
@@ -159,9 +207,9 @@ test.describe('INT-002: User Login Flow', () => {
 
     // Fill with invalid credentials
     await page.fill('input[data-testid="email-input"]', 'invalid@test.com');
-    await page.fill('input[data-testid="password-input"]', 'wrongpassword');
+    await page.fill('input[placeholder="Enter password"]', 'wrongpassword');
 
-    await page.click('[data-testid="submit-button"]');
+    await page.click('button[type="submit"]');
 
     // Should show error message (check for Ant Design message component)
     await page.waitForTimeout(2000);

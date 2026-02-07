@@ -9,20 +9,19 @@ WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm install --legacy-peer-deps
 
-# Copy source code (use dot to preserve directory structure)
+# Copy source code and environment files
 WORKDIR /app
 COPY frontend/ ./
 COPY tsconfig.base.json ../
 COPY frontend/index.html ./index.html
 
-# Build with API base URL if provided
-ARG API_BASE_URL=
-ENV VITE_API_BASE_URL=${API_BASE_URL}
+# Copy staging environment file for build
+COPY frontend/.env.staging ./.env.staging
 
-# Build production assets
+# Build production assets with staging mode
 # Temporarily remove stories and test files to avoid TS errors
 RUN rm -rf stories src/test
-RUN npm run build
+RUN npm run build -- --mode staging
 
 # ============================================
 # Production Nginx Stage

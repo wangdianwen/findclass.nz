@@ -1,20 +1,23 @@
-import { defineConfig, Plugin } from 'vite';
+import { defineConfig, Plugin, UserConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
 function removeTestIdPlugin(): Plugin {
+  let mode: string = 'production';
+
   return {
     name: 'remove-test-id',
     enforce: 'pre' as const,
+    config(config: UserConfig) {
+      // @ts-ignore - store mode from config
+      mode = config.mode || process.env.NODE_ENV || 'production';
+    },
     transform(code, id) {
       if (!/\.(tsx?|jsx?)$/.test(id)) return null;
       if (id.includes('node_modules')) return null;
 
-      // Keep data-testid in development and test modes
-      const isDevOrTest =
-        process.env.NODE_ENV === 'development' ||
-        process.env.NODE_ENV === 'test' ||
-        process.env.NODE_ENV === 'storybook';
+      // Keep data-testid in development, test, staging, and storybook modes
+      const isDevOrTest = ['development', 'test', 'staging', 'storybook'].includes(mode);
       if (isDevOrTest) return null;
 
       const testIdRegex = /\s+data-testid\s*=\s*["'][^"']+["']/g;
