@@ -6,13 +6,14 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Copy dependency definitions first for better caching
-COPY package*.json ./
+COPY backend/package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
-# Copy source code
-COPY . .
+# Copy source code and config files
+COPY backend/ ./
+COPY tsconfig.base.json ../
 
 # Build TypeScript
 RUN npm run build
@@ -37,7 +38,7 @@ COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/package.json ./package.json
 
 # Copy environment config files
-COPY --from=builder --chown=nodejs:nodejs /app/src/config/env ./src/config/env
+COPY --from=builder --chown=nodejs:nodejs /app/src/config/env ./dist/config/env
 
 # Create logs directory with proper permissions
 RUN mkdir -p logs && chown -R nodejs:nodejs logs

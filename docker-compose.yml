@@ -38,8 +38,8 @@ services:
   # Backend API server (development mode)
   api:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: findclass-api
     ports:
       - '3000:3000'
@@ -60,8 +60,8 @@ services:
   # Frontend static server (Nginx)
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: findclass-frontend
     ports:
       - '80:80'
@@ -73,8 +73,8 @@ services:
   # Staging environment (with seeded data)
   staging-api:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: findclass-staging-api
     ports:
       - '3001:3000'
@@ -106,8 +106,8 @@ services:
   # Staging Frontend
   staging-frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: findclass-staging-frontend
     ports:
       - '3002:80'

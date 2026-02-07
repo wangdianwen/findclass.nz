@@ -53,7 +53,5 @@ tests/
 *.md
 !README.md
 
-# Frontend specific
-frontend/src/
-frontend/public/
-frontend/index.html
+# Frontend specific (stories excluded to avoid TS errors in build)
+frontend/stories/
