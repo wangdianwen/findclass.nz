@@ -7,10 +7,14 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
+
+# Build with API base URL if provided
+ARG API_BASE_URL=
+ENV VITE_API_BASE_URL=${API_BASE_URL}
 
 # Build production assets
 RUN npm run build
@@ -20,7 +24,10 @@ RUN npm run build
 # ============================================
 FROM nginx:alpine AS production
 
-# Copy custom nginx config
+# Install curl/wget for health checks
+RUN apk add --no-cache curl
+
+# Copy custom nginx config (default)
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy built files from builder stage
@@ -31,7 +38,7 @@ EXPOSE 80
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost/health || exit 1
+  CMD curl -f http://localhost/health || exit 1
 
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

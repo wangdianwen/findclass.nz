@@ -22,6 +22,9 @@ RUN npm run build
 # ============================================
 FROM node:18-alpine AS production
 
+# Install curl for health checks
+RUN apk add --no-cache curl
+
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001 -G nodejs
@@ -33,6 +36,9 @@ COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/package.json ./package.json
 
+# Copy environment config files
+COPY --from=builder --chown=nodejs:nodejs /app/src/config/env ./src/config/env
+
 # Create logs directory with proper permissions
 RUN mkdir -p logs && chown -R nodejs:nodejs logs
 
@@ -42,9 +48,9 @@ USER nodejs
 # Expose port
 EXPOSE 3000
 
-# Health check with proper interval
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=5 \
+  CMD curl -f http://localhost:3000/health || exit 1
 
 # Start application
 CMD ["node", "dist/server.js"]
